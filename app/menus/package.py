@@ -36,7 +36,7 @@ def show_package_details(api_key, tokens, package_option_code, is_enterprise, op
     payment_for = package["package_family"]["payment_for"]
     detail = display_html(package["package_option"]["tnc"])
 
-    console.print(Panel(f"[{_c('text_title')}]📦 {family_name}[/]", border_style=_c("border_primary"), padding=(1, 4), expand=True))
+    console.print(Panel(f"[{_c('text_title')}]📦 Paket {family_name}[/]", border_style=_c("border_primary"), padding=(1, 4), expand=True))
 
     info = Table.grid(padding=(0, 2))
     info.add_column(justify="right", style=_c("text_sub"))
