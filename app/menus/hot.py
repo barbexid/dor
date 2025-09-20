@@ -80,7 +80,7 @@ def tampilkan_menu_opsi_hot():
 
 def tampilkan_info_hot2_package(selected_package):
     info_text = Text()
-    info_text.append(f"Harga: Rp{selected_package['price']}\n", style=_c("text_value"))
+    info_text.append(f"Harga: {selected_package['price']}\n", style=_c("text_value"))
     info_text.append("Detail:\n", style=_c("text_body"))
 
     detail_lines = selected_package["detail"].split("\n")
@@ -90,7 +90,7 @@ def tampilkan_info_hot2_package(selected_package):
     panel = Panel(
         info_text,
         border_style=_c("border_info"),
-        title=f"[{_c('text_title')}]📦 Info Paket[/]",
+        title=f"[{_c('text_title')}]✨Info Paket✨[/]",
         padding=(0, 1),
         expand=True
     )
