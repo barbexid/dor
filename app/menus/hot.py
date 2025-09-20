@@ -104,7 +104,7 @@ def tampilkan_menu_metode_pembelian():
 
     table.add_row("1", "E-Wallet")
     table.add_row("2", "QRIS")
-    table.add_row("00", "Kembali ke menu sebelumnya")
+    table.add_row("00", f"[{_c('text_err')}]Kembali ke menu sebelumnya[/]")
 
     panel = Panel(
         table,
