@@ -298,7 +298,7 @@ def get_families(api_key: str, tokens: dict, package_category_code: str) -> dict
         "package_category_code": package_category_code,
         "with_icon_url": True,
         "is_migration": False,
-        "lang": "en"
+        "lang": "id"
     }
     
     res = send_api_request(api_key, path, payload_dict, tokens["id_token"], "POST")
@@ -328,7 +328,7 @@ def get_package(
         "is_enterprise": False,
         "is_shareable": False,
         "is_migration": False,
-        "lang": "en",
+        "lang": "id",
         "package_option_code": package_option_code,
         "is_upsell_pdp": False,
         "package_variant_code": package_variant_code
@@ -488,7 +488,7 @@ def purchase_package(
         "payment_type": "PURCHASE",
         "is_enterprise": is_enterprise,
         "payment_target": payment_target,
-        "lang": "en",
+        "lang": "id",
         "is_referral": False,
         "token_confirmation": token_confirmation
     }
