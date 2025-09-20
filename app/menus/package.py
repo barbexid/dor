@@ -73,7 +73,7 @@ def show_package_details(api_key, tokens, package_option_code, is_enterprise, op
         addon_text = json.dumps(addons, indent=2)
         console.print(Panel(addon_text, title=f"[{_c('text_title')}]Addons[/]", border_style=_c("border_info"), padding=(0, 1), expand=True))
 
-    console.print(Panel(detail, title=f"[{_c('text_title')}]Syarat & Ketentuan[/]", border_style=_c("border_warning"), padding=(0, 1), expand=True))
+    console.print(Panel(detail, title=f"[{_c('text_title')}]✨Syarat & Ketentuan✨[/]", border_style=_c("border_warning"), padding=(0, 1), expand=True))
 
     while True:
         #clear_screen()
@@ -88,7 +88,7 @@ def show_package_details(api_key, tokens, package_option_code, is_enterprise, op
         if option_order != -1:
             menu.add_row("0", f"[{_c('text_sub')}]Tambah ke Bookmark[/]")
         menu.add_row("00", f"[{_c('text_err')}]Kembali ke daftar paket[/]")
-        console.print(Panel(menu, title=f"[{_c('text_title')}]Aksi Pembelian[/]", border_style=_c("border_primary"), padding=(0, 0), expand=True))
+        console.print(Panel(menu, title=f"[{_c('text_title')}]🛒 Pilih Metode Pembelian[/]", border_style=_c("border_primary"), padding=(0, 0), expand=True))
 
         choice = console.input(f"[{_c('text_sub')}]Pilihan:[/{_c('text_sub')}] ").strip()
         if choice == "00":
