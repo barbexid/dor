@@ -157,7 +157,7 @@ def get_packages_by_family(family_code: str, is_enterprise: bool = False):
     while True:
         clear_screen()
         judul_panel = Panel(
-            Align.center(f"✨Paket Tersedia - {family_name}✨", vertical="middle"),
+            Align.center(f"✨Paket {family_name}✨", vertical="middle"),
             style=_c("text_title"),
             border_style=_c("border_info"),
             padding=(1, 2),
