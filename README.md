@@ -34,7 +34,7 @@ python main.py
 ```
 7. Input your API key when prompted
 #
-8. For updates
+# For updates
 ```
 bash update.sh
 ```
