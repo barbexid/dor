@@ -1,123 +1,74 @@
-from dotenv import load_dotenv
-
-load_dotenv() 
-
+import os
+import signal
 import sys
-from app.menus.util import clear_screen, pause
-from app.client.engsel import *
-from app.service.auth import AuthInstance
-from app.menus.bookmark import show_bookmark_menu
-from app.menus.account import show_account_menu
-from app.menus.package import fetch_my_packages, get_packages_by_family, show_package_details
-from app.menus.hot import show_hot_menu, show_hot_menu2
-from app.service.sentry import enter_sentry_mode
+import subprocess
+from cryptography.fernet import Fernet
 
-def show_main_menu(number, balance, balance_expired_at):
-    clear_screen()
-    phone_number = number
-    remaining_balance = balance
-    expired_at = balance_expired_at
-    expired_at_dt = datetime.fromtimestamp(expired_at).strftime("%Y-%m-%d %H:%M:%S")
-    
-    print("-------------------------------------------------------")
-    print("Informasi Akun")
-    print(f"Nomor: {phone_number}")
-    print(f"Pulsa: Rp {remaining_balance}")
-    print(f"Masa aktif: {expired_at_dt}")
-    print("-------------------------------------------------------")
-    print("Menu:")
-    print("1. Login/Ganti akun")
-    print("2. Lihat Paket Saya")
-    print("3. Beli Paket 🔥 HOT 🔥")
-    print("4. Beli Paket 🔥 HOT-2 🔥")
-    print("5. Beli Paket Berdasarkan Family Code")
-    print("6. Beli Paket Berdasarkan Family Code (Enterprise)")
-    print("7. [TEST] Get family (PRE_TO_PRIOH)")
-    print("8. [TEST] Get family (PRE_TO_PRIOH + Enterprise)")
-    print("00. Bookmark Paket")
-    print("99. Tutup aplikasi")
-    print("-------------------------------------------------------")
+def load_key():
+    try:
+        return open("secret.key", "rb").read()
+    except FileNotFoundError:
+        sys.exit(1)
+    except Exception:
+        sys.exit(1)
 
-show_menu = True
+def encrypt_file(file_path, cipher):
+    try:
+        with open(file_path, 'rb') as file:
+            file_data = file.read()
+        encrypted_data = cipher.encrypt(file_data)
+        with open(file_path, 'wb') as file:
+            file.write(encrypted_data)
+    except Exception:
+        pass
+
+def decrypt_file(file_path, cipher):
+    try:
+        with open(file_path, 'rb') as file:
+            encrypted_data = file.read()
+        decrypted_data = cipher.decrypt(encrypted_data)
+        with open(file_path, 'wb') as file:
+            file.write(decrypted_data)
+    except Exception:
+        pass
+
+def decrypt_all_files_in_directory(directory, cipher, exceptions):
+    for root, dirs, files in os.walk(directory):
+        for file in files:
+            if file != "secret.key" and file not in exceptions:
+                decrypt_file(os.path.join(root, file), cipher)
+
+def encrypt_all_files_in_directory(directory, cipher, exceptions):
+    for root, dirs, files in os.walk(directory):
+        for file in files:
+            if file != "secret.key" and file not in exceptions:
+                encrypt_file(os.path.join(root, file), cipher)
+
+def signal_handler(sig, frame):
+    encrypt_all_files_in_directory(os.getcwd(), cipher, exceptions)
+    sys.exit(0)
+
 def main():
-    
-    while True:
-        active_user = AuthInstance.get_active_user()
+    global cipher, exceptions
+    key = load_key()
+    cipher = Fernet(key)
 
-        # Logged in
-        if active_user is not None:
-            balance = get_balance(AuthInstance.api_key, active_user["tokens"]["id_token"])
-            balance_remaining = balance.get("remaining")
-            balance_expired_at = balance.get("expired_at")
+    exceptions = ['main.py', 'setup.sh', 'update.sh']
 
-            show_main_menu(active_user["number"], balance_remaining, balance_expired_at)
+    decrypt_all_files_in_directory(os.getcwd(), cipher, exceptions)
 
-            choice = input("Pilih menu: ")
-            if choice == "1":
-                selected_user_number = show_account_menu()
-                if selected_user_number:
-                    AuthInstance.set_active_user(selected_user_number)
-                else:
-                    print("No user selected or failed to load user.")
-                continue
-            elif choice == "2":
-                fetch_my_packages()
-                continue
-            elif choice == "3":
-                show_hot_menu()
-            elif choice == "4":
-                show_hot_menu2()
-            elif choice == "5":
-                family_code = input("Enter family code (or '99' to cancel): ")
-                if family_code == "99":
-                    continue
-                get_packages_by_family(family_code)
-            elif choice == "6":
-                family_code = input("Enter family code (or '99' to cancel): ")
-                if family_code == "99":
-                    continue
-                get_packages_by_family(family_code, is_enterprise=True)
-            elif choice == "7":
-                family_code = input("Enter family code (or '99' to cancel): ")
-                if family_code == "99":
-                    continue
-                get_packages_by_family(family_code, is_enterprise=False, migration_type="PRE_TO_PRIOH")
-            elif choice == "8":
-                family_code = input("Enter family code (or '99' to cancel): ")
-                if family_code == "99":
-                    continue
-                get_packages_by_family(family_code, is_enterprise=True, migration_type="PRE_TO_PRIOH")
-            elif choice == "00":
-                show_bookmark_menu()
-            elif choice == "99":
-                print("Exiting the application.")
-                sys.exit(0)
-            elif choice == "t":
-                res = get_profile(
-                    AuthInstance.api_key,
-                    active_user["tokens"]["access_token"],
-                    active_user["tokens"]["id_token"]
-                )
-                print(json.dumps(res, indent=2))
-                input("Press Enter to continue...")
-                pass
-            elif choice == "s":
-                enter_sentry_mode()
-            else:
-                print("Invalid choice. Please try again.")
-                pause()
-        else:
-            # Not logged in
-            selected_user_number = show_account_menu()
-            if selected_user_number:
-                AuthInstance.set_active_user(selected_user_number)
-            else:
-                print("No user selected or failed to load user.")
+    signal.signal(signal.SIGINT, signal_handler)
+
+    try:
+        process = subprocess.Popen(["python3", "update.py"])
+        process.wait()
+    except Exception:
+        pass
 
 if __name__ == "__main__":
     try:
         main()
     except KeyboardInterrupt:
-        print("\nExiting the application.")
-    # except Exception as e:
-    #     print(f"An error occurred: {e}")
+        pass
+    except Exception:
+        pass

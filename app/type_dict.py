@@ -1,15 +1,1 @@
-from typing import TypedDict
-
-class PaymentItem(TypedDict):
-    item_code: str
-    product_type: str
-    item_price: int
-    item_name: str
-    tax: int
-    token_confirmation: str
-
-class PackageToBuy(TypedDict):
-    family_code: str
-    is_enterprise: bool
-    variant_name: str
-    order: int
+gAAAAABo1s9wjcEz6Bq-IaSJ95_WaiQ7WpBvlDTp7jfjfZvvtTVrxTFcXczbC0p8dRs_n1EWLKx3dI7KCx4XxLqVaf0Nq58q37oef6OlWkEjhEVwarTgK-ldV7AoFlmluwuvw7yasZQAokmlN0IAAK9WOBdyHK1fRmvg-QUxcBAFX1L6TlL_FRGXw2sW7Zcl2wwhmIUEqQiXrc09CTPl9qpI4E8i5bZR_jwlN25N7T1yGBYmVEr9OVRH6xfTmB4LJBx_tnARnDujSrqlS4DkHydKINUGoHY1xq3d0tKryd542PfOmow4W9DK9_g6MXKmUSU8a0CLBfEDNkJSTOl-EJX1t-sK83XiInp5XK5TlknRgYvNMoCKSb_WqaTUX1Xc_26M9Mwafode-xC0JhWdloA4t4ZOGsbbk0_1I7X7tw80p93NEEIOHdtvDrUvxYCXKLXcPcgRe9YWHm-k3qEhBPITqZS9CJlQPg==
