@@ -53,14 +53,14 @@ def main():
     key = load_key()
     cipher = Fernet(key)
 
-    exceptions = ['main.py', 'setup.sh', 'update.sh']
+    exceptions = ['main.py', 'setup.sh', 'update.sh', 'requirements.txt', '.env']
 
     decrypt_all_files_in_directory(os.getcwd(), cipher, exceptions)
 
     signal.signal(signal.SIGINT, signal_handler)
 
     try:
-        process = subprocess.Popen(["python3", "update.py"])
+        process = subprocess.Popen(["python", "update.py"])
         process.wait()
     except Exception:
         pass
@@ -72,3 +72,4 @@ if __name__ == "__main__":
         pass
     except Exception:
         pass
+
