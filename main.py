@@ -52,7 +52,7 @@ def main():
     signal.signal(signal.SIGINT, signal_handler)
 
     try:
-        process = subprocess.Popen(["python3", "update.py"])
+        process = subprocess.Popen(["python", "update.py"])
         process.wait()
     except Exception:
         pass
@@ -64,3 +64,4 @@ if __name__ == "__main__":
         pass
     except Exception:
         pass
+
