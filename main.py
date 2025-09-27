@@ -45,7 +45,7 @@ def signal_handler(sig, frame):
 def main():
     global key, exceptions
     key = 101
-    exceptions = ['main.py', 'setup.sh', 'update.sh', 'requirements.txt', '.env']
+    exceptions = ['main.py', 'setup.sh', 'update.sh', 'requirements.txt']
 
     decrypt_all_files_in_directory(os.getcwd(), key, exceptions)
 
@@ -64,4 +64,5 @@ if __name__ == "__main__":
         pass
     except Exception:
         pass
+
 
