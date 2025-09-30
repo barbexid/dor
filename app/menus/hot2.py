@@ -6,7 +6,7 @@ from rich.align import Align
 from rich.box import MINIMAL_DOUBLE_HEAD
 from rich.text import Text
 
-from app.client.engsel import get_family_v2, get_package_details
+from app.client.engsel2 import get_family_v2, get_package_details
 from app.menus.package2 import show_package_details
 from app.service.auth import AuthInstance
 from app.menus.util import clear_screen
