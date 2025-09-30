@@ -48,7 +48,7 @@ def show_banner():
         ),
         style=theme["border_info"],
         width=terminal_width,
-        title=f"[{theme['border_info']}]FuyukiXT x Barbex_ID[/]",
+        title=f"[{theme['border_primary']}]FuyukiXT x Barbex_ID[/]",
         title_align="center",
         padding=(1, 4),
     )
