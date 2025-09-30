@@ -18,7 +18,7 @@ def pause():
 
 def print_panel(title, content):
     theme = get_theme()
-    console.print(Panel(content, title=title, title_align="left", style=theme["border_primary"]))
+    console.print(Panel(content, title=title, title_align="left", style=theme["border_info"]))
 
 def print_menu(title, options):
     theme = get_theme()
