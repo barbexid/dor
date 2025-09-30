@@ -162,7 +162,7 @@ def show_theme_menu():
             selected_preset = presets[selected_theme]
 
             preview_table = Table.grid(padding=(0, 2))
-            preview_table.add_column(justify="right", style=selected_preset["text_key"])
+            preview_table.add_column(justify="right", style=selected_preset["text_sub"])
             preview_table.add_column(justify="left", style=selected_preset["text_body"])
             preview_table.add_row("Judul", f"[{selected_preset['text_title']}]Contoh Judul[/]")
             preview_table.add_row("Sub", f"[{selected_preset['text_sub']}]Contoh Subjudul[/]")
