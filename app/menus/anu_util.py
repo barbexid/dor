@@ -13,7 +13,7 @@ def clear_screen():
 
 def pause():
     theme = get_theme()
-    console.print(f"\n[bold {theme['text_sub']}]Tekan Enter untuk melanjutkan...[/]")
+    console.print(f"\n[bold {theme['border_info']}]Tekan Enter untuk melanjutkan...[/]")
     input()
 
 def print_panel(title, content):
