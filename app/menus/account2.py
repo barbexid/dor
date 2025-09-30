@@ -105,7 +105,7 @@ def show_account_menu():
 
         console.print(Panel(
             Align.center("📱 Akun Tersimpan", vertical="middle"),
-            border_style=theme["border_success"],
+            border_style=theme["border_warning"],
             padding=(1, 2),
             expand=True
         ))
