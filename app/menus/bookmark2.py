@@ -26,7 +26,7 @@ def show_bookmark_menu():
         # Panel judul
         console.print(Panel(
             Align.center("🔖 Bookmark Paket", vertical="middle"),
-            border_style=theme["border_success"],
+            border_style=theme["border_warning"],
             padding=(1, 2),
             expand=True
         ))
