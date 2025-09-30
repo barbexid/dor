@@ -128,7 +128,7 @@ def show_account_menu():
             account_table,
             #title=f"[{theme['text_title']}]📱 Akun Tersimpan[/]",
             border_style=theme["border_info"],
-            padding=(1, 2),
+            padding=(0, 1),
             expand=True
         ))
 
