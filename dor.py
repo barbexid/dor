@@ -76,7 +76,7 @@ def show_main_menu(number, balance, display_quota, balance_expired_at):
         info_table,
         title=f"[{theme['text_title']}]✨ Informasi Akun ✨[/]",
         title_align="center",
-        style=theme["border_primary"],
+        style=theme["border_info"],
         padding=(0, 2),
         expand=True,
     )
@@ -100,7 +100,7 @@ def show_main_menu(number, balance, display_quota, balance_expired_at):
         menu_table,
         title=f"[{theme['text_title']}]✨ Menu Utama ✨[/]",
         title_align="center",
-        style=theme["border_info"],
+        style=theme["border_primary"],
         padding=(0, 1),
         expand=True,
     )
