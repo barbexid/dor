@@ -276,7 +276,7 @@ def main():
             elif choice == "69":
                 show_theme_menu()
             elif choice == "99":
-                print_panel("👋 Sampai Jumpa", f"[gold]Aplikasi ditutup[/gold]")
+                print_panel("👋 Sampai Jumpa", "Aplikasi ditutup")
                 sys.exit(0)
             elif choice == "t":
                 res = get_package(AuthInstance.api_key, active_user["tokens"], "")
@@ -300,4 +300,4 @@ if __name__ == "__main__":
     try:
         main()
     except KeyboardInterrupt:
-        print_panel("👋 Keluar", f"[gold]Aplikasi dihentikan oleh pengguna.[/gold]")
+        print_panel("👋 Keluar", f"[grey]Aplikasi dihentikan oleh pengguna.[/grey]")
