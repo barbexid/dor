@@ -473,20 +473,18 @@ def fetch_my_packages():
 
 
     # Input pilihan
-    choice = console.input(f"[{theme['text_sub']}]Pilih nomor paket untuk pembelian ulang:[/{theme['text_sub']}] ").strip()
-    if choice == "00":
-        return None
+    while True:
+        choice = console.input(f"[{theme['text_sub']}]Pilih nomor paket untuk pembelian ulang:[/{theme['text_sub']}] ").strip()
+        if choice == "00":
+            return None
 
-    selected_pkg = next((pkg for pkg in my_packages if str(pkg["number"]) == choice), None)
-    if not selected_pkg:
-        print_panel("⚠️ Error", "Paket tidak ditemukan. Silakan masukkan nomor yang benar.")
-        #pause()
-        return None
+        selected_pkg = next((pkg for pkg in my_packages if str(pkg["number"]) == choice), None)
+        if not selected_pkg:
+            print_panel("⚠️ Error", "Paket tidak ditemukan. Silakan masukkan nomor yang benar.")
+            pause()
+            continue  # Ulangi input jika tidak valid
 
-    is_done = show_package_details(api_key, tokens, selected_pkg["quota_code"], False)
-    if is_done:
-        return None
-
-    #pause()
-    continue
+        is_done = show_package_details(api_key, tokens, selected_pkg["quota_code"], False)
+        if is_done:
+            return None
 
