@@ -105,7 +105,7 @@ def show_account_menu():
 
         console.print(Panel(
             Align.center("📱 Akun Tersimpan", vertical="middle"),
-            border_style=theme["border_info"],
+            border_style=theme["borde_primary"],
             padding=(1, 2),
             expand=True
         ))
@@ -127,7 +127,7 @@ def show_account_menu():
         console.print(Panel(
             account_table,
             #title=f"[{theme['text_title']}]📱 Akun Tersimpan[/]",
-            border_style=theme["border_primary"],
+            border_style=theme["border_info"],
             padding=(0, 1),
             expand=True
         ))
