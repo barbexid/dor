@@ -172,7 +172,7 @@ def show_package_details(api_key, tokens, package_option_code, is_enterprise, op
     console.print(Panel(
         option_table,
         title=f"[{theme['text_title']}]🛒 Opsi Pembelian[/]",
-        border_style=theme["border_primary"],
+        border_style=theme["border_info"],
         padding=(0, 0),
         expand=True
     ))
@@ -301,14 +301,29 @@ def get_packages_by_family(
         ))
 
         # Panel terpisah untuk navigasi
-        back_panel = Panel(
-            Align.center(f"[{theme['text_body']}]00[/]. [{theme['text_err']}]Kembali ke menu awal", vertical="middle"),
+        #back_panel = Panel(
+            #Align.center(f"[{theme['text_body']}]00[/]. [{theme['text_err']}]Kembali ke menu awal", vertical="middle"),
             #title=f"[{theme['text_title']}]🔙 Navigasi[/]",
+            #border_style=theme["border_info"],
+            #padding=(1, 2),
+            #expand=True
+        #)
+        #console.print(back_panel)
+
+        # Panel navigasi
+        nav_table = Table(show_header=False, box=MINIMAL_DOUBLE_HEAD, expand=True)
+        nav_table.add_column(justify="right", style=theme["text_key"], width=6)
+        nav_table.add_column(style=theme["text_body"])
+        nav_table.add_row("00", f"[{theme['text_err']}]Kembali ke menu utama")
+
+        console.print(Panel(
+            nav_table,
+            #title=f"[{theme['text_title']}]⚙️ Menu Aksi[/]",
             border_style=theme["border_info"],
-            padding=(1, 2),
+            padding=(0, 1),
             expand=True
-        )
-        console.print(back_panel)
+        ))
+
 
         # Input pilihan
         pkg_choice = console.input(f"[{theme['text_sub']}]Pilih paket (nomor):[/{theme['text_sub']}] ").strip()
@@ -437,7 +452,7 @@ def fetch_my_packages():
     nav_table = Table(show_header=False, box=MINIMAL_DOUBLE_HEAD, expand=True)
     nav_table.add_column(justify="right", style=theme["text_key"], width=6)
     nav_table.add_column(style=theme["text_body"])
-    nav_table.add_row("00", f"[{theme['text_sub']}]Kembali ke menu utama")
+    nav_table.add_row("00", f"[{theme['text_err']}]Kembali ke menu utama")
 
     console.print(Panel(
         nav_table,
