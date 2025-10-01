@@ -18,8 +18,7 @@ def show_bookmark_menu():
     theme = get_theme()
     console = Console()
 
-    in_bookmark_menu = True
-    while in_bookmark_menu:
+    while True:
         clear_screen()
         bookmarks = BookmarkInstance.get_bookmarks()
 
@@ -33,7 +32,7 @@ def show_bookmark_menu():
         if not bookmarks:
             print_panel("ℹ️ Info", "Tidak ada bookmark tersimpan.")
             pause()
-            return None
+            return
 
         table = Table(box=MINIMAL_DOUBLE_HEAD, expand=True)
         table.add_column("No", justify="right", style=theme["text_key"], width=4)
@@ -57,8 +56,7 @@ def show_bookmark_menu():
         choice = console.input(f"[{theme['text_sub']}]Masukkan pilihan:[/{theme['text_sub']}] ").strip().upper()
 
         if choice == "00":
-            in_bookmark_menu = False
-            return None
+            return
 
         elif choice == "H":
             del_choice = console.input("Masukkan nomor bookmark yang ingin dihapus: ").strip()
@@ -96,7 +94,22 @@ def show_bookmark_menu():
                             break
 
             if option_code:
-                show_package_details(api_key, tokens, option_code, is_enterprise, option_order=selected_bm["order"])
+                result = show_package_details(
+                    api_key,
+                    tokens,
+                    option_code,
+                    is_enterprise,
+                    option_order=selected_bm["order"]
+                )
+                if result == "MAIN":
+                    return
+                elif result == "BACK":
+                    continue
+                elif result is True:
+                    return
+            else:
+                print_panel("❌ Error", "Paket tidak ditemukan.")
+                pause()
         else:
             print_panel("❌ Error", "Input tidak valid. Silakan coba lagi.")
             pause()
