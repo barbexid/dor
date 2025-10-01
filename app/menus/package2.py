@@ -167,7 +167,8 @@ def show_package_details(api_key, tokens, package_option_code, is_enterprise, op
         option_table.add_row("4", "Ambil sebagai bonus")
     if option_order != -1:
         option_table.add_row("0", "Tambah ke Bookmark")
-    option_table.add_row("00", f"[{theme['text_err']}]Kembali ke menu sebelumnya[/]")
+    option_table.add_row("00", f"[{theme['text_sub']}]Kembali ke menu sebelumnya[/]")
+    option_table.add_row("99", f"[{theme['text_err']}]Kembali ke menu utama[/]")
 
     console.print(Panel(
         option_table,
@@ -183,6 +184,8 @@ def show_package_details(api_key, tokens, package_option_code, is_enterprise, op
         choice = console.input(f"[{theme['text_sub']}]Pilihan:[/{theme['text_sub']}] ").strip()
         if choice == "00":
             return False
+        if choice == "99":
+            return "MAIN"
         elif choice == "0" and option_order != -1:
             success = BookmarkInstance.add_bookmark(
                 family_code=package["package_family"]["package_family_code"],
@@ -473,12 +476,20 @@ def fetch_my_packages():
             selected_pkg = next((pkg for pkg in my_packages if str(pkg["number"]) == choice), None)
             if not selected_pkg:
                 print_panel("⚠️ Error", "Paket tidak ditemukan. Silakan masukkan nomor yang benar. Atau 00 untuk kembali.")
-                pause()
+                #pause()
                 continue
 
-            is_done = show_package_details(api_key, tokens, selected_pkg["quota_code"], False)
-            if is_done:
-                return None
-            else:
-                break  # kembali ke awal loop luar untuk refresh tampilan
+            #is_done = show_package_details(api_key, tokens, selected_pkg["quota_code"], False)
+            #if is_done:
+                #return None
+            #else:
+                #break  # kembali ke awal loop luar untuk refresh tampilan
+
+            result = show_package_details(api_key, tokens, selected_pkg["quota_code"], False)
+            if result == "MAIN":
+                return None  # langsung kembali ke menu utama
+            elif result is True:
+                return None  # selesai pembelian
+            # jika result False, maka lanjut loop dan tampilkan ulang
+
 
