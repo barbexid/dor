@@ -61,7 +61,7 @@ def show_package_details(api_key, tokens, package_option_code, is_enterprise, op
     ]
     # Panel judul
     console.print(Panel(
-        Align.center("📦 Informasi Paket", vertical="middle"),
+        Align.center(f"[{theme['text_title']}]📦 Paket {family_name}[/]", vertical="middle"),
         border_style=theme["border_primary"],
         padding=(1, 2),
         expand=True
@@ -77,7 +77,7 @@ def show_package_details(api_key, tokens, package_option_code, is_enterprise, op
 
     console.print(Panel(
         info_text,
-        #title=f"[{theme['text_title']}]✨ 📦 Informasi Paket ✨[/]",
+        title=f"[{theme['text_title']}]✨ Informasi Paket ✨[/]",
         border_style=theme["border_info"],
         padding=(1, 1),
         expand=True
