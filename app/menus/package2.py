@@ -6,13 +6,13 @@ from app.client.engsel2 import get_family, get_family_v2, get_package, get_addon
 from app.service.bookmark import BookmarkInstance
 from app.client.purchase import show_qris_payment, settlement_bounty
 from app.client.ewallet import show_multipayment
-from app.menus.util import display_html
+from app.menus.util import display_html, clear_screen
 from app.client.qris import show_qris_payment_v2
 from app.client.ewallet import show_multipayment_v2
 from app.client.balance import settlement_balance
 from app.type_dict import PaymentItem
 
-from app.menus.anu_util import pause, clear_screen, print_panel, get_rupiah
+from app.menus.anu_util import pause, print_panel, get_rupiah
 from rich.table import Table
 from rich.panel import Panel
 from rich.console import Console
