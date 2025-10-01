@@ -157,8 +157,8 @@ def show_hot_menu2():
     api_key = AuthInstance.api_key
     tokens = AuthInstance.get_active_tokens()
 
-    in_bookmark_menu = True
-    while in_bookmark_menu:
+    in_hot_menu = True
+    while in_hot_menu:
         clear_screen()
 
         console.print(Panel(
@@ -169,15 +169,15 @@ def show_hot_menu2():
         ))
 
         url = "https://me.mashu.lol/pg-hot2.json"
-        response = requests.get(url, timeout=30)
-        if response.status_code != 200:
-            print_panel("⚠️ Error", "Gagal mengambil data hot Package.")
+        try:
+            response = requests.get(url, timeout=30)
+            response.raise_for_status()
+            hot_packages = response.json()
+        except Exception:
+            print_panel("⚠️ Error", "Gagal mengambil data HOT Package.")
             pause()
             return
 
-        hot_packages = response.json()
-
-        # Panel judul terpisah
         console.print(Panel(
             Align.center("✨ Paket HOT v2 ✨", vertical="middle"),
             border_style=theme["border_primary"],
@@ -185,7 +185,6 @@ def show_hot_menu2():
             expand=True
         ))
 
-        # Tabel daftar paket
         table = Table(box=MINIMAL_DOUBLE_HEAD, expand=True)
         table.add_column("No", justify="right", style=theme["text_key"], width=6)
         table.add_column("Nama Paket", style=theme["text_body"])
@@ -195,11 +194,11 @@ def show_hot_menu2():
             formatted_price = get_rupiah(p["price"])
             table.add_row(str(idx + 1), p["name"], formatted_price)
 
-        table.add_row("00", f"[{theme['text_err']}]Kembali ke menu utama[/]", "")
+        table.add_row("00", f"[{theme['text_sub']}]Kembali ke menu sebelumnya[/]", "")
+        table.add_row("99", f"[{theme['text_err']}]Kembali ke menu utama[/]", "")
 
         console.print(Panel(
             table,
-            #title=f"[{theme['text_title']}]📦 Daftar Paket[/]",
             border_style=theme["border_info"],
             padding=(0, 0),
             expand=True
@@ -207,8 +206,11 @@ def show_hot_menu2():
 
         choice = console.input(f"[{theme['text_sub']}]Pilih paket:[/{theme['text_sub']}] ").strip()
         if choice == "00":
-            in_bookmark_menu = False
-            return
+            return  # kembali ke menu sebelumnya
+        if choice == "99":
+            in_hot_menu = False
+            return  # kembali ke menu utama
+
         if choice.isdigit() and 1 <= int(choice) <= len(hot_packages):
             selected_package = hot_packages[int(choice) - 1]
             packages = selected_package.get("packages", [])
@@ -271,7 +273,8 @@ def show_hot_menu2():
                 payment_table.add_column(justify="left", style=theme["text_body"])
                 payment_table.add_row("1", "E-Wallet")
                 payment_table.add_row("2", "QRIS")
-                payment_table.add_row("00", f"[{theme['text_err']}]Kembali ke menu sebelumnya[/]")
+                payment_table.add_row("00", f"[{theme['text_sub']}]Kembali ke daftar paket[/]")
+                payment_table.add_row("99", f"[{theme['text_err']}]Kembali ke menu utama[/]")
 
                 console.print(Panel(
                     payment_table,
@@ -285,15 +288,15 @@ def show_hot_menu2():
                 if input_method == "1":
                     show_multipayment_v2(api_key, tokens, payment_items, "BUY_PACKAGE", True)
                     console.input(f"[{theme['text_sub']}]Tekan enter untuk kembali...[/{theme['text_sub']}] ")
-                    in_payment_menu = False
-                    in_bookmark_menu = False
+                    return  # selesai pembelian
                 elif input_method == "2":
                     show_qris_payment_v2(api_key, tokens, payment_items, "BUY_PACKAGE", True)
                     console.input(f"[{theme['text_sub']}]Tekan enter untuk kembali...[/{theme['text_sub']}] ")
-                    in_payment_menu = False
-                    in_bookmark_menu = False
+                    return  # selesai pembelian
                 elif input_method == "00":
-                    in_payment_menu = False
+                    in_payment_menu = False  # kembali ke daftar paket
+                elif input_method == "99":
+                    return  # kembali ke menu utama
                 else:
                     print_panel("⚠️ Error", "Metode tidak valid. Silahkan coba lagi.")
                     pause()
