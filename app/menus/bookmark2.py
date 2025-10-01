@@ -26,7 +26,7 @@ def show_bookmark_menu():
         # Panel judul
         console.print(Panel(
             Align.center("🔖 Bookmark Paket", vertical="middle"),
-            border_style=theme["border_primary"],
+            border_style=theme["border_info"],
             padding=(1, 2),
             expand=True
         ))
@@ -49,7 +49,7 @@ def show_bookmark_menu():
         console.print(Panel(
             table,
             #title=f"[{theme['text_title']}]📋 Daftar Bookmark[/]",
-            border_style=theme["border_info"],
+            border_style=theme["border_primary"],
             padding=(0, 1),
             expand=True
         ))
