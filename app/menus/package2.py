@@ -487,5 +487,6 @@ def fetch_my_packages():
     if is_done:
         return None
 
-    pause()
+    #pause()
+continue
 
