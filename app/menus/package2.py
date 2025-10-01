@@ -69,14 +69,14 @@ def show_package_details(api_key, tokens, package_option_code, is_enterprise, op
 
     # Panel informasi paket
     info_table = Table.grid(padding=(0, 1))
-    info_table.add_column(justify="right", style=theme["text_body"])
+    info_table.add_column(justify="left", style=theme["text_body"])
     info_table.add_column(justify="left")
 
-    info_table.add_row("Nama", f"[bold]{title}[/]")
-    info_table.add_row("Harga", f"[{theme['text_money']}]{formatted_price}[/]")
-    info_table.add_row("Masa Aktif", f"[{theme['text_body']}]{validity}[/]")
-    info_table.add_row("Point", f"[{theme['text_body']}]{point}[/]")
-    info_table.add_row("Plan Type", f"[{theme['text_body']}]{plan_type}[/]")
+    info_table.add_row("Nama:", f"[bold]{title}[/]")
+    info_table.add_row("Harga:", f"[{theme['text_money']}]{formatted_price}[/]")
+    info_table.add_row("Masa Aktif:", f"[{theme['text_body']}]{validity}[/]")
+    info_table.add_row("Point:", f"[{theme['text_body']}]{point}[/]")
+    info_table.add_row("Plan Type:", f"[{theme['text_body']}]{plan_type}[/]")
 
     info_panel = Panel(
         info_table,
