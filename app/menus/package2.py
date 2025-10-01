@@ -167,8 +167,8 @@ def show_package_details(api_key, tokens, package_option_code, is_enterprise, op
         option_table.add_row("4", "Ambil sebagai bonus")
     if option_order != -1:
         option_table.add_row("0", "Tambah ke Bookmark")
-    option_table.add_row("00", f"[{theme['text_sub']}]Kembali ke menu sebelumnya[/]")
     option_table.add_row("99", f"[{theme['text_err']}]Kembali ke menu utama[/]")
+    option_table.add_row("00", f"[{theme['text_sub']}]Kembali ke menu sebelumnya[/]")
 
     console.print(Panel(
         option_table,
@@ -182,10 +182,10 @@ def show_package_details(api_key, tokens, package_option_code, is_enterprise, op
     in_package_detail_menu = True
     while in_package_detail_menu:
         choice = console.input(f"[{theme['text_sub']}]Pilihan:[/{theme['text_sub']}] ").strip()
-        if choice == "00":
-            return False
         if choice == "99":
             return "MAIN"
+        if choice == "00":
+            return "BACK"
         elif choice == "0" and option_order != -1:
             success = BookmarkInstance.add_bookmark(
                 family_code=package["package_family"]["package_family_code"],
@@ -486,12 +486,14 @@ def fetch_my_packages():
                 #break  # kembali ke awal loop luar untuk refresh tampilan
 
             result = show_package_details(api_key, tokens, selected_pkg["quota_code"], False)
+
             if result == "MAIN":
-                return None  # langsung kembali ke menu utama
+                return None  # keluar ke menu utama
+            elif result == "BACK":
+                continue      # reload ulang menu sebelumnya
             elif result is True:
-                return None  # selesai pembelian
-            elif result is False:
-                continue  # kembali ke awal daftar paket tanpa keluar
+                return None   # selesai pembelian
+
 
 
 
