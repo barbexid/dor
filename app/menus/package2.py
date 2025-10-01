@@ -127,7 +127,7 @@ def show_package_details(api_key, tokens, package_option_code, is_enterprise, op
 
         console.print(Panel(
             benefit_table,
-            title=f"[{theme['text_title']}]🎁 Benefit Paket[/]",
+            title=f"[{theme['text_title']}]Benefit Paket[/]",
             border_style=theme["border_success"],
             padding=(0, 0),
             expand=True
@@ -137,7 +137,7 @@ def show_package_details(api_key, tokens, package_option_code, is_enterprise, op
     # Panel SnK
     console.print(Panel(
         detail,
-        title=f"[{theme['text_title']}]✨ 📜 Syarat & Ketentuan ✨[/]",
+        title=f"[{theme['text_title']}]✨ Syarat & Ketentuan ✨[/]",
         border_style=theme["border_warning"],
         padding=(0, 1),
         expand=True
