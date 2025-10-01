@@ -476,7 +476,7 @@ def fetch_my_packages():
             selected_pkg = next((pkg for pkg in my_packages if str(pkg["number"]) == choice), None)
             if not selected_pkg:
                 print_panel("⚠️ Error", "Paket tidak ditemukan. Silakan masukkan nomor yang benar. Atau 00 untuk kembali.")
-                pause()
+                #pause()
                 continue  # ulangi input, tidak reload
 
             result = show_package_details(api_key, tokens, selected_pkg["quota_code"], False)
