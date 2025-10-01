@@ -82,7 +82,7 @@ def show_package_details(api_key, tokens, package_option_code, is_enterprise, op
         info_table,
         title=f"[{theme['text_title']}]✨ Informasi Paket ✨[/]",
         title_align="center",
-        border_style=theme["border_info"],
+        border_style=theme["border_primary"],
         padding=(0, 1),
         expand=True
     )
@@ -251,7 +251,7 @@ def get_packages_by_family(
         # Panel info family
         info_text = Text()
         info_text.append(f"Nama: {data['package_family']['name']}\n", style="bold")
-        info_text.append(f"Kode: {family_code}\n", style=theme["text_key"])
+        info_text.append(f"Kode: {family_code}\n", style=theme["border_warning"])
         info_text.append(f"Tipe: {data['package_family']['package_family_type']}\n", style=theme["text_body"])
         info_text.append(f"Jumlah Varian: {len(data['package_variants'])}\n", style=theme["text_body"])
 
@@ -259,7 +259,7 @@ def get_packages_by_family(
             info_text,
             title=f"[{theme['text_title']}]📦 Info Paket Family[/]",
             border_style=theme["border_info"],
-            padding=(1, 2),
+            padding=(0, 2),
             expand=True
         ))
 
@@ -414,13 +414,13 @@ def fetch_my_packages():
 
         package_text = Text()
         package_text.append(f"📦 Paket {num}\n", style="bold")
-        package_text.append("Nama: ", style=theme["text_body"])
+        package_text.append("Nama: ", style=theme["border_info"])
         package_text.append(f"{name}\n", style=theme["text_sub"])
-        package_text.append("Quota Code: ", style=theme["text_body"])
+        package_text.append("Quota Code: ", style=theme["border_info"])
         package_text.append(f"{quota_code}\n", style=theme["text_body"])
-        package_text.append("Family Code: ", style=theme["text_body"])
+        package_text.append("Family Code: ", style=theme["border_info"])
         package_text.append(f"{family_code}\n", style=theme["border_warning"])
-        package_text.append("Group Code: ", style=theme["text_body"])
+        package_text.append("Group Code: ", style=theme["border_info"])
         package_text.append(f"{group_code}\n", style=theme["text_body"])
 
         console.print(Panel(
