@@ -59,6 +59,13 @@ def show_package_details(api_key, tokens, package_option_code, is_enterprise, op
             token_confirmation=token_confirmation,
         )
     ]
+    # Panel judul
+    console.print(Panel(
+        Align.center("📦 Informasi Paket", vertical="middle"),
+        border_style=theme["border_primary"],
+        padding=(1, 2),
+        expand=True
+    ))
 
     # Panel info paket
     info_text = Text()
@@ -70,7 +77,7 @@ def show_package_details(api_key, tokens, package_option_code, is_enterprise, op
 
     console.print(Panel(
         info_text,
-        title=f"[{theme['text_title']}]✨ 📦 Informasi Paket ✨[/]",
+        #title=f"[{theme['text_title']}]✨ 📦 Informasi Paket ✨[/]",
         border_style=theme["border_info"],
         padding=(1, 1),
         expand=True
@@ -127,7 +134,7 @@ def show_package_details(api_key, tokens, package_option_code, is_enterprise, op
 
         console.print(Panel(
             benefit_table,
-            title=f"[{theme['text_title']}]Benefit Paket[/]",
+            title=f"[{theme['text_title']}] Benefit Paket [/]",
             border_style=theme["border_success"],
             padding=(0, 0),
             expand=True
