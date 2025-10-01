@@ -72,7 +72,7 @@ def show_package_details(api_key, tokens, package_option_code, is_enterprise, op
     info_table.add_column(justify="left", style=theme["text_body"])
     info_table.add_column(justify="left")
 
-    info_table.add_row("Nama", f": [bold]{title}[/]")
+    info_table.add_row("Nama", f": [{theme['text_body']}]{title}[/]")
     info_table.add_row("Harga", f": [{theme['text_money']}]{formatted_price}[/]")
     info_table.add_row("Masa Aktif", f": [{theme['text_date']}]{validity}[/]")
     info_table.add_row("Point", f": [{theme['text_body']}]{point}[/]")
