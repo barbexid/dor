@@ -167,7 +167,7 @@ def show_package_details(api_key, tokens, package_option_code, is_enterprise, op
         option_table.add_row("4", "Ambil sebagai bonus")
     if option_order != -1:
         option_table.add_row("0", "Tambah ke Bookmark")
-    option_table.add_row("00", f"[{theme['text_err']}]Kembali ke daftar paket[/]")
+    option_table.add_row("00", f"[{theme['text_err']}]Kembali ke menu awal[/]")
 
     console.print(Panel(
         option_table,
@@ -385,7 +385,7 @@ def fetch_my_packages():
         "family_member_id": ""
     }
 
-    while True:  # 🔁 Loop utama agar bisa kembali ke awal
+    while True:  # 🔁 Loop utama agar bisa kembali dari detail paket
         clear_screen()
 
         console.print(Panel(
@@ -473,13 +473,10 @@ def fetch_my_packages():
         if not selected_pkg:
             print_panel("⚠️ Error", "Paket tidak ditemukan. Silakan masukkan nomor yang benar. Atau 00 untuk kembali.")
             pause()
-            continue
+            continue  # Tetap di loop, tidak clear screen
 
         is_done = show_package_details(api_key, tokens, selected_pkg["quota_code"], False)
         if is_done:
             return None
-        else:
-            # Jika belum beli, kembali ke awal dengan clear_screen
-            continue  # 🔁 Kembali ke awal loop
-
+        # Jika belum beli, kembali ke awal (clear screen dilakukan di awal loop)
 
