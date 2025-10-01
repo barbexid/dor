@@ -145,7 +145,7 @@ def show_account_menu():
         console.print(Panel(
             command_table,
             #title=f"[{theme['text_title']}]⚙️ Command[/]",
-            border_style=theme["border_primary"],
+            border_style=theme["border_info"],
             padding=(0, 1),
             expand=True
         ))
