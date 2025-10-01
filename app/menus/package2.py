@@ -72,7 +72,7 @@ def show_package_details(api_key, tokens, package_option_code, is_enterprise, op
     info_table.add_column(justify="right", style=theme["text_key"])
     info_table.add_column(justify="left")
 
-    info_table.add_row("Nama Paket", f"[bold]{title}[/]")
+    info_table.add_row("Nama", f"[bold]{title}[/]")
     info_table.add_row("Harga", f"[{theme['text_money']}]{formatted_price}[/]")
     info_table.add_row("Masa Aktif", f"[{theme['text_body']}]{validity}[/]")
     info_table.add_row("Point", f"[{theme['text_body']}]{point}[/]")
@@ -83,7 +83,7 @@ def show_package_details(api_key, tokens, package_option_code, is_enterprise, op
         title=f"[{theme['text_title']}]✨ Informasi Paket ✨[/]",
         title_align="center",
         border_style=theme["border_info"],
-        padding=(0, 2),
+        padding=(1, 1),
         expand=True
     )
 
@@ -140,7 +140,7 @@ def show_package_details(api_key, tokens, package_option_code, is_enterprise, op
 
         console.print(Panel(
             benefit_table,
-            title=f"[{theme['text_title']}] Benefit Paket [/]",
+            title=f"[{theme['text_title']}]Benefit Paket[/]",
             border_style=theme["border_success"],
             padding=(0, 0),
             expand=True
