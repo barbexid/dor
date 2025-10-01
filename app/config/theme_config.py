@@ -180,7 +180,7 @@ THEMES = {
         "text_body": "#FCE4EC",
         "text_key": "#F48FB1",
         "text_value": "bold #FFF0F5",
-        "text_money": "bold #66BB6A
+        "text_money": "bold #66BB6A",
         "text_date": "bold #FFB74D",
         "text_number": "#E91E63",
         "gradient_start": "#F48FB1",
