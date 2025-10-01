@@ -16,6 +16,7 @@ console = Console()
 
 FAMILY_FILE = os.path.abspath("family_codes.json")
 
+
 def ensure_family_file():
     default_data = {"codes": []}
     if not os.path.exists(FAMILY_FILE):
@@ -35,16 +36,15 @@ def ensure_family_file():
         return default_data
 
 def list_family_codes():
-    data = ensure_family_file()
-    return data["codes"]
+    return ensure_family_file()["codes"]
 
 def add_family_code(code, name):
-    if not code or not name:
+    if not code.strip() or not name.strip():
         return False
     data = ensure_family_file()
     if any(item["code"] == code for item in data["codes"]):
         return False
-    data["codes"].append({"code": code, "name": name})
+    data["codes"].append({"code": code.strip(), "name": name.strip()})
     with open(FAMILY_FILE, "w") as f:
         json.dump(data, f, indent=2)
     return True
@@ -59,11 +59,11 @@ def remove_family_code(index):
     return None
 
 def edit_family_name(index, new_name):
-    if not new_name:
+    if not new_name.strip():
         return False
     data = ensure_family_file()
     if 0 <= index < len(data["codes"]):
-        data["codes"][index]["name"] = new_name
+        data["codes"][index]["name"] = new_name.strip()
         with open(FAMILY_FILE, "w") as f:
             json.dump(data, f, indent=2)
         return True
@@ -74,9 +74,7 @@ def show_family_menu():
         clear_screen()
         semua_kode = list_family_codes()
         theme = get_theme()
-        console = Console()
 
-        # Panel judul
         console.print(Panel(
             Align.center("📋 Kode Yang Terdaftar", vertical="middle"),
             border_style=theme["border_info"],
@@ -84,7 +82,6 @@ def show_family_menu():
             expand=True
         ))
 
-        # Tabel daftar kode
         packages = []
         if semua_kode:
             table = Table(box=MINIMAL_DOUBLE_HEAD, expand=True)
@@ -102,7 +99,6 @@ def show_family_menu():
 
             console.print(Panel(
                 table,
-                #title=f"[{theme['text_title']}]📦 Daftar Family Code[/]",
                 border_style=theme["border_primary"],
                 padding=(0, 0),
                 expand=True
@@ -115,24 +111,22 @@ def show_family_menu():
                 expand=True
             ))
 
-        # Panel navigasi
         nav_table = Table(show_header=False, box=MINIMAL_DOUBLE_HEAD, expand=True)
         nav_table.add_column(justify="right", style=theme["text_key"], width=6)
         nav_table.add_column(style=theme["text_body"])
         nav_table.add_row("T", "Tambah family code")
         nav_table.add_row("H", "Hapus family code")
         nav_table.add_row("E", "Edit nama family code")
-        nav_table.add_row("00", f"[{theme['text_err']}]Kembali ke menu utama")
+        nav_table.add_row("00", f"[{theme['text_sub']}]Kembali ke menu sebelumnya[/]")
+        nav_table.add_row("99", f"[{theme['text_err']}]Kembali ke menu utama[/]")
 
         console.print(Panel(
             nav_table,
-            #title=f"[{theme['text_title']}]⚙️ Menu Aksi[/]",
             border_style=theme["border_info"],
             padding=(0, 1),
             expand=True
         ))
 
-        # Input pilihan
         aksi = console.input(f"[{theme['text_sub']}]Pilih aksi atau nomor kode:[/{theme['text_sub']}] ").strip().lower()
 
         if aksi == "t":
@@ -141,7 +135,7 @@ def show_family_menu():
             if add_family_code(code, name):
                 print_panel("✅ Info", "Berhasil menambahkan family code.")
             else:
-                print_panel("❌ Error", "Sudah ada dengan family yang sama.")
+                print_panel("❌ Error", "Family code sudah ada atau input tidak valid.")
             pause()
 
         elif aksi == "h":
@@ -150,7 +144,7 @@ def show_family_menu():
                 pause()
                 continue
             idx = console.input("Masukkan nomor kode yang ingin dihapus: ").strip()
-            if not idx.isdigit() or int(idx) < 1 or int(idx) > len(semua_kode):
+            if not idx.isdigit() or not (1 <= int(idx) <= len(semua_kode)):
                 print_panel("❌ Error", "Nomor tidak ditemukan.")
             else:
                 index = int(idx) - 1
@@ -173,7 +167,7 @@ def show_family_menu():
                 pause()
                 continue
             idx = console.input("Masukkan nomor kode yang ingin diubah namanya: ").strip()
-            if not idx.isdigit() or int(idx) < 1 or int(idx) > len(semua_kode):
+            if not idx.isdigit() or not (1 <= int(idx) <= len(semua_kode)):
                 print_panel("❌ Error", "Nomor tidak ditemukan.")
             else:
                 new_name = console.input("Masukkan nama baru: ").strip()
@@ -186,12 +180,19 @@ def show_family_menu():
         elif aksi == "00":
             break
 
+        elif aksi == "99":
+            return  # keluar ke menu utama
+
         elif aksi.isdigit():
             nomor = int(aksi)
             selected = next((p for p in packages if p["number"] == nomor), None)
             if selected:
                 try:
-                    get_packages_by_family(selected["code"])
+                    result = get_packages_by_family(selected["code"])
+                    if result == "MAIN":
+                        return
+                    elif result == "BACK":
+                        continue
                 except Exception as e:
                     print_panel("❌ Error", f"Gagal menampilkan paket: {e}")
             else:
