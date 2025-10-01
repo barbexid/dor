@@ -189,7 +189,7 @@ def show_theme_menu():
                 pause()
                 return
         else:
-            print_panel("⚠️ Error", f"[{theme['border_info']}]Pilihan tidak valid.")
+            print_panel("⚠️ Error", "Pilihan tidak valid.")
             pause()
 
 
@@ -255,7 +255,7 @@ def main():
                 if selected_user_number:
                     AuthInstance.set_active_user(selected_user_number)
                 else:
-                    print_panel("⚠️ Gagal", f"[{theme['border_info']}]Tidak ada akun yang dipilih.")
+                    print_panel("⚠️ Gagal", "Tidak ada akun yang dipilih.")
                 continue
             elif choice == "2":
                 fetch_my_packages()
@@ -285,14 +285,14 @@ def main():
             elif choice == "s":
                 enter_sentry_mode()
             else:
-                print_panel("⚠️ Error", f"[{theme['border_info']}]Pilihan tidak valid.")
+                print_panel("⚠️ Error", "Pilihan tidak valid.")
                 pause()
         else:
             selected_user_number = show_account_menu()
             if selected_user_number:
                 AuthInstance.set_active_user(selected_user_number)
             else:
-                print_panel("⚠️ Gagal", f"[{theme['border_info']}]Tidak ada akun yang dipilih.")
+                print_panel("⚠️ Gagal", "Tidak ada akun yang dipilih.")
                 pause()
 
 
@@ -300,4 +300,4 @@ if __name__ == "__main__":
     try:
         main()
     except KeyboardInterrupt:
-        print_panel("👋 Keluar", f"[{theme['border_info']}]Aplikasi dihentikan oleh pengguna.")
+        print_panel("👋 Keluar", "Aplikasi dihentikan oleh pengguna.")
