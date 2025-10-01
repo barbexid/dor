@@ -385,86 +385,86 @@ def fetch_my_packages():
         "family_member_id": ""
     }
 
-    console.print(Panel(
-        "[bold]Mengambil daftar paket aktif Anda...[/]",
-        border_style=theme["border_info"],
-        padding=(0, 1),
-        expand=True
-    ))
-
-    res = send_api_request(api_key, path, payload, id_token, "POST")
-    if res.get("status") != "SUCCESS":
-        print_panel("⚠️ Error", "Gagal mengambil paket.")
-        pause()
-        return None
-
-    quotas = res["data"]["quotas"]
-    if not quotas:
-        print_panel("ℹ️ Info", "Tidak ada paket aktif ditemukan.")
-        pause()
-        return None
-
-    clear_screen()
-
-    console.print(Panel(
-        Align.center("📦 Paket Aktif Saya", vertical="middle"),
-        border_style=theme["border_info"],
-        padding=(1, 2),
-        expand=True
-    ))
-
-    my_packages = []
-    for num, quota in enumerate(quotas, start=1):
-        quota_code = quota["quota_code"]
-        group_code = quota["group_code"]
-        name = quota["name"]
-        family_code = "N/A"
-
-        console.print(f"[dim]Mengambil detail paket no. {num}...[/]")
-        package_details = get_package(api_key, tokens, quota_code)
-        if package_details:
-            family_code = package_details["package_family"]["package_family_code"]
-
-        package_text = Text()
-        package_text.append(f"📦 Paket {num}\n", style="bold")
-        package_text.append("Nama: ", style=theme["border_info"])
-        package_text.append(f"{name}\n", style=theme["text_sub"])
-        package_text.append("Quota Code: ", style=theme["border_info"])
-        package_text.append(f"{quota_code}\n", style=theme["text_body"])
-        package_text.append("Family Code: ", style=theme["border_info"])
-        package_text.append(f"{family_code}\n", style=theme["border_warning"])
-        package_text.append("Group Code: ", style=theme["border_info"])
-        package_text.append(f"{group_code}\n", style=theme["text_body"])
+    while True:  # 🔁 Loop utama agar bisa kembali ke awal
+        clear_screen()
 
         console.print(Panel(
-            package_text,
-            border_style=theme["border_primary"],
+            "[bold]Mengambil daftar paket aktif Anda...[/]",
+            border_style=theme["border_info"],
             padding=(0, 1),
             expand=True
         ))
 
-        my_packages.append({
-            "number": num,
-            "quota_code": quota_code,
-        })
+        res = send_api_request(api_key, path, payload, id_token, "POST")
+        if res.get("status") != "SUCCESS":
+            print_panel("⚠️ Error", "Gagal mengambil paket.")
+            pause()
+            return None
 
-    # Panel navigasi
-    package_range = f"(1–{len(my_packages)})"
-    nav_table = Table(show_header=False, box=MINIMAL_DOUBLE_HEAD, expand=True)
-    nav_table.add_column(justify="right", style=theme["text_key"], width=6)
-    nav_table.add_column(style=theme["text_body"])
-    nav_table.add_row(package_range, f"[{theme['border_info']}]Pilih nomor paket untuk pembelian ulang")
-    nav_table.add_row("00", f"[{theme['text_err']}]Kembali ke menu utama")
+        quotas = res["data"]["quotas"]
+        if not quotas:
+            print_panel("ℹ️ Info", "Tidak ada paket aktif ditemukan.")
+            pause()
+            return None
 
-    console.print(Panel(
-        nav_table,
-        border_style=theme["border_info"],
-        padding=(0, 1),
-        expand=True
-    ))
+        console.print(Panel(
+            Align.center("📦 Paket Aktif Saya", vertical="middle"),
+            border_style=theme["border_info"],
+            padding=(1, 2),
+            expand=True
+        ))
 
-    # Input pilihan
-    while True:
+        my_packages = []
+        for num, quota in enumerate(quotas, start=1):
+            quota_code = quota["quota_code"]
+            group_code = quota["group_code"]
+            name = quota["name"]
+            family_code = "N/A"
+
+            console.print(f"[dim]Mengambil detail paket no. {num}...[/]")
+            package_details = get_package(api_key, tokens, quota_code)
+            if package_details:
+                family_code = package_details["package_family"]["package_family_code"]
+
+            package_text = Text()
+            package_text.append(f"📦 Paket {num}\n", style="bold")
+            package_text.append("Nama: ", style=theme["border_info"])
+            package_text.append(f"{name}\n", style=theme["text_sub"])
+            package_text.append("Quota Code: ", style=theme["border_info"])
+            package_text.append(f"{quota_code}\n", style=theme["text_body"])
+            package_text.append("Family Code: ", style=theme["border_info"])
+            package_text.append(f"{family_code}\n", style=theme["border_warning"])
+            package_text.append("Group Code: ", style=theme["border_info"])
+            package_text.append(f"{group_code}\n", style=theme["text_body"])
+
+            console.print(Panel(
+                package_text,
+                border_style=theme["border_primary"],
+                padding=(0, 1),
+                expand=True
+            ))
+
+            my_packages.append({
+                "number": num,
+                "quota_code": quota_code,
+            })
+
+        # Panel navigasi
+        package_range = f"(1–{len(my_packages)})"
+        nav_table = Table(show_header=False, box=MINIMAL_DOUBLE_HEAD, expand=True)
+        nav_table.add_column(justify="right", style=theme["text_key"], width=10)
+        nav_table.add_column(style=theme["text_body"])
+        nav_table.add_row(package_range, f"[{theme['border_info']}]Pilih nomor paket untuk pembelian ulang")
+        nav_table.add_row("00", f"[{theme['text_err']}]Kembali ke menu utama")
+
+        console.print(Panel(
+            nav_table,
+            border_style=theme["border_info"],
+            padding=(0, 1),
+            expand=True
+        ))
+
+        # Input pilihan
         choice = console.input(f"[{theme['text_sub']}]Masukkan nomor paket atau 00 untuk kembali:[/{theme['text_sub']}] ").strip()
         if choice == "00":
             return None
@@ -479,6 +479,7 @@ def fetch_my_packages():
         if is_done:
             return None
         else:
-            pause()
-            continue
+            # Jika belum beli, kembali ke awal dengan clear_screen
+            continue  # 🔁 Kembali ke awal loop
+
 
