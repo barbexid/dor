@@ -457,7 +457,7 @@ def fetch_my_packages():
         nav_table = Table(show_header=False, box=MINIMAL_DOUBLE_HEAD, expand=True)
         nav_table.add_column(justify="right", style=theme["text_key"], width=10)
         nav_table.add_column(style=theme["text_body"])
-        nav_table.add_row(package_range, f"[{theme['border_info']}]Pilih nomor paket untuk pembelian ulang")
+        nav_table.add_row(package_range, f"[{theme['text_sub']}]Pilih nomor paket untuk pembelian ulang")
         nav_table.add_row("00", f"[{theme['text_err']}]Kembali ke menu utama")
 
         console.print(Panel(
