@@ -64,7 +64,7 @@ def show_main_menu(number, balance, display_quota, balance_expired_at):
     expired_at_dt = datetime.fromtimestamp(balance_expired_at).strftime("%Y-%m-%d %H:%M:%S")
 
     info_table = Table.grid(padding=(0, 2))
-    info_table.add_column(justify="right", style=theme["text_sub"])
+    info_table.add_column(justify="right", style=theme["text_body"])
     info_table.add_column(justify="left", style=theme["text_body"])
 
     info_table.add_row("Nomor", f"[{theme['text_value']}]{number}[/]")
