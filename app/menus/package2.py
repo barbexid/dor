@@ -79,7 +79,7 @@ def show_package_details(api_key, tokens, package_option_code, is_enterprise, op
         info_text,
         title=f"[{theme['text_title']}]✨ Informasi Paket ✨[/]",
         border_style=theme["border_info"],
-        padding=(1, 1),
+        padding=(0, 1),
         expand=True
     ))
 
