@@ -67,21 +67,27 @@ def show_package_details(api_key, tokens, package_option_code, is_enterprise, op
         expand=True
     ))
 
-    # Panel info paket
-    info_text = Text()
-    info_text.append(f"{title}\n", style="bold")
-    info_text.append(f"Harga: {formatted_price}\n", style=theme["text_money"])
-    info_text.append(f"Masa Aktif: {validity}\n", style=theme["text_body"])
-    info_text.append(f"Point: {point}\n", style=theme["text_body"])
-    info_text.append(f"Plan Type: {plan_type}\n", style=theme["text_body"])
+    # Panel informasi paket
+    info_table = Table.grid(padding=(0, 1))
+    info_table.add_column(justify="right", style=theme["text_key"])
+    info_table.add_column(justify="left")
 
-    console.print(Panel(
-        info_text,
+    info_table.add_row("Nama Paket", f"[bold]{title}[/]")
+    info_table.add_row("Harga", f"[{theme['text_money']}]{formatted_price}[/]")
+    info_table.add_row("Masa Aktif", f"[{theme['text_body']}]{validity}[/]")
+    info_table.add_row("Point", f"[{theme['text_body']}]{point}[/]")
+    info_table.add_row("Plan Type", f"[{theme['text_body']}]{plan_type}[/]")
+
+    info_panel = Panel(
+        info_table,
         title=f"[{theme['text_title']}]✨ Informasi Paket ✨[/]",
+        title_align="center",
         border_style=theme["border_info"],
-        padding=(0, 1),
+        padding=(0, 2),
         expand=True
-    ))
+    )
+
+    console.print(info_panel)
 
     # Tabel benefit
     benefits = package["package_option"].get("benefits", [])
