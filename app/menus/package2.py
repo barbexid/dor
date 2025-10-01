@@ -479,20 +479,16 @@ def fetch_my_packages():
                 #pause()
                 continue
 
-            #is_done = show_package_details(api_key, tokens, selected_pkg["quota_code"], False)
-            #if is_done:
-                #return None
-            #else:
-                #break  # kembali ke awal loop luar untuk refresh tampilan
 
             result = show_package_details(api_key, tokens, selected_pkg["quota_code"], False)
 
             if result == "MAIN":
                 return None  # keluar ke menu utama
             elif result == "BACK":
-                continue      # reload ulang menu sebelumnya
+                continue      # reload ulang menu fetch_my_packages
             elif result is True:
                 return None   # selesai pembelian
+
 
 
 
