@@ -385,7 +385,7 @@ def fetch_my_packages():
         "family_member_id": ""
     }
 
-    while True:  # 🔁 Loop utama agar bisa kembali dari detail paket
+    while True:  # 🔁 Loop utama untuk refresh setelah detail
         clear_screen()
 
         console.print(Panel(
@@ -464,19 +464,21 @@ def fetch_my_packages():
             expand=True
         ))
 
-        # Input pilihan
-        choice = console.input(f"[{theme['text_sub']}]Masukkan nomor paket atau 00 untuk kembali:[/{theme['text_sub']}] ").strip()
-        if choice == "00":
-            return None
+        # 🔁 Loop input pilihan tanpa clear_screen
+        while True:
+            choice = console.input(f"[{theme['text_sub']}]Masukkan nomor paket atau 00 untuk kembali:[/{theme['text_sub']}] ").strip()
+            if choice == "00":
+                return None
 
-        selected_pkg = next((pkg for pkg in my_packages if str(pkg["number"]) == choice), None)
-        if not selected_pkg:
-            print_panel("⚠️ Error", "Paket tidak ditemukan. Silakan masukkan nomor yang benar. Atau 00 untuk kembali.")
-            pause()
-            continue  # Tetap di loop, tidak clear screen
+            selected_pkg = next((pkg for pkg in my_packages if str(pkg["number"]) == choice), None)
+            if not selected_pkg:
+                print_panel("⚠️ Error", "Paket tidak ditemukan. Silakan masukkan nomor yang benar. Atau 00 untuk kembali.")
+                pause()
+                continue
 
-        is_done = show_package_details(api_key, tokens, selected_pkg["quota_code"], False)
-        if is_done:
-            return None
-        # Jika belum beli, kembali ke awal (clear screen dilakukan di awal loop)
+            is_done = show_package_details(api_key, tokens, selected_pkg["quota_code"], False)
+            if is_done:
+                return None
+            else:
+                break  # kembali ke awal loop luar untuk refresh tampilan
 
