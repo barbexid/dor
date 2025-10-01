@@ -58,7 +58,7 @@ def show_bookmark_menu():
         nav_table = Table(show_header=False, box=MINIMAL_DOUBLE_HEAD, expand=True)
         nav_table.add_column(justify="right", style=theme["text_key"], width=6)
         nav_table.add_column(style=theme["text_body"])
-        nav_table.add_row("00", "Kembali ke menu utama")
+        nav_table.add_row("00", f"[{theme['text_sub']}]Kembali ke menu utama")
         nav_table.add_row("000", f"[{theme['text_err']}]Hapus Bookmark")
 
         console.print(Panel(
