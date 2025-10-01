@@ -94,9 +94,9 @@ def show_package_details(api_key, tokens, package_option_code, is_enterprise, op
     if benefits:
         benefit_table = Table(box=MINIMAL_DOUBLE_HEAD, expand=True)
         benefit_table.add_column("Nama", style=theme["text_body"])
-        benefit_table.add_column("Jenis", style=theme["border_info"])
-        benefit_table.add_column("Unli", style=theme["text_key"], justify="center")
-        benefit_table.add_column("Total", style=theme["text_date"], justify="right")
+        benefit_table.add_column("Jenis", style=theme["text_body"])
+        benefit_table.add_column("Unli", style=theme["text_body"], justify="center")
+        benefit_table.add_column("Total", style=theme["text_body"], justify="right")
 
         for benefit in benefits:
             dt = benefit["data_type"]
@@ -133,7 +133,7 @@ def show_package_details(api_key, tokens, package_option_code, is_enterprise, op
             benefit_table.add_row(
                 benefit["name"],
                 dt,
-                "✅" if is_unlimited else "-",
+                "YES" if is_unlimited else "-",
                 total_str
             )
 
