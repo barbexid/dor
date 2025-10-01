@@ -31,6 +31,14 @@ def print_info(label, value):
     theme = get_theme()
     console.print(f"[{theme['text_sub']}]{label}:[/{theme['text_sub']}] [{theme['text_body']}]{value}[/{theme['text_body']}]")
 
+def loading_animation(text="Memuat ulang...", delay=0.05, repeat=3):
+    from time import sleep
+    console = Console()
+    for _ in range(repeat):
+        for dots in [".", "..", "..."]:
+            console.print(f"[bold cyan]{text}{dots}[/]", end="\r")
+            sleep(delay)
+    clear_screen()
 
 def get_rupiah(value) -> str:
     # Konversi ke string dan bersihkan
