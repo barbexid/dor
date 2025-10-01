@@ -63,10 +63,10 @@ def show_main_menu(number, balance, display_quota, balance_expired_at):
     theme = get_theme()
     expired_at_dt = datetime.fromtimestamp(balance_expired_at).strftime("%Y-%m-%d %H:%M:%S")
 
+    # Panel informasi akun
     info_table = Table.grid(padding=(0, 1))
     info_table.add_column(justify="right", style=theme["text_body"])
     info_table.add_column(justify="left", style=theme["text_body"])
-
     info_table.add_row("Nomor", f"[{theme['text_value']}]{number}[/]")
     info_table.add_row("Pulsa", f"[bold {theme['text_money']}]{get_rupiah(balance)}[/]")
     info_table.add_row("Kuota", f"[{theme['text_number']}]{display_quota or '-'}[/]")
@@ -76,15 +76,17 @@ def show_main_menu(number, balance, display_quota, balance_expired_at):
         info_table,
         title=f"[{theme['text_title']}]✨ Informasi Akun ✨[/]",
         title_align="center",
-        style=theme["border_info"],
+        border_style=theme["border_info"],
         padding=(0, 2),
         expand=True,
     )
     console.print(info_panel)
 
+    # Tabel menu utama 
     menu_table = Table(show_header=False, box=MINIMAL_DOUBLE_HEAD, expand=True)
-    menu_table.add_column("Kode", justify="right", style=theme["text_key"], width=6)
-    menu_table.add_column("Aksi", style=theme["text_body"])
+    menu_table.add_column("Kode", justify="right", width=6)  # tanpa style
+    menu_table.add_column("Aksi")  # tanpa style
+
     menu_table.add_row("1", "Login/Ganti akun")
     menu_table.add_row("2", "Lihat Paket Saya")
     menu_table.add_row("3", "Beli Paket HOT 🔥")
@@ -100,11 +102,12 @@ def show_main_menu(number, balance, display_quota, balance_expired_at):
         menu_table,
         title=f"[{theme['text_title']}]✨ Menu Utama ✨[/]",
         title_align="center",
-        style=theme["border_primary"],
+        border_style=theme["border_primary"],
         padding=(0, 1),
         expand=True,
     )
     console.print(menu_panel)
+
 
 
 def show_theme_menu():
