@@ -480,7 +480,7 @@ def fetch_my_packages():
 
         selected_pkg = next((pkg for pkg in my_packages if str(pkg["number"]) == choice), None)
         if not selected_pkg:
-            print_panel("⚠️ Error", "Paket tidak ditemukan. Silakan masukkan nomor yang benar.")
+            print_panel("⚠️ Error", "Paket tidak ditemukan. Silakan masukkan nomor yang benar. Atau 00 untuk kembali")
             #pause()
             continue  # Ulangi input jika tidak valid
 
