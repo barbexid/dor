@@ -221,30 +221,26 @@ def get_packages_by_family(
     if not tokens:
         print_panel("⚠️ Error", "Tidak ditemukan token pengguna aktif.")
         pause()
-        return None
+        return "BACK"
 
     packages = []
-
     data = get_family_v2(api_key, tokens, family_code, is_enterprise, migration_type)
     if not data:
         print_panel("⚠️ Error", "Gagal memuat data paket family.")
-        return None
+        pause()
+        return "BACK"
 
-    in_package_menu = True
-    while in_package_menu:
+    while True:
         clear_screen()
 
         # Panel info family
         info_text = Text()
         info_text.append("Nama: ", style=theme["text_body"])
         info_text.append(f"{data['package_family']['name']}\n", style=theme["text_value"])
-
         info_text.append("Kode: ", style=theme["text_body"])
         info_text.append(f"{family_code}\n", style=theme["border_warning"])
-
         info_text.append("Tipe: ", style=theme["text_body"])
         info_text.append(f"{data['package_family']['package_family_type']}\n", style=theme["text_value"])
-
         info_text.append("Jumlah Varian: ", style=theme["text_body"])
         info_text.append(f"{len(data['package_variants'])}\n", style=theme["text_value"])
 
@@ -256,7 +252,6 @@ def get_packages_by_family(
             expand=True
         ))
 
-
         # Tabel daftar paket
         package_table = Table(box=MINIMAL_DOUBLE_HEAD, expand=True)
         package_table.add_column("No", justify="right", style=theme["text_key"], width=4)
@@ -264,6 +259,7 @@ def get_packages_by_family(
         package_table.add_column("Nama Paket", style=theme["text_body"])
         package_table.add_column("Harga", style=theme["text_money"], justify="left")
 
+        packages.clear()
         option_number = 1
         for variant in data["package_variants"]:
             variant_name = variant["name"]
@@ -288,66 +284,56 @@ def get_packages_by_family(
 
         console.print(Panel(
             package_table,
-            #title=f"[{theme['text_title']}]📦 Daftar Paket Tersedia[/]",
             border_style=theme["border_primary"],
             padding=(0, 1),
             expand=True
         ))
 
-        # Panel terpisah untuk navigasi
-        #back_panel = Panel(
-            #Align.center(f"[{theme['text_body']}]00[/]. [{theme['text_err']}]Kembali ke menu awal", vertical="middle"),
-            #title=f"[{theme['text_title']}]🔙 Navigasi[/]",
-            #border_style=theme["border_info"],
-            #padding=(1, 2),
-            #expand=True
-        #)
-        #console.print(back_panel)
-
         # Panel navigasi
         nav_table = Table(show_header=False, box=MINIMAL_DOUBLE_HEAD, expand=True)
         nav_table.add_column(justify="right", style=theme["text_key"], width=6)
         nav_table.add_column(style=theme["text_body"])
-        nav_table.add_row("00", f"[{theme['text_err']}]Kembali ke menu awal")
+        nav_table.add_row("00", f"[{theme['text_sub']}]Kembali ke menu sebelumnya[/]")
+        nav_table.add_row("99", f"[{theme['text_err']}]Kembali ke menu utama[/]")
 
         console.print(Panel(
             nav_table,
-            #title=f"[{theme['text_title']}]⚙️ Menu Aksi[/]",
             border_style=theme["border_info"],
             padding=(0, 1),
             expand=True
         ))
 
-
         # Input pilihan
         pkg_choice = console.input(f"[{theme['text_sub']}]Pilih paket (nomor):[/{theme['text_sub']}] ").strip()
         if pkg_choice == "00":
-            in_package_menu = False
-            return None
-
+            return "BACK"
+        if pkg_choice == "99":
+            return "MAIN"
         if not pkg_choice.isdigit():
             print_panel("⚠️ Error", "Input tidak valid. Masukkan nomor paket.")
-            #pause()
-            #continue
+            pause()
+            continue
 
         selected_pkg = next((p for p in packages if p["number"] == int(pkg_choice)), None)
         if not selected_pkg:
             print_panel("⚠️ Error", "Paket tidak ditemukan. Silakan masukkan nomor yang benar.")
-            #pause()
-            #continue
+            pause()
+            continue
 
-        is_done = show_package_details(
+        result = show_package_details(
             api_key,
             tokens,
             selected_pkg["code"],
             is_enterprise,
             option_order=selected_pkg["option_order"]
         )
-        if is_done:
-            in_package_menu = False
-            return None
 
-    return packages
+        if result == "MAIN":
+            return "MAIN"
+        elif result == "BACK":
+            continue
+        elif result is True:
+            return "BACK"
 
 
 
