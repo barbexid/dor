@@ -1,8 +1,10 @@
 import json
 import os
 
+# Path ke file konfigurasi tema
 CONFIG_PATH = os.path.join(os.path.dirname(__file__), "theme_config.json")
 
+# Kumpulan preset tema CLI
 THEMES = {
     "emerald_glass": {
         "border_primary": "#10B981",
@@ -122,7 +124,107 @@ THEMES = {
         "text_date": "bold #FBBF24",
         "text_number": "#C084FC",
         "gradient_start": "#22D3EE",
-        "gradient_end": "#A78BFA",
+        "gradient_end": "#A78BFA"
+    },
+    "solar_flare": {
+        "border_primary": "#FF6B00",
+        "border_info": "#FFA500",
+        "border_success": "#FFD700",
+        "border_warning": "#FF4500",
+        "border_error": "#B22222",
+        "text_title": "bold #FFF8DC",
+        "text_sub": "bold #FFDAB9",
+        "text_ok": "bold #ADFF2F",
+        "text_warn": "bold #FFA500",
+        "text_err": "bold #FF6347",
+        "text_body": "#FFE4B5",
+        "text_key": "#FFD700",
+        "text_value": "bold #FFFACD",
+        "text_money": "bold #32CD32",
+        "text_date": "bold #FF8C00",
+        "text_number": "#FF6B00",
+        "gradient_start": "#FF8C00",
+        "gradient_end": "#FFD700"
+    },
+    "arctic_frost": {
+        "border_primary": "#5DADE2",
+        "border_info": "#85C1E9",
+        "border_success": "#48C9B0",
+        "border_warning": "#F7DC6F",
+        "border_error": "#E74C3C",
+        "text_title": "bold #EBF5FB",
+        "text_sub": "bold #AED6F1",
+        "text_ok": "bold #A3E4D7",
+        "text_warn": "bold #F9E79F",
+        "text_err": "bold #F1948A",
+        "text_body": "#D6EAF8",
+        "text_key": "#AED6F1",
+        "text_value": "bold #FDFEFE",
+        "text_money": "bold #58D68D",
+        "text_date": "bold #F7DC6F",
+        "text_number": "#5DADE2",
+        "gradient_start": "#85C1E9",
+        "gradient_end": "#D6EAF8"
+    },
+    "sakura_bloom": {
+        "border_primary": "#E91E63",
+        "border_info": "#F48FB1",
+        "border_success": "#81C784",
+        "border_warning": "#FFB74D",
+        "border_error": "#F44336",
+        "text_title": "bold #FCE4EC",
+        "text_sub": "bold #F8BBD0",
+        "text_ok": "bold #A5D6A7",
+        "text_warn": "bold #FFCC80",
+        "text_err": "bold #EF9A9A",
+        "text_body": "#FCE4EC",
+        "text_key": "#F48FB1",
+        "text_value": "bold #FFF0F5",
+        "text_money": "bold #66BB6A
+        "text_date": "bold #FFB74D",
+        "text_number": "#E91E63",
+        "gradient_start": "#F48FB1",
+        "gradient_end": "#FFF0F5"
+    },
+    "cyber_noir": {
+        "border_primary": "#00FFFF",
+        "border_info": "#00CED1",
+        "border_success": "#7FFF00",
+        "border_warning": "#FFFF00",
+        "border_error": "#FF1493",
+        "text_title": "bold #FFFFFF",
+        "text_sub": "bold #00FFFF",
+        "text_ok": "bold #7CFC00",
+        "text_warn": "bold #FFD700",
+        "text_err": "bold #FF69B4",
+        "text_body": "#C0C0C0",
+        "text_key": "#00FFFF",
+        "text_value": "bold #FFFFFF",
+        "text_money": "bold #00FF7F",
+        "text_date": "bold #FFFF00",
+        "text_number": "#00FFFF",
+        "gradient_start": "#00CED1",
+        "gradient_end": "#7CFC00"
+    },
+    "bright_cyan_wave": {
+        "border_primary": "#00FFFF",
+        "border_info": "#00CED1",
+        "border_success": "#40E0D0",
+        "border_warning": "#FFD700",
+        "border_error": "#FF4500",
+        "text_title": "bold #E0FFFF",
+        "text_sub": "bold #AFEEEE",
+        "text_ok": "bold #7FFFD4",
+        "text_warn": "bold #FFD700",
+        "text_err": "bold #FF6347",
+        "text_body": "#B2FFFF",
+        "text_key": "#00FFFF",
+        "text_value": "bold #E0FFFF",
+        "text_money": "bold #7FFFD4",
+        "text_date": "bold #FFD700",
+        "text_number": "#00CED1",
+        "gradient_start": "#00FFFF",
+        "gradient_end": "#AFEEEE"
     }
 }
 
