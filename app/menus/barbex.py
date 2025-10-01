@@ -59,7 +59,16 @@ def show_barbex_main_menu():
             in_main_menu = False
         else:
             print_panel("⚠️ Error", "Input tidak valid. Silahkan coba lagi.")
-            pause()
+            pause
+        if option_code:
+            result = show_package_details(api_key, tokens, option_code, is_enterprise)
+            if result == "MAIN":
+                return  # keluar ke menu utama
+            elif result == "BACK":
+                continue  # kembali ke daftar paket
+            elif result is True:
+                return  # selesai pembelian
+
 
 def show_barbex_menu():
     theme = get_theme()
@@ -266,6 +275,7 @@ def show_barbex_menu2():
                 payment_table.add_column(justify="left", style=theme["text_body"])
                 payment_table.add_row("1", "E-Wallet")
                 payment_table.add_row("2", "QRIS")
+                payment_table.add_row("99", f"[{theme['text_sub']}]Kembali ke menu utama[/]")
                 payment_table.add_row("00", f"[{theme['text_err']}]Kembali ke menu sebelumnya[/]")
 
                 console.print(Panel(
@@ -287,6 +297,8 @@ def show_barbex_menu2():
                     console.input(f"[{theme['text_sub']}]Tekan enter untuk kembali...[/{theme['text_sub']}] ")
                     in_payment_menu = False
                     in_bookmark_menu = False
+                elif input_method == "99":
+                    return  # keluar ke menu utama
                 elif input_method == "00":
                     in_payment_menu = False
                 else:
