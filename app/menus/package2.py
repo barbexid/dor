@@ -374,7 +374,7 @@ def fetch_my_packages():
 
     if not tokens:
         print_panel("⚠️ Error", "Tidak ditemukan token pengguna aktif.")
-        #pause()
+        pause()
         return None
 
     id_token = tokens.get("id_token")
@@ -395,13 +395,17 @@ def fetch_my_packages():
     res = send_api_request(api_key, path, payload, id_token, "POST")
     if res.get("status") != "SUCCESS":
         print_panel("⚠️ Error", "Gagal mengambil paket.")
-        #pause()
+        pause()
         return None
 
     quotas = res["data"]["quotas"]
+    if not quotas:
+        print_panel("ℹ️ Info", "Tidak ada paket aktif ditemukan.")
+        pause()
+        return None
+
     clear_screen()
 
-    # Panel judul
     console.print(Panel(
         Align.center("📦 Paket Aktif Saya", vertical="middle"),
         border_style=theme["border_info"],
@@ -445,47 +449,36 @@ def fetch_my_packages():
         })
 
     # Panel navigasi
-    #console.print(Panel(
-        #Align.center(
-            #f"[{theme['text_body']}]00[/]. [{theme['text_err']}]Kembali ke menu utama[/]",
-            #vertical="middle"
-        #),
-        #title=f"[{theme['text_title']}]🔙 Navigasi[/]",
-        #border_style=theme["border_info"],
-        #padding=(1, 2),
-        #expand=True
-    #))
-
-
-    # Panel navigasi
+    package_range = f"(1–{len(my_packages)})"
     nav_table = Table(show_header=False, box=MINIMAL_DOUBLE_HEAD, expand=True)
-    nav_table.add_column(justify="right", style=theme["text_key"], width=6)
+    nav_table.add_column(justify="right", style=theme["text_key"], width=10)
     nav_table.add_column(style=theme["text_body"])
-    nav_table.add_row("-", f"[{theme['border_info']}]Pilih nomor paket, untuk pembelian ulang")
+    nav_table.add_row(package_range, f"[{theme['border_info']}]Pilih nomor paket untuk pembelian ulang")
     nav_table.add_row("00", f"[{theme['text_err']}]Kembali ke menu utama")
 
     console.print(Panel(
         nav_table,
-        #title=f"[{theme['text_title']}]⚙️ Menu Aksi[/]",
         border_style=theme["border_info"],
         padding=(0, 1),
         expand=True
     ))
 
-
     # Input pilihan
     while True:
-        choice = console.input(f"[{theme['text_sub']}]Pilih nomor:[/{theme['text_sub']}] ").strip()
+        choice = console.input(f"[{theme['text_sub']}]Masukkan nomor paket atau 00 untuk kembali:[/{theme['text_sub']}] ").strip()
         if choice == "00":
             return None
 
         selected_pkg = next((pkg for pkg in my_packages if str(pkg["number"]) == choice), None)
         if not selected_pkg:
-            print_panel("⚠️ Error", "Paket tidak ditemukan. Silakan masukkan nomor yang benar. Atau 00 untuk kembali")
-            #pause()
-            continue  # Ulangi input jika tidak valid
+            print_panel("⚠️ Error", "Paket tidak ditemukan. Silakan masukkan nomor yang benar. Atau 00 untuk kembali.")
+            pause()
+            continue
 
         is_done = show_package_details(api_key, tokens, selected_pkg["quota_code"], False)
         if is_done:
             return None
+        else:
+            pause()
+            continue
 
