@@ -302,7 +302,7 @@ def get_packages_by_family(
 
         # Panel terpisah untuk navigasi
         back_panel = Panel(
-            Align.center("00. Kembali ke menu awal", vertical="middle"),
+            Align.center(f"[{theme['text_body']}]00[/]. [{theme['text_err']}]Kembali ke menu awal", vertical="middle"),
             #title=f"[{theme['text_title']}]🔙 Navigasi[/]",
             border_style=theme["border_primary"],
             padding=(1, 2),
@@ -420,13 +420,13 @@ def fetch_my_packages():
             "quota_code": quota_code,
         })
 
-    # Navigasi
-    nav_text = Text()
-    nav_text.append("00", style=theme["text_key"])
-    nav_text.append(". Kembali ke menu utama", style=theme["text_err"])
-
+    # Panel navigasi
     console.print(Panel(
-        Align.center(nav_text, vertical="middle"),
+        Align.center(
+            f"[{theme['text_body']}]00[/]. [{theme['text_err']}]Kembali ke menu utama[/]",
+            vertical="middle"
+        ),
+        #title=f"[{theme['text_title']}]🔙 Navigasi[/]",
         border_style=theme["border_info"],
         padding=(1, 2),
         expand=True
