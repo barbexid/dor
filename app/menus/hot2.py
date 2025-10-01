@@ -195,7 +195,7 @@ def show_hot_menu2():
             table.add_row(str(idx + 1), p["name"], formatted_price)
 
         table.add_row("00", f"[{theme['text_sub']}]Kembali ke menu sebelumnya[/]", "")
-        table.add_row("99", f"[{theme['text_err']}]Kembali ke menu utama[/]", "")
+        #table.add_row("99", f"[{theme['text_err']}]Kembali ke menu utama[/]", "")
 
         console.print(Panel(
             table,
@@ -207,9 +207,9 @@ def show_hot_menu2():
         choice = console.input(f"[{theme['text_sub']}]Pilih paket:[/{theme['text_sub']}] ").strip()
         if choice == "00":
             return  # kembali ke menu sebelumnya
-        if choice == "99":
-            in_hot_menu = False
-            return  # kembali ke menu utama
+        #if choice == "99":
+            #in_hot_menu = False
+            #return  # kembali ke menu utama
 
         if choice.isdigit() and 1 <= int(choice) <= len(hot_packages):
             selected_package = hot_packages[int(choice) - 1]
