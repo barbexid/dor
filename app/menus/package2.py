@@ -219,7 +219,7 @@ def show_package_details(api_key, tokens, package_option_code, is_enterprise, op
                 item_name=variant_name
             )
         else:
-            print_panel("⚠️ Error", "Pilihan tidak valid.")
+            print_panel("⚠️ Error", "Pilihan tidak valid. Pastikan input sesuai di opsi pembelian")
             #pause()
 
 
