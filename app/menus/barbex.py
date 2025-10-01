@@ -20,11 +20,9 @@ console = Console()
 
 def show_barbex_main_menu():
     theme = get_theme()
-    in_main_menu = True
-    while in_main_menu:
+    while True:
         clear_screen()
 
-        # Panel judul terpisah
         console.print(Panel(
             Align.center("✨ Paket Lainnya ✨", vertical="middle"),
             border_style=theme["border_primary"],
@@ -32,8 +30,6 @@ def show_barbex_main_menu():
             expand=True
         ))
 
-        # Tabel menu paket
-        #menu_table = Table(box=MINIMAL_DOUBLE_HEAD, expand=True
         menu_table = Table(show_header=False, box=MINIMAL_DOUBLE_HEAD, expand=True)
         menu_table.add_column("No", justify="right", style=theme["text_key"], width=6)
         menu_table.add_column("Daftar Paket", style=theme["text_body"])
@@ -43,34 +39,30 @@ def show_barbex_main_menu():
 
         console.print(Panel(
             menu_table,
-            #title=f"[{theme['text_title']}]📦 Menu Paket[/]",
             border_style=theme["border_info"],
             padding=(0, 0),
             expand=True
         ))
 
-        # Input pilihan
         choice = console.input(f"[{theme['text_sub']}]Pilih menu:[/{theme['text_sub']}] ").strip()
         if choice == "1":
             show_barbex_menu()
         elif choice == "2":
             show_barbex_menu2()
         elif choice == "00":
-            in_main_menu = False
+            return  # keluar ke menu utama
         else:
             print_panel("⚠️ Error", "Input tidak valid. Silahkan coba lagi.")
-            pause
+            pause()
 
 def show_barbex_menu():
     theme = get_theme()
     api_key = AuthInstance.api_key
     tokens = AuthInstance.get_active_tokens()
 
-    in_bookmark_menu = True
-    while in_bookmark_menu:
+    while True:
         clear_screen()
 
-        # Panel loading
         console.print(Panel(
             "[bold]Memuat Daftar Paket Lainnya v1...[/]",
             border_style=theme["border_info"],
@@ -87,7 +79,6 @@ def show_barbex_menu():
 
         barbex_packages = response.json()
 
-        # Panel judul terpisah
         console.print(Panel(
             Align.center("✨ Paket Lainnya v1 ✨", vertical="middle"),
             border_style=theme["border_primary"],
@@ -95,7 +86,6 @@ def show_barbex_menu():
             expand=True
         ))
 
-        # Tabel daftar paket
         table = Table(box=MINIMAL_DOUBLE_HEAD, expand=True)
         table.add_column("No", justify="right", style=theme["text_key"], width=6)
         table.add_column("Nama Paket", style=theme["text_body"])
@@ -104,22 +94,22 @@ def show_barbex_menu():
             label = f"{p['family_name']} - {p['variant_name']} - {p['option_name']}"
             table.add_row(str(idx + 1), label)
 
-        table.add_row("00", f"[{theme['text_err']}]Kembali ke menu sebelumnya[/]")
+        table.add_row("00", f"[{theme['text_sub']}]Kembali ke menu sebelumnya[/]")
+        table.add_row("99", f"[{theme['text_err']}]Kembali ke menu utama[/]")
 
-        # Panel untuk tabel
         console.print(Panel(
             table,
-            #title=f"[{theme['text_title']}]📦 Paket Lainnya[/]",
             border_style=theme["border_info"],
             padding=(0, 0),
             expand=True
         ))
 
-        # Input pilihan
         choice = console.input(f"[{theme['text_sub']}]Pilih paket:[/{theme['text_sub']}] ").strip()
         if choice == "00":
-            in_bookmark_menu = False
-            return
+            return  # kembali ke menu sebelumnya
+        if choice == "99":
+            return  # kembali ke menu utama
+
         if choice.isdigit() and 1 <= int(choice) <= len(barbex_packages):
             selected_bm = barbex_packages[int(choice) - 1]
             family_code = selected_bm["family_code"]
@@ -141,18 +131,16 @@ def show_barbex_menu():
                             break
 
             if option_code:
-                show_package_details(api_key, tokens, option_code, is_enterprise)
+                result = show_package_details(api_key, tokens, option_code, is_enterprise)
+                if result == "MAIN":
+                    return  # keluar ke menu utama
+                elif result == "BACK":
+                    continue  # reload ulang daftar paket
+                elif result is True:
+                    return  # selesai pembelian
         else:
             print_panel("⚠️ Error", "Input tidak valid. Silahkan coba lagi.")
-            pause
-        if option_code:
-            result = show_package_details(api_key, tokens, option_code, is_enterprise)
-            if result == "MAIN":
-                return  # keluar ke menu utama
-            elif result == "BACK":
-                continue  # kembali ke daftar paket
-            elif result is True:
-                return  # selesai pembelian
+            pause()
 
 
 
@@ -161,8 +149,7 @@ def show_barbex_menu2():
     api_key = AuthInstance.api_key
     tokens = AuthInstance.get_active_tokens()
 
-    in_bookmark_menu = True
-    while in_bookmark_menu:
+    while True:
         clear_screen()
 
         console.print(Panel(
@@ -181,7 +168,6 @@ def show_barbex_menu2():
 
         barbex_packages = response.json()
 
-        # Panel judul terpisah
         console.print(Panel(
             Align.center("✨ Paket Lainnya v2 ✨", vertical="middle"),
             border_style=theme["border_primary"],
@@ -189,7 +175,6 @@ def show_barbex_menu2():
             expand=True
         ))
 
-        # Tabel daftar paket
         table = Table(box=MINIMAL_DOUBLE_HEAD, expand=True)
         table.add_column("No", justify="right", style=theme["text_key"], width=6)
         table.add_column("Nama Paket", style=theme["text_body"])
@@ -199,11 +184,11 @@ def show_barbex_menu2():
             formatted_price = get_rupiah(p["price"])
             table.add_row(str(idx + 1), p["name"], formatted_price)
 
-        table.add_row("00", f"[{theme['text_err']}]Kembali ke menu sebelumnya[/]", "")
+        table.add_row("00", f"[{theme['text_sub']}]Kembali ke menu sebelumnya[/]", "")
+        table.add_row("99", f"[{theme['text_err']}]Kembali ke menu utama[/]", "")
 
         console.print(Panel(
             table,
-            #title=f"[{theme['text_title']}]📦 Daftar Paket[/]",
             border_style=theme["border_info"],
             padding=(0, 0),
             expand=True
@@ -211,8 +196,10 @@ def show_barbex_menu2():
 
         choice = console.input(f"[{theme['text_sub']}]Pilih paket:[/{theme['text_sub']}] ").strip()
         if choice == "00":
-            in_bookmark_menu = False
-            return
+            return  # kembali ke menu sebelumnya
+        if choice == "99":
+            return  # keluar ke menu utama
+
         if choice.isdigit() and 1 <= int(choice) <= len(barbex_packages):
             selected_package = barbex_packages[int(choice) - 1]
             packages = selected_package.get("packages", [])
@@ -254,8 +241,7 @@ def show_barbex_menu2():
             info_text.append(f"Harga: {get_rupiah(selected_package['price'])}\n", style=theme["text_money"])
             info_text.append("Detail:\n", style=theme["text_body"])
 
-            detail_lines = selected_package["detail"].split("\n")
-            for line in detail_lines:
+            for line in selected_package["detail"].split("\n"):
                 cleaned = line.strip()
                 if cleaned:
                     info_text.append(f"- {cleaned}\n", style=theme["text_body"])
@@ -268,15 +254,14 @@ def show_barbex_menu2():
                 expand=True
             ))
 
-            in_payment_menu = True
-            while in_payment_menu:
+            while True:
                 payment_table = Table(show_header=False, box=MINIMAL_DOUBLE_HEAD, expand=True)
                 payment_table.add_column(justify="right", style=theme["text_key"], width=6)
                 payment_table.add_column(justify="left", style=theme["text_body"])
                 payment_table.add_row("1", "E-Wallet")
                 payment_table.add_row("2", "QRIS")
-                payment_table.add_row("99", f"[{theme['text_sub']}]Kembali ke menu utama[/]")
-                payment_table.add_row("00", f"[{theme['text_err']}]Kembali ke menu sebelumnya[/]")
+                payment_table.add_row("00", f"[{theme['text_sub']}]Kembali ke daftar paket[/]")
+                payment_table.add_row("99", f"[{theme['text_err']}]Kembali ke menu utama[/]")
 
                 console.print(Panel(
                     payment_table,
@@ -290,17 +275,15 @@ def show_barbex_menu2():
                 if input_method == "1":
                     show_multipayment_v2(api_key, tokens, payment_items, "BUY_PACKAGE", True)
                     console.input(f"[{theme['text_sub']}]Tekan enter untuk kembali...[/{theme['text_sub']}] ")
-                    in_payment_menu = False
-                    in_bookmark_menu = False
+                    return  # selesai pembelian
                 elif input_method == "2":
                     show_qris_payment_v2(api_key, tokens, payment_items, "BUY_PACKAGE", True)
                     console.input(f"[{theme['text_sub']}]Tekan enter untuk kembali...[/{theme['text_sub']}] ")
-                    in_payment_menu = False
-                    in_bookmark_menu = False
+                    return  # selesai pembelian
+                elif input_method == "00":
+                    break  # kembali ke daftar paket
                 elif input_method == "99":
                     return  # keluar ke menu utama
-                elif input_method == "00":
-                    in_payment_menu = False
                 else:
                     print_panel("⚠️ Error", "Metode tidak valid. Silahkan coba lagi.")
                     pause()
