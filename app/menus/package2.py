@@ -222,7 +222,7 @@ def show_package_details(api_key, tokens, package_option_code, is_enterprise, op
                 item_name=variant_name
             )
         else:
-            print_panel("⚠️ Error", "Pilihan tidak valid. Pastikan input sesuai di opsi pembelian")
+            print_panel("⚠️ Error", "Pilihan tidak valid. Pastikan input sesuai dengan nomor menu yang ada")
             #pause()
 
 
@@ -469,7 +469,7 @@ def fetch_my_packages():
 
         # 🔁 Loop input pilihan TERPISAH agar tidak reload saat input salah
         while True:
-            choice = console.input(f"[{theme['text_sub']}]Masukkan nomor paket {package_range} atau 00 untuk kembali:[/{theme['text_sub']}] ").strip()
+            choice = console.input(f"[{theme['text_sub']}]Masukkan nomor paket {package_range} atau 00, untuk kembali:[/{theme['text_sub']}] ").strip()
             if choice == "00":
                 return None
 
