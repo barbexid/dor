@@ -84,8 +84,10 @@ def show_main_menu(number, balance, display_quota, balance_expired_at):
 
     # Tabel menu utama 
     menu_table = Table(show_header=False, box=MINIMAL_DOUBLE_HEAD, expand=True)
-    menu_table.add_column("Kode", justify="right", width=6)  # tanpa style
-    menu_table.add_column("Aksi")  # tanpa style
+    #menu_table.add_column("Kode", justify="right", width=6)  # tanpa style
+    #menu_table.add_column("Aksi")  # tanpa style
+    menu_table.add_column("Kode", justify="right", style=theme["text_key"], width=6)
+    menu_table.add_column("Aksi", style=theme["text_body"])
 
     menu_table.add_row("1", "Login/Ganti akun")
     menu_table.add_row("2", "Lihat Paket Saya")
