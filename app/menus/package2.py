@@ -194,8 +194,8 @@ def show_package_details(api_key, tokens, package_option_code, is_enterprise, op
             )
             msg = "Paket berhasil ditambahkan ke bookmark." if success else "Paket sudah ada di bookmark."
             print_panel("✅ Info", msg)
-            pause()
-            continue  # Tetap di dalam menu opsi pembelian
+            #pause()
+            #continue  # Tetap di dalam menu opsi pembelian
 
         elif choice == "1":
             settlement_balance(api_key, tokens, payment_items, payment_for, True, amount_used="first")
