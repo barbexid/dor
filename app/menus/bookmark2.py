@@ -58,8 +58,8 @@ def show_bookmark_menu():
         nav_table = Table(show_header=False, box=MINIMAL_DOUBLE_HEAD, expand=True)
         nav_table.add_column(justify="right", style=theme["text_key"], width=6)
         nav_table.add_column(style=theme["text_body"])
+        nav_table.add_row("H", f"[{theme['text_err']}]Hapus Bookmark")
         nav_table.add_row("00", f"[{theme['text_sub']}]Kembali ke menu utama")
-        nav_table.add_row("000", f"[{theme['text_err']}]Hapus Bookmark")
 
         console.print(Panel(
             nav_table,
@@ -73,7 +73,10 @@ def show_bookmark_menu():
         if choice == "00":
             in_bookmark_menu = False
             return None
-        elif choice == "000":
+            
+        choice = console.input("Masukkan pilihan: ").strip().upper()
+
+        if choice == "H":
             del_choice = console.input("Masukkan nomor bookmark yang ingin dihapus: ").strip()
             if del_choice.isdigit() and 1 <= int(del_choice) <= len(bookmarks):
                 del_bm = bookmarks[int(del_choice) - 1]
@@ -88,6 +91,7 @@ def show_bookmark_menu():
                 print_panel("❌ Error", "Input tidak valid. Silakan coba lagi.")
             pause()
             continue
+
 
         if choice.isdigit() and 1 <= int(choice) <= len(bookmarks):
             selected_bm = bookmarks[int(choice) - 1]
