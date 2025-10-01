@@ -54,7 +54,7 @@ def show_bookmark_menu():
 
         console.print(Panel(nav_table, border_style=theme["border_info"], padding=(0, 1), expand=True))
 
-        choice = console.input(f"[{theme['text_sub']}]Masukkan pilihan (nomor / H / 00):[/{theme['text_sub']}] ").strip().upper()
+        choice = console.input(f"[{theme['text_sub']}]Masukkan pilihan:[/{theme['text_sub']}] ").strip().upper()
 
         if choice == "00":
             in_bookmark_menu = False
