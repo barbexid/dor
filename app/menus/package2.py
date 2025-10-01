@@ -477,9 +477,9 @@ def fetch_my_packages():
             if not selected_pkg:
                 print_panel(
                     "⚠️ Error",
-                    f"Nomor paket tidak ditemukan.\nSilakan masukkan nomor yang benar {package_range} atau 00 untuk kembali."
+                    f"Nomor paket tidak ditemukan.\nSilakan masukkan nomor yang benar {package_range} atau 00, untuk kembali."
                 )
-                pause()
+                #pause()
                 continue  # ulangi input, tidak reload
 
             result = show_package_details(api_key, tokens, selected_pkg["quota_code"], False)
