@@ -195,8 +195,7 @@ def show_package_details(api_key, tokens, package_option_code, is_enterprise, op
             msg = "Paket berhasil ditambahkan ke bookmark." if success else "Paket sudah ada di bookmark."
             print_panel("✅ Info", msg)
             #pause()
-            #continue  # Tetap di dalam menu opsi pembelian
-
+            #continue
         elif choice == "1":
             settlement_balance(api_key, tokens, payment_items, payment_for, True, amount_used="first")
             console.input(f"[{theme['text_sub']}]Tekan enter untuk kembali...[/{theme['text_sub']}] ")
@@ -221,7 +220,7 @@ def show_package_details(api_key, tokens, package_option_code, is_enterprise, op
             )
         else:
             print_panel("⚠️ Error", "Pilihan tidak valid.")
-            pause()
+            #pause()
 
 
 def get_packages_by_family(
@@ -343,14 +342,14 @@ def get_packages_by_family(
 
         if not pkg_choice.isdigit():
             print_panel("⚠️ Error", "Input tidak valid. Masukkan nomor paket.")
-            pause()
-            continue
+            #pause()
+            #continue
 
         selected_pkg = next((p for p in packages if p["number"] == int(pkg_choice)), None)
         if not selected_pkg:
             print_panel("⚠️ Error", "Paket tidak ditemukan. Silakan masukkan nomor yang benar.")
-            pause()
-            continue
+            #pause()
+            #continue
 
         is_done = show_package_details(
             api_key,
@@ -375,7 +374,7 @@ def fetch_my_packages():
 
     if not tokens:
         print_panel("⚠️ Error", "Tidak ditemukan token pengguna aktif.")
-        pause()
+        #pause()
         return None
 
     id_token = tokens.get("id_token")
@@ -396,7 +395,7 @@ def fetch_my_packages():
     res = send_api_request(api_key, path, payload, id_token, "POST")
     if res.get("status") != "SUCCESS":
         print_panel("⚠️ Error", "Gagal mengambil paket.")
-        pause()
+        #pause()
         return None
 
     quotas = res["data"]["quotas"]
@@ -481,12 +480,12 @@ def fetch_my_packages():
     selected_pkg = next((pkg for pkg in my_packages if str(pkg["number"]) == choice), None)
     if not selected_pkg:
         print_panel("⚠️ Error", "Paket tidak ditemukan. Silakan masukkan nomor yang benar.")
-        pause()
+        #pause()
         return None
 
     is_done = show_package_details(api_key, tokens, selected_pkg["quota_code"], False)
     if is_done:
         return None
 
-    pause()
+    #pause()
 
