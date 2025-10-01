@@ -117,8 +117,8 @@ def show_family_menu():
         nav_table.add_row("T", "Tambah family code")
         nav_table.add_row("H", "Hapus family code")
         nav_table.add_row("E", "Edit nama family code")
-        nav_table.add_row("00", f"[{theme['text_sub']}]Kembali ke menu sebelumnya[/]")
-        nav_table.add_row("99", f"[{theme['text_err']}]Kembali ke menu utama[/]")
+        #nav_table.add_row("00", f"[{theme['text_sub']}]Kembali ke menu sebelumnya[/]")
+        nav_table.add_row("00", f"[{theme['text_err']}]Kembali ke menu utama[/]")
 
         console.print(Panel(
             nav_table,
@@ -177,10 +177,10 @@ def show_family_menu():
                     print_panel("❌ Error", "Gagal memperbarui nama.")
             pause()
 
-        elif aksi == "00":
-            break
+        #elif aksi == "00":
+            #break
 
-        elif aksi == "99":
+        elif aksi == "00":
             return  # keluar ke menu utama
 
         elif aksi.isdigit():
