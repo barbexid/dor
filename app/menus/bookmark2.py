@@ -23,7 +23,6 @@ def show_bookmark_menu():
         clear_screen()
         bookmarks = BookmarkInstance.get_bookmarks()
 
-        # Panel judul
         console.print(Panel(
             Align.center("🔖 Bookmark Paket", vertical="middle"),
             border_style=theme["border_info"],
@@ -36,7 +35,6 @@ def show_bookmark_menu():
             pause()
             return None
 
-        # Tabel bookmark
         table = Table(box=MINIMAL_DOUBLE_HEAD, expand=True)
         table.add_column("No", justify="right", style=theme["text_key"], width=4)
         table.add_column("Family", style=theme["text_body"])
@@ -46,37 +44,23 @@ def show_bookmark_menu():
         for idx, bm in enumerate(bookmarks, start=1):
             table.add_row(str(idx), bm["family_name"], bm["variant_name"], bm["option_name"])
 
-        console.print(Panel(
-            table,
-            #title=f"[{theme['text_title']}]📋 Daftar Bookmark[/]",
-            border_style=theme["border_primary"],
-            padding=(0, 1),
-            expand=True
-        ))
+        console.print(Panel(table, border_style=theme["border_primary"], padding=(0, 1), expand=True))
 
-        # Panel navigasi
         nav_table = Table(show_header=False, box=MINIMAL_DOUBLE_HEAD, expand=True)
         nav_table.add_column(justify="right", style=theme["text_key"], width=6)
         nav_table.add_column(style=theme["text_body"])
         nav_table.add_row("H", f"[{theme['text_err']}]Hapus Bookmark")
         nav_table.add_row("00", f"[{theme['text_sub']}]Kembali ke menu utama")
 
-        console.print(Panel(
-            nav_table,
-            #title=f"[{theme['text_title']}]⚙️ Menu Aksi[/]",
-            border_style=theme["border_info"],
-            padding=(0, 1),
-            expand=True
-        ))
+        console.print(Panel(nav_table, border_style=theme["border_info"], padding=(0, 1), expand=True))
 
-        choice = console.input(f"[{theme['text_sub']}]Pilih bookmark (nomor):[/{theme['text_sub']}] ").strip()
+        choice = console.input(f"[{theme['text_sub']}]Masukkan pilihan (nomor / H / 00):[/{theme['text_sub']}] ").strip().upper()
+
         if choice == "00":
             in_bookmark_menu = False
             return None
-            
-        choice = console.input("Masukkan pilihan: ").strip().upper()
 
-        if choice == "H":
+        elif choice == "H":
             del_choice = console.input("Masukkan nomor bookmark yang ingin dihapus: ").strip()
             if del_choice.isdigit() and 1 <= int(del_choice) <= len(bookmarks):
                 del_bm = bookmarks[int(del_choice) - 1]
@@ -92,8 +76,7 @@ def show_bookmark_menu():
             pause()
             continue
 
-
-        if choice.isdigit() and 1 <= int(choice) <= len(bookmarks):
+        elif choice.isdigit() and 1 <= int(choice) <= len(bookmarks):
             selected_bm = bookmarks[int(choice) - 1]
             family_code = selected_bm["family_code"]
             is_enterprise = selected_bm["is_enterprise"]
@@ -117,3 +100,4 @@ def show_bookmark_menu():
         else:
             print_panel("❌ Error", "Input tidak valid. Silakan coba lagi.")
             pause()
+
