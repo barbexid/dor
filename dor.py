@@ -77,7 +77,7 @@ def show_main_menu(number, balance, display_quota, balance_expired_at):
         title=f"[{theme['text_title']}]✨ Informasi Akun ✨[/]",
         title_align="center",
         border_style=theme["border_info"],
-        padding=(0, 2),
+        padding=(0, 4),
         expand=True,
     )
     console.print(info_panel)
