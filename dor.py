@@ -46,7 +46,7 @@ def show_banner():
         Align.center(
             f"[bold {theme['text_title']}]Selamat Datang di myXL CLI v.8.7.0 gen.2[/]"
         ),
-        style=theme["border_primary"],
+        style=theme["border_warning"],
         width=terminal_width,
         title=f"[{theme['text_number']}]FuyukiXT x Barbex_ID[/]",
         title_align="center",
