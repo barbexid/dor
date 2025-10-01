@@ -66,8 +66,8 @@ def show_hot_menu():
     api_key = AuthInstance.api_key
     tokens = AuthInstance.get_active_tokens()
 
-    in_bookmark_menu = True
-    while in_bookmark_menu:
+    in_hot_menu = True
+    while in_hot_menu:
         clear_screen()
 
         # Panel loading
@@ -79,15 +79,16 @@ def show_hot_menu():
         ))
 
         url = "https://me.mashu.lol/pg-hot.json"
-        response = requests.get(url, timeout=30)
-        if response.status_code != 200:
-            print_panel("⚠️ Error", "Gagal mengambil data hot Package.")
+        try:
+            response = requests.get(url, timeout=30)
+            response.raise_for_status()
+            hot_packages = response.json()
+        except Exception:
+            print_panel("⚠️ Error", "Gagal mengambil data HOT Package.")
             pause()
             return
 
-        hot_packages = response.json()
-
-        # Panel judul terpisah
+        # Panel judul
         console.print(Panel(
             Align.center("✨ Paket HOT v1 ✨", vertical="middle"),
             border_style=theme["border_primary"],
@@ -104,12 +105,10 @@ def show_hot_menu():
             label = f"{p['family_name']} - {p['variant_name']} - {p['option_name']}"
             table.add_row(str(idx + 1), label)
 
-        table.add_row("00", f"[{theme['text_err']}]Kembali ke menu utama[/]")
+        table.add_row("00", f"[{theme['text_sub']}]Kembali ke menu sebelumnya[/]")
 
-        # Panel untuk tabel
         console.print(Panel(
             table,
-            #title=f"[{theme['text_title']}]📦 Paket HOT[/]",
             border_style=theme["border_info"],
             padding=(0, 0),
             expand=True
@@ -118,12 +117,12 @@ def show_hot_menu():
         # Input pilihan
         choice = console.input(f"[{theme['text_sub']}]Pilih paket:[/{theme['text_sub']}] ").strip()
         if choice == "00":
-            in_bookmark_menu = False
-            return
+            return  # kembali ke menu sebelumnya
+
         if choice.isdigit() and 1 <= int(choice) <= len(hot_packages):
-            selected_bm = hot_packages[int(choice) - 1]
-            family_code = selected_bm["family_code"]
-            is_enterprise = selected_bm["is_enterprise"]
+            selected_pkg = hot_packages[int(choice) - 1]
+            family_code = selected_pkg["family_code"]
+            is_enterprise = selected_pkg["is_enterprise"]
 
             family_data = get_family_v2(api_key, tokens, family_code, is_enterprise)
             if not family_data:
@@ -134,16 +133,22 @@ def show_hot_menu():
             package_variants = family_data["package_variants"]
             option_code = None
             for variant in package_variants:
-                if variant["name"] == selected_bm["variant_name"]:
+                if variant["name"] == selected_pkg["variant_name"]:
                     for option in variant["package_options"]:
-                        if option["order"] == selected_bm["order"]:
+                        if option["order"] == selected_pkg["order"]:
                             option_code = option["package_option_code"]
                             break
 
             if option_code:
-                show_package_details(api_key, tokens, option_code, is_enterprise)
+                result = show_package_details(api_key, tokens, option_code, is_enterprise)
+                if result == "MAIN":
+                    return  # keluar ke menu utama
+                elif result == "BACK":
+                    continue  # reload ulang daftar HOT v1
+                elif result is True:
+                    return  # selesai pembelian
         else:
-            print_panel("⚠️ Error", "Input tidak valid. Silahkan coba lagi.")
+            print_panel("⚠️ Error", "Input tidak valid. Silakan masukkan nomor yang tersedia.")
             pause()
 
 
