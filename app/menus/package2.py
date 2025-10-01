@@ -293,8 +293,8 @@ def get_packages_by_family(
         nav_table = Table(show_header=False, box=MINIMAL_DOUBLE_HEAD, expand=True)
         nav_table.add_column(justify="right", style=theme["text_key"], width=6)
         nav_table.add_column(style=theme["text_body"])
-        nav_table.add_row("00", f"[{theme['text_sub']}]Kembali ke menu sebelumnya[/]")
-        nav_table.add_row("99", f"[{theme['text_err']}]Kembali ke menu utama[/]")
+        nav_table.add_row("00", f"[{theme['text_sub']}]Kembali ke awal menu[/]")
+        #nav_table.add_row("99", f"[{theme['text_err']}]Kembali ke menu utama[/]")
 
         console.print(Panel(
             nav_table,
@@ -307,8 +307,8 @@ def get_packages_by_family(
         pkg_choice = console.input(f"[{theme['text_sub']}]Pilih paket (nomor):[/{theme['text_sub']}] ").strip()
         if pkg_choice == "00":
             return "BACK"
-        if pkg_choice == "99":
-            return "MAIN"
+        #if pkg_choice == "99":
+            #return "MAIN"
         if not pkg_choice.isdigit():
             print_panel("⚠️ Error", "Input tidak valid. Masukkan nomor paket.")
             pause()
