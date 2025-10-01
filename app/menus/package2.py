@@ -62,7 +62,7 @@ def show_package_details(api_key, tokens, package_option_code, is_enterprise, op
     # Panel judul
     console.print(Panel(
         Align.center(f"[{theme['text_title']}]📦 Paket {family_name}[/]", vertical="middle"),
-        border_style=theme["border_info"],
+        border_style=theme["border_primary"],
         padding=(1, 2),
         expand=True
     ))
@@ -82,7 +82,7 @@ def show_package_details(api_key, tokens, package_option_code, is_enterprise, op
         info_table,
         title=f"[{theme['text_title']}]✨ Informasi Paket ✨[/]",
         title_align="center",
-        border_style=theme["border_primary"],
+        border_style=theme["border_info"],
         padding=(0, 1),
         expand=True
     )
@@ -96,7 +96,7 @@ def show_package_details(api_key, tokens, package_option_code, is_enterprise, op
         benefit_table.add_column("Nama", style=theme["text_body"])
         benefit_table.add_column("Jenis", style=theme["border_info"])
         benefit_table.add_column("Unli", style=theme["text_key"], justify="center")
-        benefit_table.add_column("Total", style=theme["border_warning"], justify="right")
+        benefit_table.add_column("Total", style=theme["text_date"], justify="right")
 
         for benefit in benefits:
             dt = benefit["data_type"]
