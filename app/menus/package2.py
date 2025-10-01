@@ -399,13 +399,13 @@ def fetch_my_packages():
 
         package_text = Text()
         package_text.append(f"📦 Paket {num}\n", style="bold")
-        package_text.append("Nama: ", style=theme["text_key"])
+        package_text.append("Nama: ", style=theme["text_body"])
         package_text.append(f"{name}\n", style=theme["text_sub"])
-        package_text.append("Quota Code: ", style=theme["text_key"])
+        package_text.append("Quota Code: ", style=theme["text_body"])
         package_text.append(f"{quota_code}\n", style=theme["text_body"])
-        package_text.append("Family Code: ", style=theme["text_key"])
+        package_text.append("Family Code: ", style=theme["text_body"])
         package_text.append(f"{family_code}\n", style=theme["border_warning"])
-        package_text.append("Group Code: ", style=theme["text_key"])
+        package_text.append("Group Code: ", style=theme["text_body"])
         package_text.append(f"{group_code}\n", style=theme["text_body"])
 
         console.print(Panel(
