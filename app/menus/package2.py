@@ -388,7 +388,7 @@ def fetch_my_packages():
         "family_member_id": ""
     }
 
-    while True:  # 🔁 Loop utama untuk refresh setelah detail
+    while True:  # 🔁 Loop utama untuk reload menu
         clear_screen()
 
         console.print(Panel(
@@ -467,28 +467,25 @@ def fetch_my_packages():
             expand=True
         ))
 
-        # 🔁 Loop input pilihan tanpa clear_screen
-        while True:
-            choice = console.input(f"[{theme['text_sub']}]Masukkan nomor paket atau 00 untuk kembali:[/{theme['text_sub']}] ").strip()
-            if choice == "00":
-                return None
+        # 🔁 Loop input pilihan
+        choice = console.input(f"[{theme['text_sub']}]Masukkan nomor paket atau 00 untuk kembali:[/{theme['text_sub']}] ").strip()
+        if choice == "00":
+            return None
 
-            selected_pkg = next((pkg for pkg in my_packages if str(pkg["number"]) == choice), None)
-            if not selected_pkg:
-                print_panel("⚠️ Error", "Paket tidak ditemukan. Silakan masukkan nomor yang benar. Atau 00 untuk kembali.")
-                #pause()
-                continue
+        selected_pkg = next((pkg for pkg in my_packages if str(pkg["number"]) == choice), None)
+        if not selected_pkg:
+            print_panel("⚠️ Error", "Paket tidak ditemukan. Silakan masukkan nomor yang benar. Atau 00 untuk kembali.")
+            pause()
+            continue  # kembali ke awal loop utama
 
+        result = show_package_details(api_key, tokens, selected_pkg["quota_code"], False)
 
-            result = show_package_details(api_key, tokens, selected_pkg["quota_code"], False)
-
-            if result == "MAIN":
-                return None  # keluar ke menu utama
-            elif result == "BACK":
-                continue      # reload ulang menu fetch_my_packages
-            elif result is True:
-                return None   # selesai pembelian
-
+        if result == "MAIN":
+            return None  # keluar ke menu utama
+        elif result == "BACK":
+            continue      # reload ulang menu fetch_my_packages
+        elif result is True:
+            return None   # selesai pembelian
 
 
 
