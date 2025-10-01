@@ -150,8 +150,8 @@ def show_package_details(api_key, tokens, package_option_code, is_enterprise, op
         option_table.add_row("4", "Ambil sebagai bonus")
     if option_order != -1:
         option_table.add_row("0", "Tambah ke Bookmark")
+    option_table.add_row("00", f"[{theme['text_sub']}]Kembali ke daftar paket[/]")
     option_table.add_row("99", f"[{theme['text_err']}]Kembali ke menu utama[/]")
-    option_table.add_row("00", f"[{theme['text_sub']}]Kembali ke menu sebelumnya[/]")
 
     console.print(Panel(
         option_table,
