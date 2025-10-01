@@ -65,12 +65,12 @@ def show_main_menu(number, balance, display_quota, balance_expired_at):
 
     # Panel informasi akun
     info_table = Table.grid(padding=(0, 1))
-    info_table.add_column(justify="right", style=theme["text_body"])
     info_table.add_column(justify="left", style=theme["text_body"])
-    info_table.add_row("Nomor", f"[bold {theme['text_body']}]{number}[/]")
-    info_table.add_row("Pulsa", f"[{theme['text_money']}]{get_rupiah(balance)}[/]")
-    info_table.add_row("Kuota", f"[{theme['text_body']}]{display_quota or '-'}[/]")
-    info_table.add_row("Masa Aktif", f"[{theme['text_date']}]{expired_at_dt}[/]")
+    info_table.add_column(justify="left", style=theme["text_body"])
+    info_table.add_row("Nomor", f": [bold {theme['text_body']}]{number}[/]")
+    info_table.add_row("Pulsa", f": [{theme['text_money']}]{get_rupiah(balance)}[/]")
+    info_table.add_row("Kuota", f": [{theme['text_body']}]{display_quota or '-'}[/]")
+    info_table.add_row("Masa Aktif", f": [{theme['text_date']}]{expired_at_dt}[/]")
 
     info_panel = Panel(
         info_table,
