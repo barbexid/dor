@@ -455,7 +455,7 @@ def fetch_my_packages():
         # Panel navigasi
         package_range = f"(1–{len(my_packages)})"
         nav_table = Table(show_header=False, box=MINIMAL_DOUBLE_HEAD, expand=True)
-        nav_table.add_column(justify="right", style=theme["text_key"], width=10)
+        nav_table.add_column(justify="right", style=theme["text_key"], width=6)
         nav_table.add_column(style=theme["text_body"])
         nav_table.add_row(package_range, f"[{theme['text_sub']}]Pilih nomor paket untuk pembelian ulang")
         nav_table.add_row("00", f"[{theme['text_err']}]Kembali ke menu utama")
@@ -469,14 +469,17 @@ def fetch_my_packages():
 
         # 🔁 Loop input pilihan TERPISAH agar tidak reload saat input salah
         while True:
-            choice = console.input(f"[{theme['text_sub']}]Masukkan nomor paket atau 00 untuk kembali:[/{theme['text_sub']}] ").strip()
+            choice = console.input(f"[{theme['text_sub']}]Masukkan nomor paket {package_range} atau 00 untuk kembali:[/{theme['text_sub']}] ").strip()
             if choice == "00":
                 return None
 
             selected_pkg = next((pkg for pkg in my_packages if str(pkg["number"]) == choice), None)
             if not selected_pkg:
-                print_panel("⚠️ Error", "Paket tidak ditemukan. Silakan masukkan nomor yang benar. Atau 00 untuk kembali.")
-                #pause()
+                print_panel(
+                    "⚠️ Error",
+                    f"Nomor paket tidak ditemukan.\nSilakan masukkan nomor yang benar {package_range} atau 00 untuk kembali."
+                )
+                pause()
                 continue  # ulangi input, tidak reload
 
             result = show_package_details(api_key, tokens, selected_pkg["quota_code"], False)
@@ -488,3 +491,4 @@ def fetch_my_packages():
                 break  # reload ulang menu fetch_my_packages
             elif result is True:
                 return None  # selesai pembelian
+
