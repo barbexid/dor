@@ -304,7 +304,7 @@ def get_packages_by_family(
         back_panel = Panel(
             Align.center(f"[{theme['text_body']}]00[/]. [{theme['text_err']}]Kembali ke menu awal", vertical="middle"),
             #title=f"[{theme['text_title']}]🔙 Navigasi[/]",
-            border_style=theme["border_primary"],
+            border_style=theme["border_info"],
             padding=(1, 2),
             expand=True
         )
