@@ -60,15 +60,6 @@ def show_barbex_main_menu():
         else:
             print_panel("⚠️ Error", "Input tidak valid. Silahkan coba lagi.")
             pause
-        if option_code:
-            result = show_package_details(api_key, tokens, option_code, is_enterprise)
-            if result == "MAIN":
-                return  # keluar ke menu utama
-            elif result == "BACK":
-                continue  # kembali ke daftar paket
-            elif result is True:
-                return  # selesai pembelian
-
 
 def show_barbex_menu():
     theme = get_theme()
@@ -153,7 +144,16 @@ def show_barbex_menu():
                 show_package_details(api_key, tokens, option_code, is_enterprise)
         else:
             print_panel("⚠️ Error", "Input tidak valid. Silahkan coba lagi.")
-            pause()
+            pause
+        if option_code:
+            result = show_package_details(api_key, tokens, option_code, is_enterprise)
+            if result == "MAIN":
+                return  # keluar ke menu utama
+            elif result == "BACK":
+                continue  # kembali ke daftar paket
+            elif result is True:
+                return  # selesai pembelian
+
 
 
 def show_barbex_menu2():
