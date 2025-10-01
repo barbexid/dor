@@ -251,7 +251,8 @@ def get_packages_by_family(
         # Panel info family
         info_text = Text()
         info_text.append(f"Nama: {data['package_family']['name']}\n", style="bold")
-        info_text.append("Kode:", f"{family_code}\n", style=theme["border_warning"])
+        info_text.append("Kode: ", style=theme["text_key"])
+        info_text.append(f"{family_code}\n", style=theme["border_warning"])
         info_text.append(f"Tipe: {data['package_family']['package_family_type']}\n", style=theme["text_body"])
         info_text.append(f"Jumlah Varian: {len(data['package_variants'])}\n", style=theme["text_body"])
 
