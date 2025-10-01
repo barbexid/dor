@@ -488,8 +488,10 @@ def fetch_my_packages():
             result = show_package_details(api_key, tokens, selected_pkg["quota_code"], False)
             if result == "MAIN":
                 return None  # langsung kembali ke menu utama
-            elif result is false:
+            elif result is True:
                 return None  # selesai pembelian
-            # jika result False, maka lanjut loop dan tampilkan ulang
+            elif result is False:
+                continue  # kembali ke awal daftar paket tanpa keluar
+
 
 
