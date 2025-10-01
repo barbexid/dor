@@ -12,7 +12,7 @@ from app.client.ewallet import show_multipayment_v2
 from app.client.balance import settlement_balance
 from app.type_dict import PaymentItem
 
-from app.menus.anu_util import pause, print_panel, get_rupiah
+from app.menus.anu_util import pause, print_panel, get_rupiah, loading_animation
 from rich.table import Table
 from rich.panel import Panel
 from rich.console import Console
