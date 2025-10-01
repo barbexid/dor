@@ -149,7 +149,6 @@ def show_theme_menu():
 
         console.print(Panel(
             table,
-            #title=f"[{theme['text_title']}]🖌️ Daftar Tema[/]",
             border_style=theme["border_primary"],
             padding=(0, 0),
             expand=True
@@ -164,29 +163,8 @@ def show_theme_menu():
 
         if choice.isdigit() and 1 <= int(choice) <= len(theme_names):
             selected_theme = theme_names[int(choice) - 1]
-            selected_preset = presets[selected_theme]
-
-            preview_table = Table.grid(padding=(0, 2))
-            preview_table.add_column(justify="right", style=selected_preset["text_sub"])
-            preview_table.add_column(justify="left", style=selected_preset["text_body"])
-            preview_table.add_row("Judul", f"[{selected_preset['text_title']}]Contoh Judul[/]")
-            preview_table.add_row("Sub", f"[{selected_preset['text_sub']}]Contoh Subjudul[/]")
-            preview_table.add_row("Nomor", f"[{selected_preset['text_value']}]628123456789[/]")
-            preview_table.add_row("Pulsa", f"[{selected_preset['text_money']}]Rp 123.456[/]")
-            preview_table.add_row("Kuota", f"[{selected_preset['text_number']}]10.50/500.00 GB[/]")
-            preview_table.add_row("Expired", f"[{selected_preset['text_date']}]2035-09-29 23:59:59[/]")
-            preview_table.add_row("Error", f"[{selected_preset['text_err']}]Contoh Error[/]")
-
-            console.print(Panel(
-                preview_table,
-                title=f"[{selected_preset['text_title']}]Preview Tema: {selected_theme.replace('_', ' ').title()}[/]",
-                border_style=selected_preset["border_primary"],
-                padding=(1, 2),
-                expand=True
-            ))
-
             confirm = console.input(
-                f"[{theme['text_sub']}]Gunakan tema ini? (y/n):[/{theme['text_sub']}] "
+                f"[{theme['text_sub']}]Gunakan tema '{selected_theme.replace('_', ' ').title()}'? (y/n):[/{theme['text_sub']}] "
             ).strip().lower()
             if confirm == "y":
                 set_theme(selected_theme)
