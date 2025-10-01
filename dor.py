@@ -300,4 +300,4 @@ if __name__ == "__main__":
     try:
         main()
     except KeyboardInterrupt:
-        print_panel("👋 Keluar", f"[grey]"Aplikasi dihentikan oleh pengguna.[/grey]")
+        print_panel("👋 Keluar", f"[white]"Aplikasi dihentikan oleh pengguna.[/white]")
