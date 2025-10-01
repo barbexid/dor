@@ -64,7 +64,7 @@ def show_main_menu(number, balance, display_quota, balance_expired_at):
     expired_at_dt = datetime.fromtimestamp(balance_expired_at).strftime("%Y-%m-%d %H:%M:%S")
 
     # Panel informasi akun
-    info_table = Table.grid(padding=(0, 1))
+    info_table = Table.grid(padding=(0, 4))
     info_table.add_column(justify="left", style=theme["text_body"])
     info_table.add_column(justify="left", style=theme["text_body"])
     info_table.add_row("Nomor", f": [bold {theme['text_body']}]{number}[/]")
@@ -77,7 +77,7 @@ def show_main_menu(number, balance, display_quota, balance_expired_at):
         title=f"[{theme['text_title']}]✨ Informasi Akun ✨[/]",
         title_align="center",
         border_style=theme["border_info"],
-        padding=(0, 4),
+        padding=(0, 1),
         expand=True,
     )
     console.print(info_panel)
