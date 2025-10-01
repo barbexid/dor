@@ -32,7 +32,7 @@ def show_package_details(api_key, tokens, package_option_code, is_enterprise, op
     if not package:
         print_panel("⚠️ Error", "Gagal memuat detail paket.")
         pause()
-        return False
+        return "BACK"
 
     price = package["package_option"]["price"]
     formatted_price = get_rupiah(price)
@@ -59,7 +59,7 @@ def show_package_details(api_key, tokens, package_option_code, is_enterprise, op
             token_confirmation=token_confirmation,
         )
     ]
-    # Panel judul
+
     console.print(Panel(
         Align.center(f"[{theme['text_title']}]📦 Paket {family_name}[/]", vertical="middle"),
         border_style=theme["border_primary"],
@@ -67,29 +67,24 @@ def show_package_details(api_key, tokens, package_option_code, is_enterprise, op
         expand=True
     ))
 
-    # Panel informasi paket
     info_table = Table.grid(padding=(0, 1))
     info_table.add_column(justify="left", style=theme["text_body"])
     info_table.add_column(justify="left")
-
     info_table.add_row("Nama", f": [bolt {theme['text_body']}]{title}[/]")
     info_table.add_row("Harga", f": [{theme['text_money']}]{formatted_price}[/]")
     info_table.add_row("Masa Aktif", f": [{theme['text_date']}]{validity}[/]")
     info_table.add_row("Point", f": [{theme['text_body']}]{point}[/]")
     info_table.add_row("Plan Type", f": [{theme['text_body']}]{plan_type}[/]")
 
-    info_panel = Panel(
+    console.print(Panel(
         info_table,
         title=f"[{theme['text_title']}]✨ Informasi Paket ✨[/]",
         title_align="center",
         border_style=theme["border_info"],
         padding=(0, 1),
         expand=True
-    )
+    ))
 
-    console.print(info_panel)
-
-    # Tabel benefit
     benefits = package["package_option"].get("benefits", [])
     if benefits:
         benefit_table = Table(box=MINIMAL_DOUBLE_HEAD, expand=True)
@@ -103,16 +98,8 @@ def show_package_details(api_key, tokens, package_option_code, is_enterprise, op
             total = benefit["total"]
             is_unlimited = benefit["is_unlimited"]
 
-            # Tentukan total_str hanya jika bukan unlimited
             if is_unlimited:
-                if dt == "VOICE":
-                    total_str = "menit"
-                elif dt == "TEXT":
-                    total_str = "SMS"
-                elif dt == "DATA":
-                    total_str = "kuota"
-                else:
-                    total_str = dt
+                total_str = {"VOICE": "menit", "TEXT": "SMS", "DATA": "kuota"}.get(dt, dt)
             else:
                 if dt == "VOICE":
                     total_str = f"{total / 60:.0f} menit"
@@ -137,7 +124,6 @@ def show_package_details(api_key, tokens, package_option_code, is_enterprise, op
                 total_str
             )
 
-
         console.print(Panel(
             benefit_table,
             title=f"[{theme['text_title']}]Benefit Paket[/]",
@@ -146,8 +132,6 @@ def show_package_details(api_key, tokens, package_option_code, is_enterprise, op
             expand=True
         ))
 
-
-    # Panel SnK
     console.print(Panel(
         detail,
         title=f"[{theme['text_title']}]✨ Syarat & Ketentuan ✨[/]",
@@ -156,7 +140,6 @@ def show_package_details(api_key, tokens, package_option_code, is_enterprise, op
         expand=True
     ))
 
-    # Tabel opsi pembelian
     option_table = Table(show_header=False, box=MINIMAL_DOUBLE_HEAD, expand=True)
     option_table.add_column(justify="right", style=theme["text_key"], width=6)
     option_table.add_column(justify="left", style=theme["text_body"])
@@ -178,13 +161,11 @@ def show_package_details(api_key, tokens, package_option_code, is_enterprise, op
         expand=True
     ))
 
-    # Input pilihan
-    in_package_detail_menu = True
-    while in_package_detail_menu:
+    while True:
         choice = console.input(f"[{theme['text_sub']}]Pilihan:[/{theme['text_sub']}] ").strip()
         if choice == "99":
             return "MAIN"
-        if choice == "00":
+        elif choice == "00":
             return "BACK"
         elif choice == "0" and option_order != -1:
             success = BookmarkInstance.add_bookmark(
@@ -197,8 +178,7 @@ def show_package_details(api_key, tokens, package_option_code, is_enterprise, op
             )
             msg = "Paket berhasil ditambahkan ke bookmark." if success else "Paket sudah ada di bookmark."
             print_panel("✅ Info", msg)
-            #pause()
-            #continue
+            pause()
         elif choice == "1":
             settlement_balance(api_key, tokens, payment_items, payment_for, True, amount_used="first")
             console.input(f"[{theme['text_sub']}]Tekan enter untuk kembali...[/{theme['text_sub']}] ")
@@ -221,8 +201,10 @@ def show_package_details(api_key, tokens, package_option_code, is_enterprise, op
                 price=price,
                 item_name=variant_name
             )
+            console.input(f"[{theme['text_sub']}]Tekan enter untuk kembali...[/{theme['text_sub']}] ")
+            return True
         else:
-            print_panel("⚠️ Error", "Pilihan tidak valid. Pastikan input sesuai dengan nomor yang ada di menu")
+            print_panel("⚠️ Error", "Pilihan tidak valid. Pastikan input sesuai dengan nomor yang ada di menu.")
             #pause()
 
 
