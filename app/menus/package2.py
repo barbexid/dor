@@ -95,7 +95,7 @@ def show_package_details(api_key, tokens, package_option_code, is_enterprise, op
         benefit_table = Table(box=MINIMAL_DOUBLE_HEAD, expand=True)
         benefit_table.add_column("Nama", style=theme["text_body"])
         benefit_table.add_column("Jenis", style=theme["text_body"])
-        benefit_table.add_column("Unli", style=theme["text_body"], justify="center")
+        benefit_table.add_column("Unli", style=theme["border_info"], justify="center")
         benefit_table.add_column("Total", style=theme["text_body"], justify="right")
 
         for benefit in benefits:
