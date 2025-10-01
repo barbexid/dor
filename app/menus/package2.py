@@ -62,7 +62,7 @@ def show_package_details(api_key, tokens, package_option_code, is_enterprise, op
     # Panel judul
     console.print(Panel(
         Align.center(f"[{theme['text_title']}]📦 Paket {family_name}[/]", vertical="middle"),
-        border_style=theme["border_primary"],
+        border_style=theme["border_info"],
         padding=(1, 2),
         expand=True
     ))
@@ -304,8 +304,8 @@ def get_packages_by_family(
         back_panel = Panel(
             Align.center("00. Kembali ke menu awal", vertical="middle"),
             #title=f"[{theme['text_title']}]🔙 Navigasi[/]",
-            border_style=theme["border_warning"],
-            padding=(0, 1),
+            border_style=theme["border_primary"],
+            padding=(1, 2),
             expand=True
         )
         console.print(back_panel)
@@ -380,7 +380,7 @@ def fetch_my_packages():
     # Panel judul
     console.print(Panel(
         Align.center("📦 Paket Aktif Saya", vertical="middle"),
-        border_style=theme["border_primary"],
+        border_style=theme["border_info"],
         padding=(1, 2),
         expand=True
     ))
@@ -410,7 +410,7 @@ def fetch_my_packages():
 
         console.print(Panel(
             package_text,
-            border_style=theme["border_info"],
+            border_style=theme["border_primary"],
             padding=(0, 1),
             expand=True
         ))
@@ -424,8 +424,8 @@ def fetch_my_packages():
     console.print(Panel(
         Align.center("00. Kembali ke menu utama", vertical="middle"),
         #title=f"[{theme['text_title']}]🔙 Navigasi[/]",
-        border_style=theme["border_warning"],
-        padding=(0, 1),
+        border_style=theme["border_primary"],
+        padding=(1, 2),
         expand=True
     ))
 
