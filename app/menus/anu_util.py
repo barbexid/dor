@@ -40,19 +40,26 @@ def loading_animation(text="Memuat ulang...", delay=0.05, repeat=3):
             sleep(delay)
     clear_screen()
 
+import re
+
 def get_rupiah(value) -> str:
-    # Konversi ke string dan bersihkan
     value_str = str(value).strip()
 
-    # Tangani input seperti "Rp1000", "Rp1000 (refund)", "1000", dll
-    match = re.match(r"(Rp)?\s?(\d+)(.*)", value_str)
+    # Tangani input seperti "Rp1000", "Rp 1,000", "1000", "Rp1000 (refund)"
+    match = re.match(r"(Rp)?\s?([\d,]+)(.*)", value_str)
     if not match:
         return value_str  # fallback jika format tidak cocok
 
-    number = int(match.group(2))
+    raw_number = match.group(2).replace(",", "")  # hilangkan koma jika ada
     suffix = match.group(3).strip()
 
+    try:
+        number = int(raw_number)
+    except ValueError:
+        return value_str  # fallback jika bukan angka
+
     # Format angka dengan titik ribuan dan tambahkan ,00
-    formatted = f"Rp {number:,}".replace(",", ",")# + ",00"
+    formatted = f"Rp{number:,}".replace(",", ".") + ",00"
 
     return f"{formatted} {suffix}" if suffix else formatted
+
