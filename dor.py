@@ -9,6 +9,7 @@ from datetime import datetime
 from app.client.engsel2 import *
 from app.service.auth import AuthInstance
 from app.menus.bookmark2 import show_bookmark_menu
+from app.menus.donate import show_donate_menu
 from app.menus.account2 import show_account_menu
 from app.menus.package2 import (
     fetch_my_packages,
