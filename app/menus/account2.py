@@ -38,7 +38,7 @@ def login_prompt(api_key: str):
     raw_input = console.input(f"[{theme['text_sub']}]Nomor:[/{theme['text_sub']}] ").strip()
     if raw_input == "00":
         print_panel("ℹ️ Dibatalkan", "Login dibatalkan oleh pengguna.")
-        pause()
+        #pause()
         return None, None
 
     phone_number = normalize_number(raw_input)
@@ -61,7 +61,7 @@ def login_prompt(api_key: str):
 
         if otp == "00":
             print_panel("ℹ️ Dibatalkan", "Login dibatalkan oleh pengguna.")
-            pause()
+            #pause()
             return None, None
 
         if not otp.isdigit() or len(otp) != 6:
