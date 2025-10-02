@@ -127,9 +127,11 @@ def show_account_menu():
         if AuthInstance.get_active_user() is None or add_user:
             number, refresh_token = login_prompt(AuthInstance.api_key)
             if not refresh_token:
-                print_panel("⚠️ Gagal", "Gagal menambah akun. Silakan coba lagi.")
+                print_panel("ℹ️ Dibatalkan", "Login dibatalkan. Kembali ke menu akun.")
                 pause()
+                add_user = False  # pastikan tidak lanjut login
                 continue
+
 
             AuthInstance.add_refresh_token(int(number), refresh_token)
             AuthInstance.load_tokens()
