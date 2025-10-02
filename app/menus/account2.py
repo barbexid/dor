@@ -94,7 +94,7 @@ def show_account_menu():
         # Cek apakah ingin menambah akun dan sudah mencapai batas
         if add_user and len(users) >= MAX_FREE_ACCOUNTS:
             console.print(Panel(
-                Align.center("🚫 Batas akun gratis tercapai (maks 2 akun).\nMasukkan kode unlock untuk menambah lebih banyak akun.", vertical="middle"),
+                Align.center("🚫 Batas akun tercapai (maks 2 akun).\nMasukkan kode unlock untuk menambah lebih banyak akun.", vertical="middle"),
                 border_style=theme["border_warning"],
                 padding=(1, 2),
                 expand=True
