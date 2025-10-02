@@ -284,6 +284,7 @@ def get_family(
 
 
 
+
 def get_family_v2(
     api_key: str,
     tokens: dict,
@@ -300,8 +301,8 @@ def get_family_v2(
     id_token = tokens.get("id_token")
     family_data = None
 
-    # Spinner untuk animasi loading
-    spinner_text = f"Mengambil data paket: {family_code}..."
+    # Spinner loading tunggal
+    spinner_text = "🔄 Mengambil data paket, mohon tunggu..."
     with Live(Spinner("dots", text=spinner_text), refresh_per_second=10):
         for mt in migration_type_list:
             if family_data is not None:
@@ -333,6 +334,7 @@ def get_family_v2(
                         break
 
     return family_data
+
 
 
 
