@@ -24,7 +24,7 @@ def show_barbex_main_menu():
         clear_screen()
 
         console.print(Panel(
-            Align.center("✨ Paket Lainnya ✨", vertical="middle"),
+            Align.center("✨ Menu Paket Lainnya ✨", vertical="middle"),
             border_style=theme["border_info"],
             padding=(1, 2),
             expand=True
@@ -33,8 +33,8 @@ def show_barbex_main_menu():
         menu_table = Table(show_header=False, box=MINIMAL_DOUBLE_HEAD, expand=True)
         menu_table.add_column("No", justify="right", style=theme["text_key"], width=6)
         menu_table.add_column("Daftar Paket", style=theme["text_body"])
-        menu_table.add_row("1", "Paket Lainnya v1")
-        menu_table.add_row("2", "Paket Lainnya v2")
+        menu_table.add_row("1", "Paket v1")
+        menu_table.add_row("2", "Paket v2")
         menu_table.add_row("00", f"[{theme['text_err']}]Kembali ke menu utama[/]")
 
         console.print(Panel(
@@ -64,7 +64,7 @@ def show_barbex_menu():
         clear_screen()
 
         console.print(Panel(
-            "[bold]Memuat Daftar Paket Lainnya v1...[/]",
+            "[bold]Memuat Daftar Paket v1...[/]",
             border_style=theme["border_info"],
             padding=(0, 1),
             expand=True
@@ -80,7 +80,7 @@ def show_barbex_menu():
         barbex_packages = response.json()
 
         console.print(Panel(
-            Align.center("✨ Paket Lainnya v1 ✨", vertical="middle"),
+            Align.center("✨ Paket v1 ✨", vertical="middle"),
             border_style=theme["border_info"],
             padding=(1, 2),
             expand=True
@@ -164,7 +164,7 @@ def show_barbex_menu2():
         clear_screen()
 
         console.print(Panel(
-            "[bold]Memuat Daftar Paket Lainnya v2...[/]",
+            "[bold]Memuat Daftar Paket v2...[/]",
             border_style=theme["border_info"],
             padding=(0, 1),
             expand=True
@@ -180,7 +180,7 @@ def show_barbex_menu2():
         barbex_packages = response.json()
 
         console.print(Panel(
-            Align.center("✨ Paket Lainnya v2 ✨", vertical="middle"),
+            Align.center("✨ Paket v2 ✨", vertical="middle"),
             border_style=theme["border_info"],
             padding=(1, 2),
             expand=True
