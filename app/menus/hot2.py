@@ -5,7 +5,7 @@ from rich.console import Console
 from rich.align import Align
 from rich.box import MINIMAL_DOUBLE_HEAD
 from rich.text import Text
-
+from app.client.balance import settlement_balance
 from app.client.engsel2 import get_family_v2, get_package_details
 from app.menus.package2 import show_package_details
 from app.service.auth import AuthInstance
@@ -323,6 +323,19 @@ def show_hot_menu2():
                     show_qris_payment_v2(api_key, tokens, payment_items, "BUY_PACKAGE", True)
                     console.input(f"[{theme['text_sub']}]Tekan enter untuk kembali...[/{theme['text_sub']}] ")
                     return  # selesai pembelian
+                
+                elif input_method == "3":
+                    settlement_balance(
+                        api_key,
+                        tokens,
+                        payment_items,
+                        "BUY_PACKAGE",
+                        True
+                    )
+                    input("Tekan enter untuk kembali...")
+                    in_payment_menu = False
+                    in_bookmark_menu = False
+                    return None
                 elif input_method == "00":
                     in_payment_menu = False  # kembali ke daftar paket
                 elif input_method == "99":
