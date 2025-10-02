@@ -70,7 +70,7 @@ def show_barbex_menu():
             expand=True
         ))
 
-        url = "https://me.mashu.lol/pg-hot.json"
+        url = "https://raw.githubusercontent.com/dratx1/engsel/refs/heads/main/family/anu.json"
         response = requests.get(url, timeout=30)
         if response.status_code != 200:
             print_panel("⚠️ Error", "Gagal mengambil data barbex Package.")
@@ -170,7 +170,7 @@ def show_barbex_menu2():
             expand=True
         ))
 
-        url = "https://me.mashu.lol/pg-hot2.json"
+        url = "https://raw.githubusercontent.com/dratx1/engsel/refs/heads/main/family/anu2.json"
         response = requests.get(url, timeout=30)
         if response.status_code != 200:
             print_panel("⚠️ Error", "Gagal mengambil data barbex Package.")
