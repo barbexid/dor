@@ -23,7 +23,6 @@ def decrypt_base64(encoded_data: str) -> dict:
         return {"is_unlocked": False}
 
 def load_unlock_status():
-    """Selalu baca ulang file unlock_status.json untuk menghindari error saat file berubah."""
     if not os.path.exists(UNLOCK_FILE):
         return {"is_unlocked": False}
     try:
@@ -34,10 +33,9 @@ def load_unlock_status():
         return {"is_unlocked": False}
 
 def save_unlock_status(status: bool):
-    """Simpan status unlock dengan enkripsi base64 dan validasi aman."""
     try:
         encoded = encrypt_base64({"is_unlocked": status})
         with open(UNLOCK_FILE, "w") as f:
             f.write(encoded)
     except Exception:
-        pass  # Hindari crash jika gagal menulis
+        pass
