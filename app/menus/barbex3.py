@@ -7,7 +7,7 @@ from rich.box import MINIMAL_DOUBLE_HEAD
 from rich.text import Text
 from app.client.balance import settlement_balance
 from app.client.engsel2 import get_family_v2, get_package_details
-from app.menus.package2 import show_package_details
+from app.menus.package3 import show_package_details
 from app.service.auth import AuthInstance
 from app.menus.util import clear_screen
 from app.menus.anu_util import pause, print_panel, get_rupiah
