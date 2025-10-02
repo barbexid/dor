@@ -301,41 +301,36 @@ def get_family_v2(
     id_token = tokens.get("id_token")
     family_data = None
 
-    # Spinner loading tunggal
-    spinner_text = "🔄 Mengambil data paket, mohon tunggu..."
-    with Live(Spinner("dots", text=spinner_text), refresh_per_second=10):
-        for mt in migration_type_list:
+    for mt in migration_type_list:
+        if family_data is not None:
+            break
+
+        for ie in is_enterprise_list:
             if family_data is not None:
                 break
 
-            for ie in is_enterprise_list:
-                if family_data is not None:
+            payload_dict = {
+                "is_show_tagging_tab": True,
+                "is_dedicated_event": True,
+                "is_transaction_routine": False,
+                "migration_type": mt,
+                "package_family_code": family_code,
+                "is_autobuy": False,
+                "is_enterprise": ie,
+                "is_pdlp": True,
+                "referral_code": "",
+                "is_migration": False,
+                "lang": "en"
+            }
+
+            res = send_api_request(api_key, path, payload_dict, id_token, "POST")
+            if res.get("status") == "SUCCESS":
+                family_name = res["data"]["package_family"].get("name", "")
+                if family_name:
+                    family_data = res["data"]
                     break
 
-                payload_dict = {
-                    "is_show_tagging_tab": True,
-                    "is_dedicated_event": True,
-                    "is_transaction_routine": False,
-                    "migration_type": mt,
-                    "package_family_code": family_code,
-                    "is_autobuy": False,
-                    "is_enterprise": ie,
-                    "is_pdlp": True,
-                    "referral_code": "",
-                    "is_migration": False,
-                    "lang": "en"
-                }
-
-                res = send_api_request(api_key, path, payload_dict, id_token, "POST")
-                if res.get("status") == "SUCCESS":
-                    family_name = res["data"]["package_family"].get("name", "")
-                    if family_name:
-                        family_data = res["data"]
-                        break
-
     return family_data
-
-
 
 
 def get_families(api_key: str, tokens: dict, package_category_code: str) -> dict:
