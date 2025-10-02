@@ -111,7 +111,7 @@ def show_account_menu():
 
         if is_adding_user and len(users) >= MAX_FREE_ACCOUNTS and not is_unlocked:
             console.print(Panel(
-                Align.center("Batas maksimal akun sudah tercapai.\nMasukkan kode unlock untuk menambah lebih banyak akun.", vertical="middle"),
+                Align.center("!!! Batas maksimal akun sudah tercapai.\nMasukkan kode unlock untuk menambah lebih banyak akun.", vertical="middle"),
                 border_style=theme["border_warning"],
                 padding=(1, 2),
                 expand=True
