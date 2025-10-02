@@ -5,7 +5,7 @@ from rich.console import Console
 from rich.align import Align
 from rich.box import MINIMAL_DOUBLE_HEAD
 from rich.text import Text
-
+from app.client.balance import settlement_balance
 from app.client.engsel2 import get_family_v2, get_package_details
 from app.menus.package2 import show_package_details
 from app.service.auth import AuthInstance
@@ -164,23 +164,24 @@ def show_barbex_menu2():
         clear_screen()
 
         console.print(Panel(
-            "[bold]Memuat Daftar Paket v2...[/]",
+            "[bold]Memuat Daftar Paket Barbex v2...[/]",
             border_style=theme["border_info"],
             padding=(0, 1),
             expand=True
         ))
 
         url = "https://raw.githubusercontent.com/dratx1/engsel/refs/heads/main/family/anu2.json"
-        response = requests.get(url, timeout=30)
-        if response.status_code != 200:
-            print_panel("⚠️ Error", "Gagal mengambil data barbex Package.")
+        try:
+            response = requests.get(url, timeout=30)
+            response.raise_for_status()
+            barbex_packages = response.json()
+        except Exception:
+            print_panel("⚠️ Error", "Gagal mengambil data Barbex Package.")
             pause()
             return
 
-        barbex_packages = response.json()
-
         console.print(Panel(
-            Align.center("✨ Paket v2 ✨", vertical="middle"),
+            Align.center("✨ Paket Barbex v2 ✨", vertical="middle"),
             border_style=theme["border_info"],
             padding=(1, 2),
             expand=True
@@ -202,12 +203,10 @@ def show_barbex_menu2():
             expand=True
         ))
 
-        # Panel navigasi terpisah
         nav_table = Table(show_header=False, box=MINIMAL_DOUBLE_HEAD, expand=True)
         nav_table.add_column(justify="right", style=theme["text_key"], width=6)
         nav_table.add_column(style=theme["text_body"])
         nav_table.add_row("00", f"[{theme['text_sub']}]Kembali ke menu sebelumnya[/]")
-        #nav_table.add_row("99", f"[{theme['text_err']}]Kembali ke menu utama[/]")
 
         console.print(Panel(
             nav_table,
@@ -218,9 +217,7 @@ def show_barbex_menu2():
 
         choice = console.input(f"[{theme['text_sub']}]Pilih paket:[/{theme['text_sub']}] ").strip()
         if choice == "00":
-            return  # kembali ke menu sebelumnya
-        #if choice == "99":
-            #return  # keluar ke menu utama
+            return
 
         if choice.isdigit() and 1 <= int(choice) <= len(barbex_packages):
             selected_package = barbex_packages[int(choice) - 1]
@@ -282,6 +279,7 @@ def show_barbex_menu2():
                 payment_table.add_column(justify="left", style=theme["text_body"])
                 payment_table.add_row("1", "E-Wallet")
                 payment_table.add_row("2", "QRIS")
+                #payment_table.add_row("3", "Saldo Langsung")
                 payment_table.add_row("00", f"[{theme['text_sub']}]Kembali ke daftar paket[/]")
                 payment_table.add_row("99", f"[{theme['text_err']}]Kembali ke menu utama[/]")
 
@@ -297,15 +295,19 @@ def show_barbex_menu2():
                 if input_method == "1":
                     show_multipayment_v2(api_key, tokens, payment_items, "BUY_PACKAGE", True)
                     console.input(f"[{theme['text_sub']}]Tekan enter untuk kembali...[/{theme['text_sub']}] ")
-                    return  # selesai pembelian
+                    return
                 elif input_method == "2":
                     show_qris_payment_v2(api_key, tokens, payment_items, "BUY_PACKAGE", True)
                     console.input(f"[{theme['text_sub']}]Tekan enter untuk kembali...[/{theme['text_sub']}] ")
-                    return  # selesai pembelian
+                    return
+                elif input_method == "3":
+                    settlement_balance(api_key, tokens, payment_items, "BUY_PACKAGE", True)
+                    console.input(f"[{theme['text_sub']}]Tekan enter untuk kembali...[/{theme['text_sub']}] ")
+                    return
                 elif input_method == "00":
-                    break  # kembali ke daftar paket
+                    break
                 elif input_method == "99":
-                    return  # keluar ke menu utama
+                    return
                 else:
                     print_panel("⚠️ Error", "Metode tidak valid. Silahkan coba lagi.")
                     pause()
