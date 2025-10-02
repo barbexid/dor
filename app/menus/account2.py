@@ -27,12 +27,8 @@ def login_prompt(api_key: str):
     clear_screen()
     theme = get_theme()
 
-def login_prompt(api_key: str):
-    clear_screen()
-    theme = get_theme()
-
     console.print(Panel(
-        Align.center("🔐 Login ke myXL CLI\nMasukkan nomor XL, Support 08xx/ 628xx/ +628xx ", vertical="middle"),
+        Align.center("🔐 Login ke myXL CLI\nMasukkan nomor XL, Support 08xx/628xx/+628xx\nKetik [bold red]00[/] untuk batal", vertical="middle"),
         border_style=theme["border_info"],
         style=theme["text_title"],
         padding=(1, 2),
@@ -95,8 +91,6 @@ def login_prompt(api_key: str):
         pause()
         return None, None
 
-
-
 def show_account_menu():
     clear_screen()
     theme = get_theme()
@@ -110,7 +104,7 @@ def show_account_menu():
     MAX_FREE_ACCOUNTS = 2
     UNLOCK_CODE = "@barbex_id-vip"
     unlock_data = load_unlock_status()
-    is_unlocked = unlock_data.get("is_unlocked", False)  # cache di memori
+    is_unlocked = unlock_data.get("is_unlocked", False)
 
     while in_account_menu:
         clear_screen()
@@ -140,19 +134,16 @@ def show_account_menu():
             if not refresh_token:
                 print_panel("ℹ️ Dibatalkan", "Login dibatalkan. Kembali ke menu akun.")
                 pause()
-                add_user = False  # pastikan tidak lanjut login
+                add_user = False
                 continue
-
 
             AuthInstance.add_refresh_token(int(number), refresh_token)
             AuthInstance.load_tokens()
             users = AuthInstance.refresh_tokens
             active_user = AuthInstance.get_active_user()
-
             add_user = False
             continue
 
-        # Tampilkan akun tersimpan
         console.print(Panel(
             Align.center("📱 Akun Tersimpan", vertical="middle"),
             border_style=theme["border_info"],
@@ -175,7 +166,6 @@ def show_account_menu():
 
         console.print(Panel(account_table, border_style=theme["border_primary"], padding=(0, 1), expand=True))
 
-        # Tampilkan menu perintah
         command_table = Table(show_header=False, box=MINIMAL_DOUBLE_HEAD, expand=True)
         command_table.add_column("Kode", justify="right", style=theme["text_key"], width=6)
         command_table.add_column("Pilih Aksi", style=theme["text_body"])
@@ -188,9 +178,12 @@ def show_account_menu():
 
         input_str = console.input(f"[{theme['text_sub']}]Pilihan:[/{theme['text_sub']}] ").strip()
 
-        if input_str.upper() == "T":
+        if input_str == "00":
+            in_account_menu = False
+            return active_user["number"] if active_user else None
+
+        elif input_str.upper() == "T":
             add_user = True
-            continue
 
         elif input_str.upper() == "H":
             if not users:
@@ -198,39 +191,41 @@ def show_account_menu():
                 pause()
                 continue
 
-            console.print(f"[{theme['text_sub']}]Masukkan nomor akun yang ingin dihapus (1 - {len(users)}):[/{theme['text_sub']}]")
-            nomor_input = console.input(f"[{theme['text_sub']}]Nomor:[/{theme['text_sub']}] ").strip()
-
-            if not nomor_input.isdigit() or not (1 <= int(nomor_input) <= len(users)):
-                print_panel("⚠️ Error", "Input tidak valid. Silakan masukkan nomor yang sesuai.")
+            nomor_input = console.input(f"[{theme['text_sub']}]Nomor akun yang ingin dihapus (1 - {len(users)}):[/{theme['text_sub']}] ").strip()
+            if nomor_input == "00":
+                print_panel("ℹ️ Dibatalkan", "Penghapusan akun dibatalkan.")
                 pause()
                 continue
 
-            selected_user = users[int(nomor_input) - 1]
-            confirm = console.input(
-                f"[{theme['text_sub']}]Yakin ingin hapus akun {selected_user['number']}? (y/n):[/{theme['text_sub']}] "
-            ).strip().lower()
-
-            if confirm == "y":
-                AuthInstance.remove_refresh_token(selected_user["number"])
-                users = AuthInstance.refresh_tokens
-                active_user = AuthInstance.get_active_user()
-                print_panel("✅ Info", f"Akun {selected_user['number']} berhasil dihapus.")
-                pause()
+            if nomor_input.isdigit():
+                nomor = int(nomor_input)
+                if 1 <= nomor <= len(users):
+                    selected_user = users[nomor - 1]
+                    confirm = console.input(
+                        f"[{theme['text_sub']}]Yakin ingin hapus akun {selected_user['number']}? (y/n):[/{theme['text_sub']}] "
+                    ).strip().lower()
+                    if confirm == "y":
+                        AuthInstance.remove_refresh_token(selected_user["number"])
+                        users = AuthInstance.refresh_tokens
+                        active_user = AuthInstance.get_active_user()
+                        print_panel("✅ Info", f"Akun {selected_user['number']} berhasil dihapus.")
+                    else:
+                        print_panel("ℹ️ Info", "Penghapusan akun dibatalkan.")
+                else:
+                    print_panel("⚠️ Error", f"Nomor akun di luar jangkauan (1 - {len(users)}).")
             else:
-                print_panel("ℹ️ Info", "Penghapusan akun dibatalkan.")
+                print_panel("⚠️ Error", "Input tidak valid. Masukkan angka atau 00 untuk batal.")
+            pause()
+
+        elif input_str.isdigit():
+            nomor = int(input_str)
+            if 1 <= nomor <= len(users):
+                selected_user = users[nomor - 1]
+                return selected_user['number']
+            else:
+                print_panel("⚠️ Error", f"Nomor akun di luar jangkauan (1 - {len(users)}).")
                 pause()
-            continue
-
-        elif input_str == "00":
-            in_account_menu = False
-            return active_user["number"] if active_user else None
-
-        elif input_str.isdigit() and 1 <= int(input_str) <= len(users):
-            selected_user = users[int(input_str) - 1]
-            return selected_user['number']
 
         else:
-            print_panel("⚠️ Error", "Input tidak valid. Silakan coba lagi.")
+            print_panel("⚠️ Error", "Input tidak dikenali. Silakan pilih opsi yang tersedia.")
             pause()
-            continue
