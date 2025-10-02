@@ -28,7 +28,7 @@ def login_prompt(api_key: str):
     theme = get_theme()
 
     console.print(Panel(
-        Align.center("🔐 Login ke myXL CLI\nMasukkan nomor XL, Support 08xx/ 628xx/ +628xx", vertical="middle"),
+        Align.center("🔐 Login ke myXL CLI\nMasukkan nomor XL, Support 08xx/ 628xx/ +628xx\nKetik [bold red]00[/] untuk batal", vertical="middle"),
         border_style=theme["border_info"],
         style=theme["text_title"],
         padding=(1, 2),
@@ -36,6 +36,11 @@ def login_prompt(api_key: str):
     ))
 
     raw_input = console.input(f"[{theme['text_sub']}]Nomor:[/{theme['text_sub']}] ").strip()
+    if raw_input == "00":
+        print_panel("ℹ️ Dibatalkan", "Login dibatalkan oleh pengguna.")
+        pause()
+        return None, None
+
     phone_number = normalize_number(raw_input)
 
     if len(phone_number) < 10 or len(phone_number) > 14:
@@ -53,6 +58,11 @@ def login_prompt(api_key: str):
 
         print_panel("✅ Info", "OTP berhasil dikirim ke nomor Anda.")
         otp = console.input(f"[{theme['text_sub']}]Masukkan OTP (6 digit):[/{theme['text_sub']}] ").strip()
+
+        if otp == "00":
+            print_panel("ℹ️ Dibatalkan", "Login dibatalkan oleh pengguna.")
+            pause()
+            return None, None
 
         if not otp.isdigit() or len(otp) != 6:
             print_panel("⚠️ Error", "OTP tidak valid. Harus 6 digit angka.")
@@ -96,7 +106,7 @@ def show_account_menu():
 
         if add_user and len(users) >= MAX_FREE_ACCOUNTS and not is_unlocked:
             console.print(Panel(
-                Align.center("🚫 Batas akun tercapai (maks 2 akun).\nMasukkan kode unlock untuk menambah lebih banyak akun.", vertical="middle"),
+                Align.center("🚫 Batas maksimal akun tercapai.\nMasukkan kode unlock untuk menambah lebih banyak akun.", vertical="middle"),
                 border_style=theme["border_warning"],
                 padding=(1, 2),
                 expand=True
