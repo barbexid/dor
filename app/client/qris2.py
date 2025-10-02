@@ -215,7 +215,7 @@ def show_qris_payment_v2(
         console.print(f"[{theme['text_err']}]❌ Gagal mendapatkan kode QRIS.[/]")
         return
 
-    # Step 3: Render QR code sebagai teks ringan
+    # Step 3: Buat QR code
     qr = qrcode.QRCode(
         version=1,
         error_correction=qrcode.constants.ERROR_CORRECT_L,
@@ -227,17 +227,18 @@ def show_qris_payment_v2(
 
     qr_matrix = qr.get_matrix()
     term_width = shutil.get_terminal_size().columns
-    qr_width = len(qr_matrix[0]) * 2  # asumsi karakter lebar 2
+    max_cols = term_width // 2  # karena karakter "■" lebar 2
 
-    # Pilih karakter blok sesuai lebar layar
-    block_char = "▓" if qr_width <= term_width else "█"
+    # Potong QR secara horizontal agar tidak melebihi layar
+    trimmed_matrix = [row[:max_cols] for row in qr_matrix]
 
+    # Gunakan karakter kubus "■" untuk tampilan simetris
     qr_text = "\n".join(
-        "".join(block_char if cell else " " for cell in row)
-        for row in qr_matrix
+        "".join("■" if cell else " " for cell in row)
+        for row in trimmed_matrix
     )
 
-    # Step 4: Tampilkan QR code dalam box Rich tanpa memaksa lebar
+    # Step 4: Tampilkan QR dalam panel Rich
     console.print(Panel(
         qr_text,
         title=f"[{theme['text_title']}]🔍 QRIS Pembayaran[/]",
