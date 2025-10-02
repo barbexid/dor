@@ -115,7 +115,6 @@ def submit_otp(api_key: str, contact: str, code: str) -> dict | None:
         return None
 
 
-
 def get_new_token(refresh_token: str) -> str | None:
     url = SUBMIT_OTP_URL
 
@@ -592,11 +591,78 @@ def purchase_package(
     return purchase_result if isinstance(purchase_result, dict) else None
 
 
+def login_info(
+    api_key: str,
+    tokens: dict,
+    is_enterprise: bool = False
+) -> dict | None:
+    path = "api/v8/auth/login"
+
+    raw_payload = {
+        "access_token": tokens["access_token"],
+        "is_enterprise": is_enterprise,
+        "lang": "en"
+    }
+
+    res = send_api_request(api_key, path, raw_payload, tokens["id_token"], "POST")
+
+    if isinstance(res, dict) and "data" in res:
+        return res["data"]
+
+    return None
 
 
+def get_package_details(
+    api_key: str,
+    tokens: dict,
+    family_code: str,
+    variant_code: str,
+    option_order: int,
+    is_enterprise: bool,
+    migration_type: str | None = None
+) -> dict | None:
+    family_data = get_family_v2(api_key, tokens, family_code, is_enterprise, migration_type)
+    if not family_data:
+        return None
+
+    package_variants = family_data.get("package_variants", [])
+    option_code = None
+
+    for variant in package_variants:
+        if variant.get("package_variant_code") == variant_code:
+            for option in variant.get("package_options", []):
+                if option.get("order") == option_order:
+                    option_code = option.get("package_option_code")
+                    break
+            break
+
+    if not option_code:
+        return None
+
+    return get_package(api_key, tokens, option_code)
 
 
+def get_quota(api_key: str, id_token: str) -> dict | None:
+    path = "api/v8/packages/quota-summary"
 
+    payload = {
+        "is_enterprise": False,
+        "lang": "en"
+    }
 
+    try:
+        res = send_api_request(api_key, path, payload, id_token, "POST")
+    except Exception:
+        return None
 
+    if isinstance(res, dict):
+        quota = res.get("data", {}).get("quota", {}).get("data")
+        if quota:
+            return {
+                "remaining": quota.get("remaining", 0),
+                "total": quota.get("total", 0),
+                "has_unlimited": quota.get("has_unlimited", False)
+            }
+
+    return None
 
