@@ -98,7 +98,7 @@ def show_main_menu(number, balance, display_quota, balance_expired_at):
     menu_table.add_row("6", "Simpan/Kelola Family Code")
     menu_table.add_row("7", "Beli Paket Berdasarkan Family Code")
     menu_table.add_row("66", f"[{theme['text_body']}]Bookmark Paket[/]")
-    menu_table.add_row("77", f"[{theme['text_body']}]Menu Paket VIP[/]")
+    menu_table.add_row("77", f"[{theme['text_body']}]Info Unlock Code [/]")
     menu_table.add_row("88", f"[{theme['text_sub']}]Ganti Tema CLI[/]")
     menu_table.add_row("99", f"[{theme['text_err']}]Tutup aplikasi[/]")
 
