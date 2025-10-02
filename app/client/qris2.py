@@ -7,6 +7,7 @@ import qrcode
 from rich.panel import Panel
 from rich.console import Console
 from app.config.theme_config import get_theme
+import shutil
 
 import time
 import requests
@@ -183,7 +184,6 @@ def get_qris_code(
     return res["data"]["qr_code"]
 
 
-
 def show_qris_payment_v2(
     api_key: str,
     tokens: dict,
@@ -215,34 +215,44 @@ def show_qris_payment_v2(
         console.print(f"[{theme['text_err']}]❌ Gagal mendapatkan kode QRIS.[/]")
         return
 
-    # Step 3: Render QR code sebagai teks
+    # Step 3: Render QR code sebagai teks ringan
     qr = qrcode.QRCode(
         version=1,
         error_correction=qrcode.constants.ERROR_CORRECT_L,
         box_size=1,
-        border=1,
+        border=0,
     )
     qr.add_data(qris_code)
     qr.make(fit=True)
 
     qr_matrix = qr.get_matrix()
+    term_width = shutil.get_terminal_size().columns
+    qr_width = len(qr_matrix[0]) * 2  # asumsi karakter lebar 2
+
+    # Pilih karakter blok sesuai lebar layar
+    block_char = "▓" if qr_width <= term_width else "█"
+
     qr_text = "\n".join(
-        "".join("██" if cell else "  " for cell in row)
+        "".join(block_char if cell else " " for cell in row)
         for row in qr_matrix
     )
 
-    # Step 4: Tampilkan QR code dalam box Rich
+    # Step 4: Tampilkan QR code dalam box Rich tanpa memaksa lebar
     console.print(Panel(
         qr_text,
         title=f"[{theme['text_title']}]🔍 QRIS Pembayaran[/]",
         border_style=theme["border_info"],
-        padding=(1, 2)
+        padding=(0, 1),
+        expand=False
     ))
+
+    # Step 5: Instruksi tambahan
     console.print(f"[{theme['text_body']}]📱 Scan QR ini dengan aplikasi pembayaran yang mendukung QRIS.[/]\n")
 
-    # Step 5: Tampilkan link alternatif
+    # Step 6: Link alternatif
     qris_b64 = base64.urlsafe_b64encode(qris_code.encode()).decode()
     qris_url = f"https://ki-ar-kod.netlify.app/?data={qris_b64}"
     console.print(f"[{theme['text_sub']}]🌐 Alternatif tampilan QR:[/] [bold cyan]{qris_url}[/]\n")
+
 
 
