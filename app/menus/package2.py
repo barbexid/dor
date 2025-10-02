@@ -7,7 +7,7 @@ from app.service.bookmark import BookmarkInstance
 from app.client.purchase import show_qris_payment, settlement_bounty
 from app.client.ewallet import show_multipayment
 from app.menus.util import display_html, clear_screen
-from app.client.qris import show_qris_payment_v2
+from app.client.qris2 import show_qris_payment_v2
 from app.client.ewallet import show_multipayment_v2
 from app.client.balance import settlement_balance
 from app.type_dict import PaymentItem
