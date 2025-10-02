@@ -99,7 +99,7 @@ def show_account_menu():
     active_user = AuthInstance.get_active_user()
 
     in_account_menu = True
-    add_user = False
+    is_adding_user = False
 
     MAX_FREE_ACCOUNTS = 2
     UNLOCK_CODE = "@barbex_id"
@@ -109,7 +109,7 @@ def show_account_menu():
     while in_account_menu:
         clear_screen()
 
-        if add_user and len(users) >= MAX_FREE_ACCOUNTS and not is_unlocked:
+        if is_adding_user and len(users) >= MAX_FREE_ACCOUNTS and not is_unlocked:
             console.print(Panel(
                 Align.center("🚫 Batas maksimal akun sudah tercapai.\nMasukkan kode unlock untuk menambah lebih banyak akun.", vertical="middle"),
                 border_style=theme["border_warning"],
@@ -121,7 +121,7 @@ def show_account_menu():
             if unlock_input != UNLOCK_CODE:
                 print_panel("⚠️ Gagal", "Kode unlock salah. Tidak dapat menambah akun.")
                 pause()
-                add_user = False
+                is_adding_user = False
                 continue
             else:
                 save_unlock_status(True)
@@ -129,19 +129,19 @@ def show_account_menu():
                 print_panel("✅ Berhasil", "Akses akun tambahan telah dibuka.")
                 pause()
 
-        if AuthInstance.get_active_user() is None or add_user:
+        if AuthInstance.get_active_user() is None or is_adding_user:
             number, refresh_token = login_prompt(AuthInstance.api_key)
             if not refresh_token:
                 print_panel("ℹ️ Dibatalkan", "Login dibatalkan. Kembali ke menu akun.")
                 pause()
-                add_user = False
+                is_adding_user = False
                 continue
 
             AuthInstance.add_refresh_token(int(number), refresh_token)
             AuthInstance.load_tokens()
             users = AuthInstance.refresh_tokens
             active_user = AuthInstance.get_active_user()
-            add_user = False
+            is_adding_user = False
             continue
 
         console.print(Panel(
@@ -161,7 +161,7 @@ def show_account_menu():
         else:
             for idx, user in enumerate(users):
                 is_active = active_user and user["number"] == active_user["number"]
-                status = "✅ Aktif" if is_active else "-"
+                status = "✅ Aktif" if is_active else "❌"
                 account_table.add_row(str(idx + 1), str(user["number"]), status)
 
         console.print(Panel(account_table, border_style=theme["border_primary"], padding=(0, 1), expand=True))
@@ -169,23 +169,22 @@ def show_account_menu():
         command_table = Table(show_header=False, box=MINIMAL_DOUBLE_HEAD, expand=True)
         command_table.add_column("Kode", justify="right", style=theme["text_key"], width=6)
         command_table.add_column("Pilih Aksi", style=theme["text_body"])
-        command_table.add_row("(1 - {len(users)})", "Pilih nomor akun, untuk berganti")
+        command_table.add_row(f"(1 - {len(users)})", "Pilih nomor akun untuk berganti")
         command_table.add_row("T", "Tambah akun")
         command_table.add_row("H", f"[{theme['text_err']}]Hapus akun tersimpan[/]")
         command_table.add_row("00", f"[{theme['text_sub']}]Kembali ke menu utama[/]")
 
         console.print(Panel(command_table, border_style=theme["border_info"], padding=(0, 1), expand=True))
 
-        input_str = console.input(f"[{theme['text_sub']}]Pilihan:[/{theme['text_sub']}] ").strip()
+        user_input = console.input(f"[{theme['text_sub']}]Pilihan:[/{theme['text_sub']}] ").strip()
 
-        if input_str == "00":
-            in_account_menu = False
+        if user_input == "00":
             return active_user["number"] if active_user else None
 
-        elif input_str.upper() == "T":
-            add_user = True
+        elif user_input.upper() == "T":
+            is_adding_user = True
 
-        elif input_str.upper() == "H":
+        elif user_input.upper() == "H":
             if not users:
                 print_panel("⚠️ Error", "Tidak ada akun untuk dihapus.")
                 pause()
@@ -206,9 +205,12 @@ def show_account_menu():
                     ).strip().lower()
                     if confirm == "y":
                         AuthInstance.remove_refresh_token(selected_user["number"])
+                        AuthInstance.load_tokens()
                         users = AuthInstance.refresh_tokens
                         active_user = AuthInstance.get_active_user()
                         print_panel("✅ Info", f"Akun {selected_user['number']} berhasil dihapus.")
+                        pause()
+                        continue
                     else:
                         print_panel("ℹ️ Info", "Penghapusan akun dibatalkan.")
                 else:
@@ -217,8 +219,8 @@ def show_account_menu():
                 print_panel("⚠️ Error", "Input tidak valid. Masukkan angka atau 00 untuk batal.")
             pause()
 
-        elif input_str.isdigit():
-            nomor = int(input_str)
+        elif user_input.isdigit():
+            nomor = int(user_input)
             if 1 <= nomor <= len(users):
                 selected_user = users[nomor - 1]
                 return selected_user['number']
