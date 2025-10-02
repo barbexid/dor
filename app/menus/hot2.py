@@ -105,7 +105,7 @@ def show_hot_menu():
             label = f"{p['family_name']} - {p['variant_name']} - {p['option_name']}"
             table.add_row(str(idx + 1), label)
 
-        table.add_row("00", f"[{theme['text_sub']}]Kembali ke menu sebelumnya[/]")
+        #table.add_row("00", f"[{theme['text_sub']}]Kembali ke menu sebelumnya[/]")
 
         console.print(Panel(
             table,
@@ -114,10 +114,28 @@ def show_hot_menu():
             expand=True
         ))
 
+        # Panel navigasi terpisah
+        nav_table = Table(show_header=False, box=MINIMAL_DOUBLE_HEAD, expand=True)
+        nav_table.add_column(justify="right", style=theme["text_key"], width=6)
+        nav_table.add_column(style=theme["text_body"])
+        nav_table.add_row("00", f"[{theme['text_sub']}]Kembali ke menu sebelumnya[/]")
+        #nav_table.add_row("99", f"[{theme['text_err']}]Kembali ke menu utama[/]")
+
+        console.print(Panel(
+            nav_table,
+            border_style=theme["border_info"],
+            padding=(0, 1),
+            expand=True
+        ))
+
         # Input pilihan
         choice = console.input(f"[{theme['text_sub']}]Pilih paket:[/{theme['text_sub']}] ").strip()
         if choice == "00":
             return  # kembali ke menu sebelumnya
+
+        #if choice == "99":
+            #return
+
 
         if choice.isdigit() and 1 <= int(choice) <= len(hot_packages):
             selected_pkg = hot_packages[int(choice) - 1]
@@ -194,7 +212,7 @@ def show_hot_menu2():
             formatted_price = get_rupiah(p["price"])
             table.add_row(str(idx + 1), p["name"], formatted_price)
 
-        table.add_row("00", f"[{theme['text_sub']}]Kembali ke menu sebelumnya[/]", "")
+        #table.add_row("00", f"[{theme['text_sub']}]Kembali ke menu sebelumnya[/]", "")
         #table.add_row("99", f"[{theme['text_err']}]Kembali ke menu utama[/]", "")
 
         console.print(Panel(
@@ -203,6 +221,21 @@ def show_hot_menu2():
             padding=(0, 0),
             expand=True
         ))
+
+        # Panel navigasi terpisah
+        nav_table = Table(show_header=False, box=MINIMAL_DOUBLE_HEAD, expand=True)
+        nav_table.add_column(justify="right", style=theme["text_key"], width=6)
+        nav_table.add_column(style=theme["text_body"])
+        nav_table.add_row("00", f"[{theme['text_sub']}]Kembali ke menu sebelumnya[/]")
+        #nav_table.add_row("99", f"[{theme['text_err']}]Kembali ke menu utama[/]")
+
+        console.print(Panel(
+            nav_table,
+            border_style=theme["border_info"],
+            padding=(0, 1),
+            expand=True
+        ))
+
 
         choice = console.input(f"[{theme['text_sub']}]Pilih paket:[/{theme['text_sub']}] ").strip()
         if choice == "00":
