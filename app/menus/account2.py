@@ -169,7 +169,7 @@ def show_account_menu():
         command_table = Table(show_header=False, box=MINIMAL_DOUBLE_HEAD, expand=True)
         command_table.add_column("Kode", justify="right", style=theme["text_key"], width=6)
         command_table.add_column("Pilih Aksi", style=theme["text_body"])
-        command_table.add_row("⚠️", "Pilih nomor akun, untuk berganti")
+        command_table.add_row("(1 - {len(users)})", "Pilih nomor akun, untuk berganti")
         command_table.add_row("T", "Tambah akun")
         command_table.add_row("H", f"[{theme['text_err']}]Hapus akun tersimpan[/]")
         command_table.add_row("00", f"[{theme['text_sub']}]Kembali ke menu utama[/]")
