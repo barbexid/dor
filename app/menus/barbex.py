@@ -31,11 +31,11 @@ def show_barbex_main_menu():
         ))
 
         menu_table = Table(show_header=False, box=MINIMAL_DOUBLE_HEAD, expand=True)
-        menu_table.add_column("No", justify="right", style=theme["text_key"], width=6)
+        menu_table.add_column("No", justify="right", style=theme["text_key"], width=4)
         menu_table.add_column("Daftar Paket", style=theme["text_body"])
         menu_table.add_row("1", "Paket v1")
         menu_table.add_row("2", "Paket v2")
-        menu_table.add_row("00", f"[{theme['text_sub']}]Kembali[/]")
+        menu_table.add_row("00", f"[{theme['text_sub']}]Kembali ke menu awal[/]")
 
         console.print(Panel(
             menu_table,
