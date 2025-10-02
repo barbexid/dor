@@ -1,7 +1,8 @@
 import json
 
 from app.menus.package2 import get_family_v2
-from app.config.auth_config import AuthInstance
+from app.service.auth import AuthInstance
+
 
 def build_package_json(family_code, is_enterprise=False, migration_type=None, output_file="generated_package.json"):
     api_key = AuthInstance.api_key
