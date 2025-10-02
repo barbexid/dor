@@ -36,7 +36,7 @@ def login_prompt(api_key: str):
     ))
 
     while True:
-        raw_input = console.input(f"[{theme['text_sub']}]Nomor:[/{theme['text_sub']}] ").strip()
+        raw_input = console.input(f"[{theme['text_sub']}]Masukan nomor XL:[/{theme['text_sub']}] ").strip()
         if raw_input == "00":
             print_panel("ℹ️ Dibatalkan", "Login dibatalkan oleh pengguna.")
             #pause()
