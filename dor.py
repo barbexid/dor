@@ -75,7 +75,7 @@ def show_main_menu(number, balance, display_quota, balance_expired_at):
 
     info_panel = Panel(
         info_table,
-        title=f"[{theme['text_title']}]⚜️ Informasi Akun ⚜️[/]",
+        title=f"[{theme['text_title']}]🛡️Informasi Akun🛡️[/]",
         title_align="center",
         border_style=theme["border_info"],
         padding=(1, 2),
