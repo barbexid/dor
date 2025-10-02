@@ -16,6 +16,12 @@ from app.client.qris2 import show_qris_payment_v2
 from app.type_dict import PaymentItem
 from app.config.theme_config import get_theme
 
+import json
+import os
+from rich.spinner import Spinner
+from rich.live import Live
+
+
 console = Console()
 
 def show_hot_main_menu():
@@ -61,6 +67,19 @@ def show_hot_main_menu():
             pause()
 
 
+
+CACHE_FILE = "family_cache.json"
+
+def load_family_cache():
+    if os.path.exists(CACHE_FILE):
+        with open(CACHE_FILE, "r", encoding="utf-8") as f:
+            return json.load(f)
+    return {}
+
+def save_family_cache(cache):
+    with open(CACHE_FILE, "w", encoding="utf-8") as f:
+        json.dump(cache, f, ensure_ascii=False, indent=2)
+
 def show_hot_menu():
     theme = get_theme()
     api_key = AuthInstance.api_key
@@ -71,81 +90,96 @@ def show_hot_menu():
         pause()
         return
 
-    while True:
-        clear_screen()
+    clear_screen()
 
-        # Panel loading
-        console.print(Panel(
-            "[bold]Memuat Daftar Paket HOT v1...[/]",
-            border_style=theme["border_info"],
-            padding=(0, 1),
-            expand=True
-        ))
+    console.print(Panel(
+        "[bold]Memuat Daftar Paket HOT v1...[/]",
+        border_style=theme["border_info"],
+        padding=(0, 1),
+        expand=True
+    ))
 
-        url = "https://me.mashu.lol/pg-hot.json"
-        try:
-            response = requests.get(url, timeout=30)
-            response.raise_for_status()
-            hot_packages = response.json()
-        except Exception:
-            print_panel("⚠️ Error", "Gagal mengambil data HOT Package.")
-            pause()
-            return
+    url = "https://me.mashu.lol/pg-hot.json"
+    try:
+        response = requests.get(url, timeout=30)
+        response.raise_for_status()
+        hot_packages = response.json()
+    except Exception:
+        print_panel("⚠️ Error", "Gagal mengambil data HOT Package.")
+        pause()
+        return
 
-        # Panel judul
-        console.print(Panel(
-            Align.center("✨ Paket HOT v1 ✨", vertical="middle"),
-            border_style=theme["border_info"],
-            padding=(1, 2),
-            expand=True
-        ))
+    # Load cache dari file
+    raw_cache = load_family_cache()
+    family_cache = {
+        eval(k): v for k, v in raw_cache.items()
+    }
 
-        # Tabel daftar paket
-        table = Table(box=MINIMAL_DOUBLE_HEAD, expand=True)
-        table.add_column("No", justify="right", style=theme["text_key"], width=6)
-        table.add_column("Nama Paket", style=theme["text_body"])
-        table.add_column("Harga", justify="right", style=theme["text_sub"], width=12)
+    enriched_packages = []
+    with Live(Spinner("dots", text="🔄 Mengambil semua data paket..."), refresh_per_second=10):
+        for p in hot_packages:
+            fc_key = (p["family_code"], p["is_enterprise"])
+            if fc_key in family_cache:
+                family_data = family_cache[fc_key]
+            else:
+                family_data = get_family_v2(api_key, tokens, p["family_code"], p["is_enterprise"])
+                if family_data:
+                    family_cache[fc_key] = family_data
 
-        enriched_packages = []
-        for idx, p in enumerate(hot_packages):
-            label = f"{p['family_name']} - {p['variant_name']} - {p['option_name']}"
-            harga = "Rp0"
-
-            # Ambil harga dari data family resmi
-            family_data = get_family_v2(api_key, tokens, p["family_code"], p["is_enterprise"])
             if family_data:
                 for variant in family_data["package_variants"]:
                     if variant["name"] == p["variant_name"]:
                         for option in variant["package_options"]:
                             if option["order"] == p["order"]:
-                                harga = get_rupiah(option["price"])
                                 p["option_code"] = option["package_option_code"]
+                                p["price"] = option["price"]
                                 break
-
             enriched_packages.append(p)
-            table.add_row(str(idx + 1), label, harga)
 
-        console.print(Panel(
-            table,
-            border_style=theme["border_primary"],
-            padding=(0, 0),
-            expand=True
-        ))
+    # Simpan cache ke file
+    raw_cache = {
+        str(k): v for k, v in family_cache.items()
+    }
+    save_family_cache(raw_cache)
 
-        # Panel navigasi
-        nav_table = Table(show_header=False, box=MINIMAL_DOUBLE_HEAD, expand=True)
-        nav_table.add_column(justify="right", style=theme["text_key"], width=4)
-        nav_table.add_column(style=theme["text_body"])
-        nav_table.add_row("00", f"[{theme['text_sub']}]Kembali ke menu sebelumnya[/]")
+    # Tampilkan hasil
+    console.print(Panel(
+        Align.center("✨ Paket HOT v1 ✨", vertical="middle"),
+        border_style=theme["border_info"],
+        padding=(1, 2),
+        expand=True
+    ))
 
-        console.print(Panel(
-            nav_table,
-            border_style=theme["border_info"],
-            padding=(0, 1),
-            expand=True
-        ))
+    table = Table(box=MINIMAL_DOUBLE_HEAD, expand=True)
+    table.add_column("No", justify="right", style=theme["text_key"], width=6)
+    table.add_column("Nama Paket", style=theme["text_body"])
+    table.add_column("Harga", justify="right", style=theme["text_sub"], width=12)
 
-        # Input pilihan
+    for idx, p in enumerate(enriched_packages):
+        label = f"{p['family_name']} - {p['variant_name']} - {p['option_name']}"
+        harga = get_rupiah(p.get("price", 0))
+        table.add_row(str(idx + 1), label, harga)
+
+    console.print(Panel(
+        table,
+        border_style=theme["border_primary"],
+        padding=(0, 0),
+        expand=True
+    ))
+
+    nav_table = Table(show_header=False, box=MINIMAL_DOUBLE_HEAD, expand=True)
+    nav_table.add_column(justify="right", style=theme["text_key"], width=4)
+    nav_table.add_column(style=theme["text_body"])
+    nav_table.add_row("00", f"[{theme['text_sub']}]Kembali ke menu sebelumnya[/]")
+
+    console.print(Panel(
+        nav_table,
+        border_style=theme["border_info"],
+        padding=(0, 1),
+        expand=True
+    ))
+
+    while True:
         choice = console.input(f"[{theme['text_sub']}]Pilih paket:[/{theme['text_sub']}] ").strip()
         if choice == "00":
             return
@@ -162,13 +196,12 @@ def show_hot_menu():
             if result == "MAIN":
                 return
             elif result == "BACK":
-                continue
+                return
             elif result is True:
                 return
         else:
             print_panel("⚠️ Error", "Input tidak valid. Silakan masukkan nomor yang tersedia.")
             pause()
-
 
 def show_hot_menu2():
     theme = get_theme()
