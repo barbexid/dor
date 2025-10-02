@@ -25,7 +25,7 @@ def show_barbex_main_menu():
 
         console.print(Panel(
             Align.center("✨ Paket Lainnya ✨", vertical="middle"),
-            border_style=theme["border_primary"],
+            border_style=theme["border_info"],
             padding=(1, 2),
             expand=True
         ))
@@ -39,7 +39,7 @@ def show_barbex_main_menu():
 
         console.print(Panel(
             menu_table,
-            border_style=theme["border_info"],
+            border_style=theme["border_primary"],
             padding=(0, 0),
             expand=True
         ))
@@ -81,7 +81,7 @@ def show_barbex_menu():
 
         console.print(Panel(
             Align.center("✨ Paket Lainnya v1 ✨", vertical="middle"),
-            border_style=theme["border_primary"],
+            border_style=theme["border_info"],
             padding=(1, 2),
             expand=True
         ))
@@ -94,12 +94,9 @@ def show_barbex_menu():
             label = f"{p['family_name']} - {p['variant_name']} - {p['option_name']}"
             table.add_row(str(idx + 1), label)
 
-        #table.add_row("00", f"[{theme['text_sub']}]Kembali ke menu sebelumnya[/]")
-        #table.add_row("99", f"[{theme['text_err']}]Kembali ke menu utama[/]")
-
         console.print(Panel(
             table,
-            border_style=theme["border_info"],
+            border_style=theme["border_primary"],
             padding=(0, 0),
             expand=True
         ))
@@ -184,7 +181,7 @@ def show_barbex_menu2():
 
         console.print(Panel(
             Align.center("✨ Paket Lainnya v2 ✨", vertical="middle"),
-            border_style=theme["border_primary"],
+            border_style=theme["border_info"],
             padding=(1, 2),
             expand=True
         ))
@@ -198,12 +195,9 @@ def show_barbex_menu2():
             formatted_price = get_rupiah(p["price"])
             table.add_row(str(idx + 1), p["name"], formatted_price)
 
-        #table.add_row("00", f"[{theme['text_sub']}]Kembali ke menu sebelumnya[/]", "")
-        #table.add_row("99", f"[{theme['text_err']}]Kembali ke menu utama[/]", "")
-
         console.print(Panel(
             table,
-            border_style=theme["border_info"],
+            border_style=theme["border_primary"],
             padding=(0, 0),
             expand=True
         ))
