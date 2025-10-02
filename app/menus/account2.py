@@ -152,7 +152,7 @@ def show_account_menu():
         ))
 
         account_table = Table(box=MINIMAL_DOUBLE_HEAD, expand=True)
-        account_table.add_column("No", justify="right", style=theme["text_key"], width=6)
+        account_table.add_column("No", justify="right", style=theme["text_key"], width=4)
         account_table.add_column("Nomor XL", style=theme["text_body"])
         account_table.add_column("Status", style=theme["text_sub"], justify="center")
 
