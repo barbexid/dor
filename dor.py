@@ -90,17 +90,17 @@ def show_main_menu(number, balance, display_quota, balance_expired_at):
     menu_table.add_column("Kode", justify="right", style=theme["text_key"], width=6)
     menu_table.add_column("Aksi", style=theme["text_body"])
 
-    menu_table.add_row("1", "Login/Ganti akun")
-    menu_table.add_row("2", "Lihat Paket Saya")
-    menu_table.add_row("3", "Beli Paket HOT")
-    menu_table.add_row("4", "Beli Paket HOT-2")
-    menu_table.add_row("5", "Beli Paket Lainnya")
-    menu_table.add_row("6", "Simpan/Kelola Family Code")
-    menu_table.add_row("7", "Beli Paket Berdasarkan Family Code")
-    menu_table.add_row("66", f"[{theme['text_body']}]Bookmark Paket[/]")
-    menu_table.add_row("77", f"[{theme['text_body']}]Info Unlock Code [/]")
-    menu_table.add_row("88", f"[{theme['text_sub']}]Ganti Tema CLI[/]")
-    menu_table.add_row("99", f"[{theme['text_err']}]Tutup aplikasi[/]")
+    menu_table.add_row("1", "🔐 Login/Ganti akun")
+    menu_table.add_row("2", "🕵️ Lihat Paket Saya")
+    menu_table.add_row("3", "🔥 Beli Paket HOT")
+    menu_table.add_row("4", "🔥 Beli Paket HOT-2")
+    menu_table.add_row("5", "🛒 Beli Paket Lainnya")
+    menu_table.add_row("6", "🪩 Beli Paket Berdasarkan Family Code")
+    menu_table.add_row("7", "⚙️ Simpan/Kelola Family Code")
+    menu_table.add_row("66", f"[{theme['text_body']}]🔖 Bookmark Paket[/]")
+    menu_table.add_row("77", f"[{theme['text_body']}]📢 Info Unlock Code [/]")
+    menu_table.add_row("88", f"[{theme['text_sub']}]🎨 Ganti Tema CLI[/]")
+    menu_table.add_row("99", f"[{theme['text_err']}]⛔ Tutup aplikasi[/]")
 
     menu_panel = Panel(
         menu_table,
