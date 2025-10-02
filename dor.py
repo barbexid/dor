@@ -117,18 +117,18 @@ def show_theme_menu():
         clear_screen()
         theme = get_theme()
         presets = get_all_presets()
-
         theme_names = list(presets.keys())
 
-        judul_panel = Panel(
+        # Panel judul
+        console.print(Panel(
             Align.center("🎨 Pilih Tema CLI", vertical="middle"),
             style=theme["text_title"],
             border_style=theme["border_info"],
             padding=(1, 2),
             expand=True,
-        )
-        console.print(judul_panel)
+        ))
 
+        # Tabel daftar tema
         table = Table(box=MINIMAL_DOUBLE_HEAD, expand=True)
         table.add_column("No", justify="right", style=theme["text_number"], width=6)
         table.add_column("Nama Tema", style=theme["text_body"])
@@ -145,8 +145,6 @@ def show_theme_menu():
             )
             table.add_row(str(idx), name.replace("_", " ").title(), preview)
 
-        table.add_row("00", f"[{theme['text_err']}]Kembali[/]", "")
-
         console.print(Panel(
             table,
             border_style=theme["border_primary"],
@@ -154,6 +152,20 @@ def show_theme_menu():
             expand=True
         ))
 
+        # Panel navigasi terpisah
+        nav_table = Table(show_header=False, box=MINIMAL_DOUBLE_HEAD, expand=True)
+        nav_table.add_column(justify="right", style=theme["text_key"], width=6)
+        nav_table.add_column(style=theme["text_body"])
+        nav_table.add_row("00", f"[{theme['text_err']}]Kembali ke menu utama[/]")
+
+        console.print(Panel(
+            nav_table,
+            border_style=theme["border_info"],
+            padding=(0, 1),
+            expand=True
+        ))
+
+        # Input pilihan
         choice = console.input(
             f"[{theme['text_sub']}]Pilih nomor tema:[/{theme['text_sub']}] "
         ).strip()
