@@ -6,10 +6,10 @@ import sys
 import json
 from datetime import datetime
 
-from app.client.engsel3 import *
+from app.client.engsel2 import *
 from app.service.auth import AuthInstance
 from app.menus.bookmark3 import show_bookmark_menu
-from app.menus.donate import show_donate_menu
+from app.menus.donate3 import show_donate_menu
 from app.menus.account3 import show_account_menu
 from app.menus.package3 import (
     fetch_my_packages,
