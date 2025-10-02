@@ -75,6 +75,7 @@ def login_prompt(api_key: str):
         pause()
         return None, None
 
+
 def show_account_menu():
     clear_screen()
     theme = get_theme()
@@ -88,14 +89,14 @@ def show_account_menu():
     MAX_FREE_ACCOUNTS = 2
     UNLOCK_CODE = "@barbex_id-vip"
     unlock_data = load_unlock_status()
-    is_unlocked = unlock_data.get("is_unlocked", False)
+    is_unlocked = unlock_data.get("is_unlocked", False)  # cache di memori
 
     while in_account_menu:
         clear_screen()
 
         if add_user and len(users) >= MAX_FREE_ACCOUNTS and not is_unlocked:
             console.print(Panel(
-                Align.center("🚫 Batas akun gratis tercapai (maks 2 akun).\nMasukkan kode unlock untuk menambah lebih banyak akun.", vertical="middle"),
+                Align.center("🚫 Batas akun tercapai (maks 2 akun).\nMasukkan kode unlock untuk menambah lebih banyak akun.", vertical="middle"),
                 border_style=theme["border_warning"],
                 padding=(1, 2),
                 expand=True
@@ -128,6 +129,7 @@ def show_account_menu():
             add_user = False
             continue
 
+        # Tampilkan akun tersimpan
         console.print(Panel(
             Align.center("📱 Akun Tersimpan", vertical="middle"),
             border_style=theme["border_info"],
@@ -148,13 +150,9 @@ def show_account_menu():
                 status = "✅ Aktif" if is_active else "-"
                 account_table.add_row(str(idx + 1), str(user["number"]), status)
 
-        console.print(Panel(
-            account_table,
-            border_style=theme["border_primary"],
-            padding=(0, 1),
-            expand=True
-        ))
+        console.print(Panel(account_table, border_style=theme["border_primary"], padding=(0, 1), expand=True))
 
+        # Tampilkan menu perintah
         command_table = Table(show_header=False, box=MINIMAL_DOUBLE_HEAD, expand=True)
         command_table.add_column("Kode", justify="right", style=theme["text_key"], width=6)
         command_table.add_column("Pilih Aksi", style=theme["text_body"])
@@ -163,12 +161,7 @@ def show_account_menu():
         command_table.add_row("H", f"[{theme['text_err']}]Hapus akun tersimpan[/]")
         command_table.add_row("00", f"[{theme['text_sub']}]Kembali ke menu utama[/]")
 
-        console.print(Panel(
-            command_table,
-            border_style=theme["border_info"],
-            padding=(0, 1),
-            expand=True
-        ))
+        console.print(Panel(command_table, border_style=theme["border_info"], padding=(0, 1), expand=True))
 
         input_str = console.input(f"[{theme['text_sub']}]Pilihan:[/{theme['text_sub']}] ").strip()
 
