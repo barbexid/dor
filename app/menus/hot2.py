@@ -153,7 +153,7 @@ def show_hot_menu():
     table = Table(box=MINIMAL_DOUBLE_HEAD, expand=True)
     table.add_column("No", justify="right", style=theme["text_key"], width=6)
     table.add_column("Nama Paket", style=theme["text_body"])
-    table.add_column("Harga", justify="left", style=theme["text_money"], width=10)
+    table.add_column("Harga", justify="right", style=theme["text_money"], width=10)
 
     for idx, p in enumerate(enriched_packages):
         label = f"{p['family_name']} - {p['variant_name']} - {p['option_name']}"
