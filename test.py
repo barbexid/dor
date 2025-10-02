@@ -1,4 +1,8 @@
 import json
+from dotenv import load_dotenv
+import os
+
+load_dotenv()  # Ini akan membaca file .env secara otomatis
 from app.menus.package2 import get_family_v2
 from app.config.auth_config import AuthInstance
 
