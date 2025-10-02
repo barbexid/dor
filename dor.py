@@ -93,11 +93,12 @@ def show_main_menu(number, balance, display_quota, balance_expired_at):
     menu_table.add_row("2", "Lihat Paket Saya")
     menu_table.add_row("3", "Beli Paket HOT")
     menu_table.add_row("4", "Beli Paket HOT-2")
-    menu_table.add_row("5", "Beli Paket Lainnya..")
+    menu_table.add_row("5", "Beli Paket Lainnya")
     menu_table.add_row("6", "Simpan/Kelola Family Code")
     menu_table.add_row("7", "Beli Paket Berdasarkan Family Code")
-    menu_table.add_row("55", f"[{theme['text_body']}]Bookmark Paket[/]")
-    menu_table.add_row("77", f"[{theme['text_sub']}]Ganti Tema CLI[/]")
+    menu_table.add_row("66", f"[{theme['text_body']}]Bookmark Paket[/]")
+    menu_table.add_row("77", f"[{theme['text_body']}]Menu Paket VIP[/]")
+    menu_table.add_row("88", f"[{theme['text_sub']}]Ganti Tema CLI[/]")
     menu_table.add_row("99", f"[{theme['text_err']}]Tutup aplikasi[/]")
 
     menu_panel = Panel(
@@ -293,10 +294,13 @@ def main():
             elif result == "BACK":
                 continue
 
-        elif choice == "55":
+        elif choice == "66":
             show_bookmark_menu()
 
         elif choice == "77":
+            show_donate_menu()
+
+        elif choice == "88":
             show_theme_menu()
 
         elif choice == "99":
