@@ -12,7 +12,7 @@ from app.service.auth import AuthInstance
 from app.menus.util import clear_screen
 from app.menus.anu_util import pause, print_panel, get_rupiah
 from app.client.ewallet import show_multipayment_v2
-from app.client.qris import show_qris_payment_v2
+from app.client.qris2 import show_qris_payment_v2
 from app.type_dict import PaymentItem
 from app.config.theme_config import get_theme
 
