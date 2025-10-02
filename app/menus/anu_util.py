@@ -63,3 +63,13 @@ def get_rupiah(value) -> str:
 
     return f"{formatted} {suffix}" if suffix else formatted
 
+# banner
+import shutil
+
+def center_ascii(ascii_art):
+    terminal_width = shutil.get_terminal_size().columns
+    centered_lines = []
+    for line in str(ascii_art).splitlines():
+        padding = max((terminal_width - len(line)) // 2, 0)
+        centered_lines.append(" " * padding + line)
+    return "\n".join(centered_lines)
