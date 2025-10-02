@@ -65,7 +65,7 @@ def login_prompt(api_key: str):
             otp = console.input(f"[{theme['text_sub']}]Masukkan OTP (percobaan {attempts+1}/5):[/{theme['text_sub']}] ").strip()
             if otp == "00":
                 print_panel("ℹ️ Dibatalkan", "Login dibatalkan oleh pengguna.")
-                pause()
+                #pause()
                 return None, None
             if not otp.isdigit() or len(otp) != 6:
                 print_panel("⚠️ Error", "OTP tidak valid. Harus 6 digit angka.")
