@@ -6,8 +6,6 @@ import sys
 import json
 from datetime import datetime
 
-from test import build_package_json
-
 from app.client.engsel2 import *
 from app.service.auth import AuthInstance
 from app.menus.bookmark2 import show_bookmark_menu
@@ -103,7 +101,6 @@ def show_main_menu(number, balance, display_quota, balance_expired_at):
     menu_table.add_row("77", f"[{theme['text_body']}]Info Unlock Code [/]")
     menu_table.add_row("88", f"[{theme['text_sub']}]Ganti Tema CLI[/]")
     menu_table.add_row("99", f"[{theme['text_err']}]Tutup aplikasi[/]")
-    menu_table.add_row("33", f"[{theme['text_err']}]Test[/]")
 
     menu_panel = Panel(
         menu_table,
@@ -301,9 +298,6 @@ def main():
         elif choice == "66":
             show_bookmark_menu()
 
-        elif choice == "33":
-            build_package_json()
-
         elif choice == "77":
             show_donate_menu()
 
@@ -334,8 +328,4 @@ if __name__ == "__main__":
     except KeyboardInterrupt:
         print_panel("👋 Keluar", "Aplikasi dihentikan oleh pengguna.")
 
-# Contoh penggunaan
-#if __name__ == "__main__":
-    code = input("Masukkan family code: ").strip()
-    build_package_json(code)
 
