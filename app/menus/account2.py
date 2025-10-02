@@ -152,7 +152,7 @@ def show_account_menu():
         ))
 
         account_table = Table(box=MINIMAL_DOUBLE_HEAD, expand=True)
-        account_table.add_column("No", justify="right", style=theme["text_key"], width=4)
+        account_table.add_column("No", justify="right", style=theme["text_key"], width=6)
         account_table.add_column("Nomor XL", style=theme["text_body"])
         account_table.add_column("Status", style=theme["text_sub"], justify="center")
 
@@ -167,7 +167,7 @@ def show_account_menu():
         console.print(Panel(account_table, border_style=theme["border_primary"], padding=(0, 1), expand=True))
 
         command_table = Table(show_header=False, box=MINIMAL_DOUBLE_HEAD, expand=True)
-        command_table.add_column("Kode", justify="right", style=theme["text_key"], width=6)
+        command_table.add_column("Kode", justify="right", style=theme["text_key"], width=8)
         command_table.add_column("Pilih Aksi", style=theme["text_body"])
         command_table.add_row(f"(1 - {len(users)})", "Pilih nomor akun untuk berganti")
         command_table.add_row("T", "Tambah akun")
