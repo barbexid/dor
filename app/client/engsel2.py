@@ -19,29 +19,24 @@ SUBMIT_OTP_URL = BASE_CIAM_URL + "/realms/xl-ciam/protocol/openid-connect/token"
 UA = os.getenv("UA")
 
 def validate_contact(contact: str) -> bool:
-    if not contact.startswith("628") or len(contact) > 14:
-        print("Invalid number")
-        return False
-    return True
+    return contact.startswith("628") and contact.isdigit() and 10 <= len(contact) <= 14
 
-def get_otp(contact: str) -> str:
-    # Contact example: "6287896089467"
+
+def get_otp(contact: str) -> str | None:
     if not validate_contact(contact):
         return None
-    
-    url = GET_OTP_URL
 
+    url = GET_OTP_URL
     querystring = {
         "contact": contact,
         "contactType": "SMS",
         "alternateContact": "false"
     }
-    
+
     now = datetime.now(timezone(timedelta(hours=7)))
     ax_request_at = java_like_timestamp(now)  # format: "2023-10-20T12:34:56.78+07:00"
     ax_request_id = str(uuid.uuid4())
 
-    payload = ""
     headers = {
         "Accept-Encoding": "gzip, deflate, br",
         "Authorization": f"Basic {BASIC_AUTH}",
@@ -57,30 +52,31 @@ def get_otp(contact: str) -> str:
         "User-Agent": UA,
     }
 
-    print("Requesting OTP...")
     try:
-        response = requests.request("GET", url, data=payload, headers=headers, params=querystring, timeout=30)
-        print("response body", response.text)
-        json_body = json.loads(response.text)
-    
+        response = requests.get(url, headers=headers, params=querystring, timeout=30)
+        response.raise_for_status()
+        json_body = response.json()
+
         if "subscriber_id" not in json_body:
-            print(json_body.get("error", "No error message in response"))
-            raise ValueError("Subscriber ID not found in response")
-        
+            return None
+
         return json_body["subscriber_id"]
-    except Exception as e:
-        print(f"Error requesting OTP: {e}")
+
+    except requests.RequestException:
         return None
-    
-def submit_otp(api_key: str, contact: str, code: str):
+    except json.JSONDecodeError:
+        return None
+    except Exception:
+        return None
+
+
+def submit_otp(api_key: str, contact: str, code: str) -> dict | None:
     if not validate_contact(contact):
-        print("Invalid number")
         return None
-    
-    if not code or len(code) != 6:
-        print("Invalid OTP code format")
+
+    if not code or len(code) != 6 or not code.isdigit():
         return None
-    
+
     url = SUBMIT_OTP_URL
 
     now_gmt7 = datetime.now(timezone(timedelta(hours=7)))
@@ -107,19 +103,20 @@ def submit_otp(api_key: str, contact: str, code: str):
 
     try:
         response = requests.post(url, data=payload, headers=headers, timeout=30)
-        json_body = json.loads(response.text)
-        
+        response.raise_for_status()
+        json_body = response.json()
+
         if "error" in json_body:
-            print(f"[Error submit_otp]: {json_body['error_description']}")
             return None
-        
-        print("Login successful.")
+
         return json_body
-    except requests.RequestException as e:
-        print(f"[Error submit_otp]: {e}")
+
+    except (requests.RequestException, json.JSONDecodeError):
         return None
 
-def get_new_token(refresh_token: str) -> str:
+
+
+def get_new_token(refresh_token: str) -> str | None:
     url = SUBMIT_OTP_URL
 
     now = datetime.now(timezone(timedelta(hours=7)))  # GMT+7
@@ -145,22 +142,24 @@ def get_new_token(refresh_token: str) -> str:
         "refresh_token": refresh_token
     }
 
-    resp = requests.post(url, headers=headers, data=data, timeout=30)
-    if resp.status_code == 400:
-        if resp.json().get("error_description") == "Session not active":
-            print("Refresh token expired. Pleas remove and re-add the account.")
-            return None
-        
-    resp.raise_for_status()
+    try:
+        resp = requests.post(url, headers=headers, data=data, timeout=30)
+        if resp.status_code == 400:
+            error_desc = resp.json().get("error_description", "")
+            if error_desc == "Session not active":
+                return None
 
-    body = resp.json()
-    
-    if "id_token" not in body:
-        raise ValueError("ID token not found in response")
-    if "error" in body:
-        raise ValueError(f"Error in response: {body['error']} - {body.get('error_description', '')}")
-    
-    return body
+        resp.raise_for_status()
+        body = resp.json()
+
+        if "error" in body or "id_token" not in body:
+            return None
+
+        return body["id_token"]
+
+    except (requests.RequestException, ValueError):
+        return None
+
 
 def send_api_request(
     api_key: str,
@@ -176,15 +175,14 @@ def send_api_request(
         id_token=id_token,
         payload=payload_dict
     )
-    
+
     xtime = int(encrypted_payload["encrypted_body"]["xtime"])
-    
+    sig_time_sec = xtime // 1000
     now = datetime.now(timezone.utc).astimezone()
-    sig_time_sec = (xtime // 1000)
 
     body = encrypted_payload["encrypted_body"]
     x_sig = encrypted_payload["x_signature"]
-    
+
     headers = {
         "host": BASE_API_URL.replace("https://", ""),
         "content-type": "application/json; charset=utf-8",
@@ -198,24 +196,17 @@ def send_api_request(
         "x-request-at": java_like_timestamp(now),
         "x-version-app": "8.7.0",
     }
-    
-    
 
     url = f"{BASE_API_URL}/{path}"
-    resp = requests.post(url, headers=headers, data=json.dumps(body), timeout=30)
-    
-    # print(f"Headers: {json.dumps(headers, indent=2)}")
-    # print(f"Response body: {resp.text}")
-
     try:
-        decrypted_body = decrypt_xdata(api_key, json.loads(resp.text))
-        # print(f"Decrypted body: {json.dumps(decrypted_body, indent=2)}")
-        return decrypted_body
-    except Exception as e:
-        print("[decrypt err]", e)
+        resp = requests.post(url, headers=headers, data=json.dumps(body), timeout=30)
+        resp.raise_for_status()
+        return decrypt_xdata(api_key, resp.json())
+    except Exception:
         return resp.text
 
-def get_profile(api_key: str, access_token: str, id_token: str) -> dict:
+
+def get_profile(api_key: str, access_token: str, id_token: str) -> dict | None:
     path = "api/v8/profile"
 
     raw_payload = {
@@ -225,40 +216,36 @@ def get_profile(api_key: str, access_token: str, id_token: str) -> dict:
         "lang": "en"
     }
 
-    print("Fetching profile...")
     res = send_api_request(api_key, path, raw_payload, id_token, "POST")
+    return res.get("data") if isinstance(res, dict) else None
 
-    return res.get("data")
 
-def get_balance(api_key: str, id_token: str) -> dict:
+def get_balance(api_key: str, id_token: str) -> dict | None:
     path = "api/v8/packages/balance-and-credit"
-    
+
     raw_payload = {
         "is_enterprise": False,
         "lang": "en"
     }
-    
-    print("Fetching balance...")
+
     res = send_api_request(api_key, path, raw_payload, id_token, "POST")
-    # print(f"[GB-256]:\n{json.dumps(res, indent=2)}")
-    
-    if "data" in res:
-        if "balance" in res["data"]:
-            return res["data"]["balance"]
-    else:
-        print("Error getting balance:", res.get("error", "Unknown error"))
-        return None
-    
+
+    if isinstance(res, dict) and "data" in res and "balance" in res["data"]:
+        return res["data"]["balance"]
+
+    return None
+
+
 def get_family(
     api_key: str,
     tokens: dict,
     family_code: str,
     is_enterprise: bool = False,
     migration_type: str = "NONE"
-) -> dict:
-    print("Fetching package family...")
+) -> dict | None:
     path = "api/v8/xl-stores/options/list"
     id_token = tokens.get("id_token")
+
     payload_dict = {
         "is_show_tagging_tab": True,
         "is_dedicated_event": True,
@@ -272,17 +259,13 @@ def get_family(
         "is_migration": False,
         "lang": "en"
     }
-    
+
     res = send_api_request(api_key, path, payload_dict, id_token, "POST")
-    if res.get("status") != "SUCCESS":
-        print(f"Failed to get family {family_code}")
-        print(json.dumps(res, indent=2))
-        input("Press Enter to continue...")
-        return None
-    # print(json.dumps(res, indent=2))
-    return res["data"]
 
+    if isinstance(res, dict) and res.get("status") == "SUCCESS":
+        return res.get("data")
 
+    return None
 
 
 def get_family_v2(
@@ -291,7 +274,7 @@ def get_family_v2(
     family_code: str,
     is_enterprise: bool | None = None,
     migration_type: str | None = None
-) -> dict:
+) -> dict | None:
     is_enterprise_list = [is_enterprise] if is_enterprise is not None else [False, True]
     migration_type_list = [migration_type] if migration_type is not None else [
         "NONE", "PRE_TO_PRIOH", "PRIOH_TO_PRIO"
@@ -302,11 +285,11 @@ def get_family_v2(
     family_data = None
 
     for mt in migration_type_list:
-        if family_data is not None:
+        if family_data:
             break
 
         for ie in is_enterprise_list:
-            if family_data is not None:
+            if family_data:
                 break
 
             payload_dict = {
@@ -324,7 +307,7 @@ def get_family_v2(
             }
 
             res = send_api_request(api_key, path, payload_dict, id_token, "POST")
-            if res.get("status") == "SUCCESS":
+            if isinstance(res, dict) and res.get("status") == "SUCCESS":
                 family_name = res["data"]["package_family"].get("name", "")
                 if family_name:
                     family_data = res["data"]
@@ -333,9 +316,9 @@ def get_family_v2(
     return family_data
 
 
-def get_families(api_key: str, tokens: dict, package_category_code: str) -> dict:
-    print("Fetching families...")
+def get_families(api_key: str, tokens: dict, package_category_code: str) -> dict | None:
     path = "api/v8/xl-stores/families"
+
     payload_dict = {
         "migration_type": "",
         "is_enterprise": False,
@@ -345,15 +328,14 @@ def get_families(api_key: str, tokens: dict, package_category_code: str) -> dict
         "is_migration": False,
         "lang": "id"
     }
-    
+
     res = send_api_request(api_key, path, payload_dict, tokens["id_token"], "POST")
-    if res.get("status") != "SUCCESS":
-        print(f"Failed to get families for category {package_category_code}")
-        print(f"Res:{res}")
-        # print(json.dumps(res, indent=2))
-        input("Press Enter to continue...")
-        return None
-    return res["data"]
+
+    if isinstance(res, dict) and res.get("status") == "SUCCESS":
+        return res.get("data")
+
+    return None
+
 
 def get_package(
     api_key: str,
@@ -361,9 +343,9 @@ def get_package(
     package_option_code: str,
     package_family_code: str = "",
     package_variant_code: str = ""
-    ) -> dict:
+) -> dict | None:
     path = "api/v8/xl-stores/options/detail"
-    
+
     raw_payload = {
         "is_transaction_routine": False,
         "migration_type": "NONE",
@@ -378,57 +360,53 @@ def get_package(
         "is_upsell_pdp": False,
         "package_variant_code": package_variant_code
     }
-    
-    print("Fetching package...")
-    # print(f"Payload: {json.dumps(raw_payload, indent=2)}")
-    res = send_api_request(api_key, path, raw_payload, tokens["id_token"], "POST")
-    
-    if "data" not in res:
-        print(json.dumps(res, indent=2))
-        print("Error getting package:", res.get("error", "Unknown error"))
-        return None
-        
-    return res["data"]
 
-def get_addons(api_key: str, tokens: dict, package_option_code: str) -> dict:
+    res = send_api_request(api_key, path, raw_payload, tokens["id_token"], "POST")
+
+    if isinstance(res, dict) and "data" in res:
+        return res["data"]
+
+    return None
+
+
+def get_addons(api_key: str, tokens: dict, package_option_code: str) -> dict | None:
     path = "api/v8/xl-stores/options/addons-pinky-box"
-    
+
     raw_payload = {
         "is_enterprise": False,
         "lang": "en",
         "package_option_code": package_option_code
     }
-    
-    print("Fetching addons...")
+
     res = send_api_request(api_key, path, raw_payload, tokens["id_token"], "POST")
-    
-    if "data" not in res:
-        print("Error getting addons:", res.get("error", "Unknown error"))
-        return None
-        
-    return res["data"]
+
+    if isinstance(res, dict) and "data" in res:
+        return res["data"]
+
+    return None
+
 
 def intercept_page(
     api_key: str,
     tokens: dict,
     option_code: str,
     is_enterprise: bool = False
-):
+) -> dict | None:
     path = "misc/api/v8/utility/intercept-page"
-    
+
     raw_payload = {
         "is_enterprise": is_enterprise,
         "lang": "en",
         "package_option_code": option_code
     }
-    
-    print("Fetching intercept page...")
+
     res = send_api_request(api_key, path, raw_payload, tokens["id_token"], "POST")
-    
-    if "status" in res:
-        print(f"Intercept status: {res['status']}")
-    else:
-        print("Intercept error")
+
+    if isinstance(res, dict) and "status" in res:
+        return res
+
+    return None
+
 
 def send_payment_request(
     api_key: str,
@@ -438,10 +416,10 @@ def send_payment_request(
     token_payment: str,
     ts_to_sign: int,
     payment_for: str = "BUY_PACKAGE"
-):
+) -> dict | str:
     path = "payments/api/v8/settlement-balance"
     package_code = payload_dict["items"][0]["item_code"]
-    
+
     encrypted_payload = encryptsign_xdata(
         api_key=api_key,
         method="POST",
@@ -449,14 +427,14 @@ def send_payment_request(
         id_token=id_token,
         payload=payload_dict
     )
-    
+
     xtime = int(encrypted_payload["encrypted_body"]["xtime"])
-    sig_time_sec = (xtime // 1000)
+    sig_time_sec = xtime // 1000
     x_requested_at = datetime.fromtimestamp(sig_time_sec, tz=timezone.utc).astimezone()
     payload_dict["timestamp"] = ts_to_sign
-    
+
     body = encrypted_payload["encrypted_body"]
-    
+
     x_sig = get_x_signature_payment(
         api_key,
         access_token,
@@ -466,7 +444,7 @@ def send_payment_request(
         "BALANCE",
         payment_for
     )
-    
+
     headers = {
         "host": BASE_API_URL.replace("https://", ""),
         "content-type": "application/json; charset=utf-8",
@@ -480,54 +458,42 @@ def send_payment_request(
         "x-request-at": java_like_timestamp(x_requested_at),
         "x-version-app": "8.7.0",
     }
-    
+
     url = f"{BASE_API_URL}/{path}"
-    resp = requests.post(url, headers=headers, data=json.dumps(body), timeout=30)
-    
     try:
-        decrypted_body = decrypt_xdata(api_key, json.loads(resp.text))
-        return decrypted_body
-    except Exception as e:
-        print("[decrypt err]", e)
+        resp = requests.post(url, headers=headers, data=json.dumps(body), timeout=30)
+        resp.raise_for_status()
+        return decrypt_xdata(api_key, resp.json())
+    except Exception:
         return resp.text
+
 
 def purchase_package(
     api_key: str,
     tokens: dict,
-    package_option_code:str,
+    package_option_code: str,
     is_enterprise: bool = False
-    ) -> dict:
+) -> dict | None:
     package_details_data = get_package(api_key, tokens, package_option_code)
     if not package_details_data:
-        print("Failed to get package details for purchase.")
         return None
-    
+
     token_confirmation = package_details_data["token_confirmation"]
     payment_target = package_details_data["package_option"]["package_option_code"]
-    
+
     variant_name = package_details_data["package_detail_variant"].get("name", "")
     option_name = package_details_data["package_option"].get("name", "")
     item_name = f"{variant_name} {option_name}".strip()
-    
+
     activated_autobuy_code = package_details_data["package_option"]["activated_autobuy_code"]
     autobuy_threshold_setting = package_details_data["package_option"]["autobuy_threshold_setting"]
     can_trigger_rating = package_details_data["package_option"]["can_trigger_rating"]
-    payment_for = package_details_data["package_family"]["payment_for"]
-    
+    payment_for = package_details_data["package_family"].get("payment_for", "BUY_PACKAGE")
     price = package_details_data["package_option"]["price"]
-    amount_str = input(f"Total amount is {price}.\nEnter value if you need to overwrite, press enter to ignore & use default amount: ")
     amount_int = price
-    
-    # Intercept, IDK for what purpose
+
     intercept_page(api_key, tokens, package_option_code, is_enterprise)
-    
-    if amount_str != "":
-        try:
-            amount_int = int(amount_str)
-        except ValueError:
-            print("Invalid overwrite input, using original price.")
-            return None
-    
+
     payment_path = "payments/api/v8/payment-methods-option"
     payment_payload = {
         "payment_type": "PURCHASE",
@@ -537,23 +503,14 @@ def purchase_package(
         "is_referral": False,
         "token_confirmation": token_confirmation
     }
-    
-    print("Initiating payment...")
+
     payment_res = send_api_request(api_key, payment_path, payment_payload, tokens["id_token"], "POST")
-    if payment_res.get("status") != "SUCCESS":
-        print("Failed to initiate payment")
-        print(json.dumps(payment_res, indent=2))
-        input("Press Enter to continue...")
+    if not isinstance(payment_res, dict) or payment_res.get("status") != "SUCCESS":
         return None
-    
+
     token_payment = payment_res["data"]["token_payment"]
     ts_to_sign = payment_res["data"]["timestamp"]
-    
-    # Overwrite, sometimes the payment_for from package details is empty
-    if payment_for == "":
-        payment_for = "BUY_PACKAGE"
-    
-    # Settlement request
+
     settlement_payload = {
         "total_discount": 0,
         "is_enterprise": is_enterprise,
@@ -598,7 +555,6 @@ def purchase_package(
             "is_spend_limit": False,
             "mission_id": "",
             "tax": 0,
-            # "benefit_type": "NONE",
             "quota_bonus": 0,
             "cashtag": "",
             "is_family_plan": False,
@@ -609,7 +565,7 @@ def purchase_package(
             "balance_type": "PREPAID_BALANCE",
             "has_bonus": False,
             "discount_promo": 0
-            },
+        },
         "total_amount": amount_int,
         "is_using_autobuy": False,
         "items": [
@@ -622,102 +578,25 @@ def purchase_package(
             }
         ]
     }
-    
-    print("Processing purchase...")
-    # print(f"settlement payload:\n{json.dumps(settlement_payload, indent=2)}")
-    purchase_result = send_payment_request(api_key, settlement_payload, tokens["access_token"], tokens["id_token"], token_payment, ts_to_sign, payment_for)
-    
-    print(f"Purchase result:\n{json.dumps(purchase_result, indent=2)}")
-    
-    input("Press Enter to continue...")
 
-def login_info(
-    api_key: str,
-    tokens: dict,
-    is_enterprise: bool = False
-):
-    path = "api/v8/auth/login"
-    
-    raw_payload = {
-        "access_token": tokens["access_token"],
-        "is_enterprise": is_enterprise,
-        "lang": "en"
-    }
-    
-    res = send_api_request(api_key, path, raw_payload, tokens["id_token"], "POST")
-    
-    if "data" not in res:
-        print(json.dumps(res, indent=2))
-        print("Error getting package:", res.get("error", "Unknown error"))
-        return None
-        
-    return res["data"]
+    purchase_result = send_payment_request(
+        api_key,
+        settlement_payload,
+        tokens["access_token"],
+        tokens["id_token"],
+        token_payment,
+        ts_to_sign,
+        payment_for
+    )
 
-def get_package_details(
-    api_key: str,
-    tokens: dict,
-    family_code: str,
-    variant_code: str,
-    option_order: int,
-    is_enterprise: bool,
-    migration_type: str | None = None
-) -> dict | None:
-    family_data = get_family_v2(api_key, tokens, family_code, is_enterprise, migration_type)
-    if not family_data:
-        print(f"Gagal mengambil data family untuk {family_code}.")
-        return None
-    
-    package_options = []
-    
-    package_variants = family_data["package_variants"]
-    option_code = None
-    for variant in package_variants:
-        if variant["package_variant_code"] == variant_code:
-            selected_variant = variant
-            package_options = selected_variant["package_options"]
-            for option in package_options:
-                if option["order"] == option_order:
-                    selected_option = option
-                    option_code = selected_option["package_option_code"]
-                    break
+    return purchase_result if isinstance(purchase_result, dict) else None
 
-    if option_code is None:
-        print("Gagal menemukan opsi paket yang sesuai.")
-        return None
-        
-    package_details_data = get_package(api_key, tokens, option_code)
-    if not package_details_data:
-        print("Gagal mengambil detail paket.")
-        return None
-    
-    return package_details_data
 
-def get_quota(api_key: str, id_token: str) -> dict | None:
-    path = "api/v8/packages/quota-summary"
-    
-    payload = {
-        "is_enterprise": False,
-        "lang": "en"
-    }
-    
-    print("Fetching quota summary...")
-    try:
-        res = send_api_request(api_key, path, payload, id_token, "POST")
-    except Exception as e:
-        print("Error sending API request:", e)
-        return None
 
-    if isinstance(res, dict) and "data" in res:
-        quota = res["data"].get("quota", {}).get("data")
-        if quota:
-            return {
-                "remaining": quota.get("remaining", 0),
-                "total": quota.get("total", 0),
-                "has_unlimited": quota.get("has_unlimited", False)
-            }
-        else:
-            print("Quota data not found in response.")
-            return None
-    else:
-        print("Error getting quota:", res.get("error", "Unknown error") if isinstance(res, dict) else res)
-        return None
+
+
+
+
+
+
+
