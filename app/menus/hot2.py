@@ -97,18 +97,15 @@ def show_hot_menu():
         ))
 
         # Tabel daftar paket
-        # Tabel daftar paket
-table = Table(box=MINIMAL_DOUBLE_HEAD, expand=True)
-table.add_column("No", justify="right", style=theme["text_key"], width=6)
-table.add_column("Nama Paket", style=theme["text_body"])
-table.add_column("Harga", justify="right", style=theme["text_sub"], width=12)
+        table = Table(box=MINIMAL_DOUBLE_HEAD, expand=True)
+        table.add_column("No", justify="right", style=theme["text_key"], width=6)
+        table.add_column("Nama Paket", style=theme["text_body"])
+        table.add_column("Harga", justify="right", style=theme["text_sub"], width=12)
 
-for idx, p in enumerate(hot_packages):
-    label = f"{p['family_name']} - {p['variant_name']} - {p['option_name']}"
-    harga = get_rupiah(p.get("price", 0))  # fallback ke 0 jika tidak ada
-    table.add_row(str(idx + 1), label, harga)
-
-        #table.add_row("00", f"[{theme['text_sub']}]Kembali ke menu sebelumnya[/]")
+        for idx, p in enumerate(hot_packages):
+            label = f"{p['family_name']} - {p['variant_name']} - {p['option_name']}"
+            harga = get_rupiah(p.get("price", 0))  # fallback ke 0 jika tidak ada
+            table.add_row(str(idx + 1), label, harga)
 
         console.print(Panel(
             table,
