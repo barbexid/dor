@@ -27,6 +27,10 @@ def login_prompt(api_key: str):
     clear_screen()
     theme = get_theme()
 
+def login_prompt(api_key: str):
+    clear_screen()
+    theme = get_theme()
+
     console.print(Panel(
         Align.center("🔐 Login ke myXL CLI\nMasukkan nomor XL, Support 08xx/ 628xx/ +628xx ", vertical="middle"),
         border_style=theme["border_info"],
@@ -35,18 +39,18 @@ def login_prompt(api_key: str):
         expand=True
     ))
 
-    raw_input = console.input(f"[{theme['text_sub']}]Nomor:[/{theme['text_sub']}] ").strip()
-    if raw_input == "00":
-        print_panel("ℹ️ Dibatalkan", "Login dibatalkan oleh pengguna.")
-        #pause()
-        return None, None
+    while True:
+        raw_input = console.input(f"[{theme['text_sub']}]Nomor:[/{theme['text_sub']}] ").strip()
+        if raw_input == "00":
+            print_panel("ℹ️ Dibatalkan", "Login dibatalkan oleh pengguna.")
+            pause()
+            return None, None
 
-    phone_number = normalize_number(raw_input)
-
-    if len(phone_number) < 10 or len(phone_number) > 14:
-        print_panel("⚠️ Error", "Nomor tidak valid. Pastikan di input dengan benar.")
-        #pause()
-        return None, None
+        phone_number = normalize_number(raw_input)
+        if len(phone_number) < 10 or len(phone_number) > 14:
+            print_panel("⚠️ Error", "Nomor tidak valid. Coba lagi atau ketik 00 untuk batal.")
+            continue
+        break
 
     try:
         console.print(f"[{theme['text_sub']}]Mengirim OTP...[/]")
@@ -57,33 +61,40 @@ def login_prompt(api_key: str):
             return None, None
 
         print_panel("✅ Info", "OTP berhasil dikirim ke nomor Anda.")
-        otp = console.input(f"[{theme['text_sub']}]Masukkan OTP (6 digit):[/{theme['text_sub']}] ").strip()
 
-        if otp == "00":
-            print_panel("ℹ️ Dibatalkan", "Login dibatalkan oleh pengguna.")
-            #pause()
-            return None, None
+        max_attempts = 5
+        attempts = 0
 
-        if not otp.isdigit() or len(otp) != 6:
-            print_panel("⚠️ Error", "OTP tidak valid. Harus 6 digit angka.")
-            pause()
-            return None, None
+        while attempts < max_attempts:
+            otp = console.input(f"[{theme['text_sub']}]Masukkan OTP (percobaan {attempts+1}/5):[/{theme['text_sub']}] ").strip()
+            if otp == "00":
+                print_panel("ℹ️ Dibatalkan", "Login dibatalkan oleh pengguna.")
+                pause()
+                return None, None
+            if not otp.isdigit() or len(otp) != 6:
+                print_panel("⚠️ Error", "OTP tidak valid. Harus 6 digit angka.")
+                attempts += 1
+                continue
 
-        console.print(f"[{theme['text_sub']}]Memverifikasi OTP...[/]")
-        tokens = submit_otp(api_key, phone_number, otp)
-        if not tokens:
-            print_panel("⚠️ Error", "Gagal login. Periksa OTP dan coba lagi.")
-            pause()
-            return None, None
+            console.print(f"[{theme['text_sub']}]Memverifikasi OTP...[/]")
+            tokens = submit_otp(api_key, phone_number, otp)
+            if tokens:
+                AuthInstance.add_refresh_token(int(phone_number), tokens["refresh_token"])
+                print_panel("✅ Berhasil", "Login berhasil!")
+                return phone_number, tokens["refresh_token"]
+            else:
+                print_panel("⚠️ Error", "OTP salah atau sudah kedaluwarsa.")
+                attempts += 1
 
-        AuthInstance.add_refresh_token(int(phone_number), tokens["refresh_token"])
-        print_panel("✅ Berhasil", "Login berhasil!")
-        return phone_number, tokens["refresh_token"]
+        print_panel("❌ Gagal", "Melebihi batas percobaan OTP (5x). Silakan kirim ulang OTP.")
+        pause()
+        return None, None
 
     except Exception:
         print_panel("⚠️ Error", "Terjadi kesalahan saat login.")
         pause()
         return None, None
+
 
 
 def show_account_menu():
