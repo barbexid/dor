@@ -4,18 +4,11 @@ import uuid
 import base64
 import qrcode
 
-from rich.panel import Panel
-from rich.console import Console
-from app.config.theme_config import get_theme
-import shutil
-
 import time
 import requests
 from app.client.engsel import *
 from app.client.encrypt import API_KEY, build_encrypted_field, decrypt_xdata, encryptsign_xdata, java_like_timestamp, get_x_signature_payment, get_x_signature_bounty
 from app.type_dict import PaymentItem
-
-console = Console()
 
 def settlement_qris_v2(
     api_key: str,
@@ -183,8 +176,6 @@ def get_qris_code(
     
     return res["data"]["qr_code"]
 
-
-
 def show_qris_payment_v2(
     api_key: str,
     tokens: dict,
@@ -193,9 +184,6 @@ def show_qris_payment_v2(
     ask_overwrite: bool,
     amount_used: str = ""
 ):  
-    theme = get_theme()
-
-    # Step 1: Buat transaksi QRIS
     transaction_id = settlement_qris_v2(
         api_key,
         tokens,
@@ -206,48 +194,29 @@ def show_qris_payment_v2(
     )
     
     if not transaction_id:
-        console.print(f"[{theme['text_err']}]❌ Gagal membuat transaksi QRIS.[/]")
+        print("Failed to create QRIS transaction.")
         return
     
-    # Step 2: Ambil kode QRIS
-    console.print(f"[{theme['text_sub']}]📡 Mengambil kode QRIS...[/]")
+    print("Fetching QRIS code...")
     qris_code = get_qris_code(api_key, tokens, transaction_id)
     if not qris_code:
-        console.print(f"[{theme['text_err']}]❌ Gagal mendapatkan kode QRIS.[/]")
+        print("Failed to get QRIS code.")
         return
-
-    # Step 3: Buat QR code
+    print(f"QRIS data:\n{qris_code}")
+    
     qr = qrcode.QRCode(
         version=1,
         error_correction=qrcode.constants.ERROR_CORRECT_L,
         box_size=1,
-        border=0,
+        border=1,
     )
     qr.add_data(qris_code)
     qr.make(fit=True)
-
-    qr_matrix = qr.get_matrix()
-    term_width = shutil.get_terminal_size().columns
-    max_cols = (term_width - 4) // 2  # 4 karakter untuk border/padding
-
-    trimmed_matrix = [row[:max_cols] for row in qr_matrix]
-
-    # Tampilkan QR langsung ke terminal tanpa panel
-    qr_text = "\n".join(
-        "".join("■" if cell else " " for cell in row)
-        for row in trimmed_matrix
-    )
-    print(qr_text)  # langsung ke terminal
-
-    # Step 4: Tampilkan link alternatif dalam panel kotak
+    qr.print_ascii(invert=True)
+    
     qris_b64 = base64.urlsafe_b64encode(qris_code.encode()).decode()
     qris_url = f"https://ki-ar-kod.netlify.app/?data={qris_b64}"
-
-    console.print(Panel(
-        f"[{theme['text_body']}]📱 Scan QR ini dengan aplikasi pembayaran yang mendukung QRIS.\n\n"
-        f"[{theme['text_sub']}]🌐 Alternatif tampilan QR:[/] [bold cyan]{qris_url}[/]",
-        title=f"[{theme['text_title']}]🔗 Link Alternatif[/]",
-        border_style=theme["border_info"],
-        padding=(1, 2),
-        expand=False
-    ))
+    
+    print(f"Atau buka link berikut untuk melihat QRIS:\n{qris_url}")
+    
+    return
