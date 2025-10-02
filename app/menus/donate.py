@@ -27,7 +27,7 @@ def show_donate_menu():
     donate_info = Text()
     donate_info.append("Dukung Pengembangan MyXL CLI!\n\n", style=f"{theme['text_title']} bold")
     donate_info.append("Jika Anda butuh Kode Unlock untuk menambahkan akun, Hubungi saya di Telegram ( @barbex_id )\n\n", style=theme["text_body"])
-    donate_info.append("Dan jika Anda ingin memberikan donasi untuk mendukung pengembangan tool ini, silakan gunakan metode berikut:\n\n", style=theme["text_body"])
+    donate_info.append("Dan jika ingin memberikan donasi untuk mendukung pengembangan tool ini, silakan gunakan metode berikut:\n\n", style=theme["text_body"])
     donate_info.append("- Dana: 0831-1921-5545\n", style=theme["text_body"])
     donate_info.append("  A/N Joko S\n", style=theme["text_body"])
     donate_info.append("- QRIS tersedia di bawah\n\n", style=theme["text_body"])
