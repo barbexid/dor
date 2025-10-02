@@ -6,12 +6,15 @@ import qrcode
 
 from rich.panel import Panel
 from rich.console import Console
+from app.config.theme_config import get_theme
 
 import time
 import requests
 from app.client.engsel import *
 from app.client.encrypt import API_KEY, build_encrypted_field, decrypt_xdata, encryptsign_xdata, java_like_timestamp, get_x_signature_payment, get_x_signature_bounty
 from app.type_dict import PaymentItem
+
+console = Console()
 
 def settlement_qris_v2(
     api_key: str,
@@ -180,7 +183,6 @@ def get_qris_code(
     return res["data"]["qr_code"]
 
 
-console = Console()
 
 def show_qris_payment_v2(
     api_key: str,
@@ -190,6 +192,8 @@ def show_qris_payment_v2(
     ask_overwrite: bool,
     amount_used: str = ""
 ):  
+    theme = get_theme()
+
     # Step 1: Buat transaksi QRIS
     transaction_id = settlement_qris_v2(
         api_key,
@@ -201,14 +205,14 @@ def show_qris_payment_v2(
     )
     
     if not transaction_id:
-        console.print("[bold red]❌ Gagal membuat transaksi QRIS.[/]")
+        console.print(f"[{theme['text_err']}]❌ Gagal membuat transaksi QRIS.[/]")
         return
     
     # Step 2: Ambil kode QRIS
-    console.print("📡 Mengambil kode QRIS...")
+    console.print(f"[{theme['text_sub']}]📡 Mengambil kode QRIS...[/]")
     qris_code = get_qris_code(api_key, tokens, transaction_id)
     if not qris_code:
-        console.print("[bold red]❌ Gagal mendapatkan kode QRIS.[/]")
+        console.print(f"[{theme['text_err']}]❌ Gagal mendapatkan kode QRIS.[/]")
         return
 
     # Step 3: Render QR code sebagai teks
@@ -228,11 +232,17 @@ def show_qris_payment_v2(
     )
 
     # Step 4: Tampilkan QR code dalam box Rich
-    console.print(Panel(qr_text, title="🔍 QRIS Pembayaran", border_style="green", padding=(1, 2)))
-    console.print("📱 [bold]Scan QR ini dengan aplikasi pembayaran yang mendukung QRIS.[/]\n")
+    console.print(Panel(
+        qr_text,
+        title=f"[{theme['text_title']}]🔍 QRIS Pembayaran[/]",
+        border_style=theme["border_info"],
+        padding=(1, 2)
+    ))
+    console.print(f"[{theme['text_body']}]📱 Scan QR ini dengan aplikasi pembayaran yang mendukung QRIS.[/]\n")
 
     # Step 5: Tampilkan link alternatif
     qris_b64 = base64.urlsafe_b64encode(qris_code.encode()).decode()
     qris_url = f"https://ki-ar-kod.netlify.app/?data={qris_b64}"
-    console.print(f"🌐 [bold cyan]Alternatif tampilan QR:[/] {qris_url}\n")
+    console.print(f"[{theme['text_sub']}]🌐 Alternatif tampilan QR:[/] [bold cyan]{qris_url}[/]\n")
+
 
