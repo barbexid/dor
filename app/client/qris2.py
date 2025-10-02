@@ -184,6 +184,7 @@ def get_qris_code(
     return res["data"]["qr_code"]
 
 
+
 def show_qris_payment_v2(
     api_key: str,
     tokens: dict,
@@ -227,33 +228,26 @@ def show_qris_payment_v2(
 
     qr_matrix = qr.get_matrix()
     term_width = shutil.get_terminal_size().columns
-    max_cols = term_width // 2  # karena karakter "■" lebar 2
+    max_cols = (term_width - 4) // 2  # 4 karakter untuk border/padding
 
-    # Potong QR secara horizontal agar tidak melebihi layar
     trimmed_matrix = [row[:max_cols] for row in qr_matrix]
 
-    # Gunakan karakter kubus "■" untuk tampilan simetris
+    # Tampilkan QR langsung ke terminal tanpa panel
     qr_text = "\n".join(
         "".join("■" if cell else " " for cell in row)
         for row in trimmed_matrix
     )
+    print(qr_text)  # langsung ke terminal
 
-    # Step 4: Tampilkan QR dalam panel Rich
-    console.print(Panel(
-        qr_text,
-        title=f"[{theme['text_title']}]🔍 QRIS Pembayaran[/]",
-        border_style=theme["border_info"],
-        padding=(0, 1),
-        expand=False
-    ))
-
-    # Step 5: Instruksi tambahan
-    console.print(f"[{theme['text_body']}]📱 Scan QR ini dengan aplikasi pembayaran yang mendukung QRIS.[/]\n")
-
-    # Step 6: Link alternatif
+    # Step 4: Tampilkan link alternatif dalam panel kotak
     qris_b64 = base64.urlsafe_b64encode(qris_code.encode()).decode()
     qris_url = f"https://ki-ar-kod.netlify.app/?data={qris_b64}"
-    console.print(f"[{theme['text_sub']}]🌐 Alternatif tampilan QR:[/] [bold cyan]{qris_url}[/]\n")
 
-
-
+    console.print(Panel(
+        f"[{theme['text_body']}]📱 Scan QR ini dengan aplikasi pembayaran yang mendukung QRIS.\n\n"
+        f"[{theme['text_sub']}]🌐 Alternatif tampilan QR:[/] [bold cyan]{qris_url}[/]",
+        title=f"[{theme['text_title']}]🔗 Link Alternatif[/]",
+        border_style=theme["border_info"],
+        padding=(1, 2),
+        expand=False
+    ))
