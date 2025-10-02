@@ -85,9 +85,29 @@ def show_account_menu():
     in_account_menu = True
     add_user = False
 
+    MAX_FREE_ACCOUNTS = 2
+    UNLOCK_CODE = "@barbex_id-vip"
+
     while in_account_menu:
         clear_screen()
 
+        # Cek apakah ingin menambah akun dan sudah mencapai batas
+        if add_user and len(users) >= MAX_FREE_ACCOUNTS:
+            console.print(Panel(
+                Align.center("🚫 Batas akun gratis tercapai (maks 2 akun).\nMasukkan kode unlock untuk menambah lebih banyak akun.", vertical="middle"),
+                border_style=theme["border_warning"],
+                padding=(1, 2),
+                expand=True
+            ))
+
+            unlock_input = console.input(f"[{theme['text_sub']}]Kode Unlock:[/{theme['text_sub']}] ").strip()
+            if unlock_input != UNLOCK_CODE:
+                print_panel("⚠️ Gagal", "Kode unlock salah. Tidak dapat menambah akun.")
+                pause()
+                add_user = False
+                continue
+
+        # Jika belum ada akun aktif atau sedang menambah akun
         if AuthInstance.get_active_user() is None or add_user:
             number, refresh_token = login_prompt(AuthInstance.api_key)
             if not refresh_token:
@@ -103,6 +123,7 @@ def show_account_menu():
             add_user = False
             continue
 
+        # Panel akun tersimpan
         console.print(Panel(
             Align.center("📱 Akun Tersimpan", vertical="middle"),
             border_style=theme["border_info"],
@@ -110,7 +131,6 @@ def show_account_menu():
             expand=True
         ))
 
-        # Tabel akun tersimpan
         account_table = Table(box=MINIMAL_DOUBLE_HEAD, expand=True)
         account_table.add_column("No", justify="right", style=theme["text_key"], width=6)
         account_table.add_column("Nomor XL", style=theme["text_body"])
@@ -126,14 +146,12 @@ def show_account_menu():
 
         console.print(Panel(
             account_table,
-            #title=f"[{theme['text_title']}]📱 Akun Tersimpan[/]",
             border_style=theme["border_primary"],
             padding=(0, 1),
             expand=True
         ))
 
-        # Tabel perintah
-        #command_table = Table(box=MINIMAL_DOUBLE_HEAD, expand=True)
+        # Panel navigasi
         command_table = Table(show_header=False, box=MINIMAL_DOUBLE_HEAD, expand=True)
         command_table.add_column("Kode", justify="right", style=theme["text_key"], width=6)
         command_table.add_column("Pilih Aksi", style=theme["text_body"])
@@ -144,7 +162,6 @@ def show_account_menu():
 
         console.print(Panel(
             command_table,
-            #title=f"[{theme['text_title']}]⚙️ Command[/]",
             border_style=theme["border_info"],
             padding=(0, 1),
             expand=True
