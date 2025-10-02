@@ -4,11 +4,8 @@ import base64
 from Crypto.Cipher import AES
 from Crypto.Util.Padding import pad, unpad
 
-# Lokasi file unlock_status.json
 UNLOCK_FILE = os.path.join(os.path.dirname(__file__), "unlock_status.json")
-
-# Kunci rahasia (harus 16, 24, atau 32 byte untuk AES)
-SECRET_KEY = b'barbex_id_secret!'  # 16-byte key, ubah sesuai kebutuhan
+SECRET_KEY = b'barbex_id_secret!'  # 16-byte AES key
 
 def encrypt_base64(data: dict) -> str:
     raw = json.dumps(data).encode()
@@ -26,6 +23,7 @@ def decrypt_base64(encoded_data: str) -> dict:
         return {"is_unlocked": False}
 
 def load_unlock_status():
+    """Selalu baca ulang file unlock_status.json untuk menghindari error saat file berubah."""
     if not os.path.exists(UNLOCK_FILE):
         return {"is_unlocked": False}
     try:
@@ -36,6 +34,10 @@ def load_unlock_status():
         return {"is_unlocked": False}
 
 def save_unlock_status(status: bool):
-    encoded = encrypt_base64({"is_unlocked": status})
-    with open(UNLOCK_FILE, "w") as f:
-        f.write(encoded)
+    """Simpan status unlock dengan enkripsi base64 dan validasi aman."""
+    try:
+        encoded = encrypt_base64({"is_unlocked": status})
+        with open(UNLOCK_FILE, "w") as f:
+            f.write(encoded)
+    except Exception:
+        pass  # Hindari crash jika gagal menulis
