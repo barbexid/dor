@@ -116,7 +116,7 @@ def show_hot_menu():
     }
 
     enriched_packages = []
-    with Live(Spinner("dots", text="🔄 Mengambil semua data paket..."), refresh_per_second=10):
+    with Live(Spinner("dots", text="Mengambil semua data paket..."), refresh_per_second=10):
         for p in hot_packages:
             fc_key = (p["family_code"], p["is_enterprise"])
             if fc_key in family_cache:
@@ -153,7 +153,7 @@ def show_hot_menu():
     table = Table(box=MINIMAL_DOUBLE_HEAD, expand=True)
     table.add_column("No", justify="right", style=theme["text_key"], width=6)
     table.add_column("Nama Paket", style=theme["text_body"])
-    table.add_column("Harga", justify="right", style=theme["text_sub"], width=12)
+    table.add_column("Harga", justify="left", style=theme["text_money"], width=6)
 
     for idx, p in enumerate(enriched_packages):
         label = f"{p['family_name']} - {p['variant_name']} - {p['option_name']}"
