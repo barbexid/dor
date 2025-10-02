@@ -27,7 +27,7 @@ def show_hot_main_menu():
         # Panel judul terpisah
         console.print(Panel(
             Align.center("✨ Paket HOT ✨", vertical="middle"),
-            border_style=theme["border_primary"],
+            border_style=theme["border_info"],
             padding=(1, 2),
             expand=True
         ))
@@ -43,7 +43,7 @@ def show_hot_main_menu():
         console.print(Panel(
             menu_table,
             #title=f"[{theme['text_title']}]📦 Menu Paket HOT[/]",
-            border_style=theme["border_info"],
+            border_style=theme["border_primary"],
             padding=(0, 1),
             expand=True
         ))
@@ -91,7 +91,7 @@ def show_hot_menu():
         # Panel judul
         console.print(Panel(
             Align.center("✨ Paket HOT v1 ✨", vertical="middle"),
-            border_style=theme["border_primary"],
+            border_style=theme["border_info"],
             padding=(1, 2),
             expand=True
         ))
@@ -109,7 +109,7 @@ def show_hot_menu():
 
         console.print(Panel(
             table,
-            border_style=theme["border_info"],
+            border_style=theme["border_primary"],
             padding=(0, 0),
             expand=True
         ))
@@ -198,7 +198,7 @@ def show_hot_menu2():
 
         console.print(Panel(
             Align.center("✨ Paket HOT v2 ✨", vertical="middle"),
-            border_style=theme["border_primary"],
+            border_style=theme["border_info"],
             padding=(1, 2),
             expand=True
         ))
@@ -212,12 +212,9 @@ def show_hot_menu2():
             formatted_price = get_rupiah(p["price"])
             table.add_row(str(idx + 1), p["name"], formatted_price)
 
-        #table.add_row("00", f"[{theme['text_sub']}]Kembali ke menu sebelumnya[/]", "")
-        #table.add_row("99", f"[{theme['text_err']}]Kembali ke menu utama[/]", "")
-
         console.print(Panel(
             table,
-            border_style=theme["border_info"],
+            border_style=theme["border_primary"],
             padding=(0, 0),
             expand=True
         ))
