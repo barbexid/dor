@@ -1,8 +1,5 @@
 import json
-from dotenv import load_dotenv
-import os
 
-load_dotenv()  # Ini akan membaca file .env secara otomatis
 from app.menus.package2 import get_family_v2
 from app.config.auth_config import AuthInstance
 
@@ -50,7 +47,3 @@ def build_package_json(family_code, is_enterprise=False, migration_type=None, ou
 
     print(f"✅ Paket berhasil dibuat dan disimpan di: {output_file}")
 
-# Contoh penggunaan
-if __name__ == "__main__":
-    code = input("Masukkan family code: ").strip()
-    build_package_json(code)
