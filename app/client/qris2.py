@@ -4,6 +4,9 @@ import uuid
 import base64
 import qrcode
 
+from rich.panel import Panel
+from rich.console import Console
+
 import time
 import requests
 from app.client.engsel import *
@@ -176,6 +179,9 @@ def get_qris_code(
     
     return res["data"]["qr_code"]
 
+
+console = Console()
+
 def show_qris_payment_v2(
     api_key: str,
     tokens: dict,
@@ -184,6 +190,7 @@ def show_qris_payment_v2(
     ask_overwrite: bool,
     amount_used: str = ""
 ):  
+    # Step 1: Buat transaksi QRIS
     transaction_id = settlement_qris_v2(
         api_key,
         tokens,
@@ -194,16 +201,17 @@ def show_qris_payment_v2(
     )
     
     if not transaction_id:
-        print("Failed to create QRIS transaction.")
+        console.print("[bold red]❌ Gagal membuat transaksi QRIS.[/]")
         return
     
-    print("Fetching QRIS code...")
+    # Step 2: Ambil kode QRIS
+    console.print("📡 Mengambil kode QRIS...")
     qris_code = get_qris_code(api_key, tokens, transaction_id)
     if not qris_code:
-        print("Failed to get QRIS code.")
+        console.print("[bold red]❌ Gagal mendapatkan kode QRIS.[/]")
         return
-    print(f"QRIS data:\n{qris_code}")
-    
+
+    # Step 3: Render QR code sebagai teks
     qr = qrcode.QRCode(
         version=1,
         error_correction=qrcode.constants.ERROR_CORRECT_L,
@@ -212,11 +220,19 @@ def show_qris_payment_v2(
     )
     qr.add_data(qris_code)
     qr.make(fit=True)
-    qr.print_ascii(invert=True)
-    
+
+    qr_matrix = qr.get_matrix()
+    qr_text = "\n".join(
+        "".join("██" if cell else "  " for cell in row)
+        for row in qr_matrix
+    )
+
+    # Step 4: Tampilkan QR code dalam box Rich
+    console.print(Panel(qr_text, title="🔍 QRIS Pembayaran", border_style="green", padding=(1, 2)))
+    console.print("📱 [bold]Scan QR ini dengan aplikasi pembayaran yang mendukung QRIS.[/]\n")
+
+    # Step 5: Tampilkan link alternatif
     qris_b64 = base64.urlsafe_b64encode(qris_code.encode()).decode()
     qris_url = f"https://ki-ar-kod.netlify.app/?data={qris_b64}"
-    
-    print(f"Atau buka link berikut untuk melihat QRIS:\n{qris_url}")
-    
-    return
+    console.print(f"🌐 [bold cyan]Alternatif tampilan QR:[/] {qris_url}\n")
+
