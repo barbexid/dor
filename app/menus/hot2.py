@@ -66,8 +66,12 @@ def show_hot_menu():
     api_key = AuthInstance.api_key
     tokens = AuthInstance.get_active_tokens()
 
-    in_hot_menu = True
-    while in_hot_menu:
+    if not tokens:
+        print_panel("⚠️ Error", "Token pengguna tidak ditemukan.")
+        pause()
+        return
+
+    while True:
         clear_screen()
 
         # Panel loading
@@ -102,9 +106,23 @@ def show_hot_menu():
         table.add_column("Nama Paket", style=theme["text_body"])
         table.add_column("Harga", justify="right", style=theme["text_sub"], width=12)
 
+        enriched_packages = []
         for idx, p in enumerate(hot_packages):
             label = f"{p['family_name']} - {p['variant_name']} - {p['option_name']}"
-            harga = get_rupiah(p.get("price", 0))  # fallback ke 0 jika tidak ada
+            harga = "Rp0"
+
+            # Ambil harga dari data family resmi
+            family_data = get_family_v2(api_key, tokens, p["family_code"], p["is_enterprise"])
+            if family_data:
+                for variant in family_data["package_variants"]:
+                    if variant["name"] == p["variant_name"]:
+                        for option in variant["package_options"]:
+                            if option["order"] == p["order"]:
+                                harga = get_rupiah(option["price"])
+                                p["option_code"] = option["package_option_code"]
+                                break
+
+            enriched_packages.append(p)
             table.add_row(str(idx + 1), label, harga)
 
         console.print(Panel(
@@ -114,12 +132,11 @@ def show_hot_menu():
             expand=True
         ))
 
-        # Panel navigasi terpisah
+        # Panel navigasi
         nav_table = Table(show_header=False, box=MINIMAL_DOUBLE_HEAD, expand=True)
         nav_table.add_column(justify="right", style=theme["text_key"], width=4)
         nav_table.add_column(style=theme["text_body"])
         nav_table.add_row("00", f"[{theme['text_sub']}]Kembali ke menu sebelumnya[/]")
-        #nav_table.add_row("99", f"[{theme['text_err']}]Kembali ke menu utama[/]")
 
         console.print(Panel(
             nav_table,
@@ -131,40 +148,23 @@ def show_hot_menu():
         # Input pilihan
         choice = console.input(f"[{theme['text_sub']}]Pilih paket:[/{theme['text_sub']}] ").strip()
         if choice == "00":
-            return  # kembali ke menu sebelumnya
+            return
 
-        #if choice == "99":
-            #return
-
-
-        if choice.isdigit() and 1 <= int(choice) <= len(hot_packages):
-            selected_pkg = hot_packages[int(choice) - 1]
-            family_code = selected_pkg["family_code"]
-            is_enterprise = selected_pkg["is_enterprise"]
-
-            family_data = get_family_v2(api_key, tokens, family_code, is_enterprise)
-            if not family_data:
-                print_panel("⚠️ Error", "Gagal mengambil data family.")
+        if choice.isdigit() and 1 <= int(choice) <= len(enriched_packages):
+            selected_pkg = enriched_packages[int(choice) - 1]
+            option_code = selected_pkg.get("option_code")
+            if not option_code:
+                print_panel("⚠️ Error", "Kode paket tidak ditemukan.")
                 pause()
                 continue
 
-            package_variants = family_data["package_variants"]
-            option_code = None
-            for variant in package_variants:
-                if variant["name"] == selected_pkg["variant_name"]:
-                    for option in variant["package_options"]:
-                        if option["order"] == selected_pkg["order"]:
-                            option_code = option["package_option_code"]
-                            break
-
-            if option_code:
-                result = show_package_details(api_key, tokens, option_code, is_enterprise)
-                if result == "MAIN":
-                    return  # keluar ke menu utama
-                elif result == "BACK":
-                    continue  # reload ulang daftar HOT v1
-                elif result is True:
-                    return  # selesai pembelian
+            result = show_package_details(api_key, tokens, option_code, selected_pkg["is_enterprise"])
+            if result == "MAIN":
+                return
+            elif result == "BACK":
+                continue
+            elif result is True:
+                return
         else:
             print_panel("⚠️ Error", "Input tidak valid. Silakan masukkan nomor yang tersedia.")
             pause()
