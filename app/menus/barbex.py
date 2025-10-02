@@ -35,7 +35,7 @@ def show_barbex_main_menu():
         menu_table.add_column("Daftar Paket", style=theme["text_body"])
         menu_table.add_row("1", "Paket v1")
         menu_table.add_row("2", "Paket v2")
-        menu_table.add_row("00", f"[{theme['text_err']}]Kembali ke menu utama[/]")
+        menu_table.add_row("00", f"[{theme['text_sub']}]Kembali[/]")
 
         console.print(Panel(
             menu_table,
