@@ -9,6 +9,7 @@ from app.menus.util import clear_screen
 from app.menus.anu_util import pause, print_panel
 from app.service.auth import AuthInstance
 from app.config.theme_config import get_theme
+from app.service.unlock import load_unlock_status, save_unlock_status
 
 console = Console()
 
@@ -74,7 +75,6 @@ def login_prompt(api_key: str):
         pause()
         return None, None
 
-
 def show_account_menu():
     clear_screen()
     theme = get_theme()
@@ -87,14 +87,15 @@ def show_account_menu():
 
     MAX_FREE_ACCOUNTS = 2
     UNLOCK_CODE = "@barbex_id-vip"
+    unlock_data = load_unlock_status()
+    is_unlocked = unlock_data.get("is_unlocked", False)
 
     while in_account_menu:
         clear_screen()
 
-        # Cek apakah ingin menambah akun dan sudah mencapai batas
-        if add_user and len(users) >= MAX_FREE_ACCOUNTS:
+        if add_user and len(users) >= MAX_FREE_ACCOUNTS and not is_unlocked:
             console.print(Panel(
-                Align.center("🚫 Batas akun tercapai (maks 2 akun).\nMasukkan kode unlock untuk menambah lebih banyak akun.", vertical="middle"),
+                Align.center("🚫 Batas akun gratis tercapai (maks 2 akun).\nMasukkan kode unlock untuk menambah lebih banyak akun.", vertical="middle"),
                 border_style=theme["border_warning"],
                 padding=(1, 2),
                 expand=True
@@ -106,8 +107,12 @@ def show_account_menu():
                 pause()
                 add_user = False
                 continue
+            else:
+                save_unlock_status(True)
+                is_unlocked = True
+                print_panel("✅ Berhasil", "Akses akun tambahan telah dibuka.")
+                pause()
 
-        # Jika belum ada akun aktif atau sedang menambah akun
         if AuthInstance.get_active_user() is None or add_user:
             number, refresh_token = login_prompt(AuthInstance.api_key)
             if not refresh_token:
@@ -123,7 +128,6 @@ def show_account_menu():
             add_user = False
             continue
 
-        # Panel akun tersimpan
         console.print(Panel(
             Align.center("📱 Akun Tersimpan", vertical="middle"),
             border_style=theme["border_info"],
@@ -151,7 +155,6 @@ def show_account_menu():
             expand=True
         ))
 
-        # Panel navigasi
         command_table = Table(show_header=False, box=MINIMAL_DOUBLE_HEAD, expand=True)
         command_table.add_column("Kode", justify="right", style=theme["text_key"], width=6)
         command_table.add_column("Pilih Aksi", style=theme["text_body"])
