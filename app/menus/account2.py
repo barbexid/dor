@@ -28,7 +28,7 @@ def login_prompt(api_key: str):
     theme = get_theme()
 
     console.print(Panel(
-        Align.center("🔐 Login ke myXL CLI\nMasukkan nomor XL, Support 08xx/628xx/+628xx\n00, untuk batal", vertical="middle"),
+        Align.center("🔐 Login ke myXL CLI\nMasukkan nomor XL, Support 08xx/628xx/+628xx", vertical="middle"),
         border_style=theme["border_info"],
         style=theme["text_title"],
         padding=(1, 2),
