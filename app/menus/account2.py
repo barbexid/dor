@@ -45,7 +45,7 @@ def login_prompt(api_key: str):
 
     if len(phone_number) < 10 or len(phone_number) > 14:
         print_panel("⚠️ Error", "Nomor tidak valid. Pastikan di input dengan benar.")
-        pause()
+        #pause()
         return None, None
 
     try:
