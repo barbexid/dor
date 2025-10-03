@@ -194,14 +194,12 @@ def show_hot_menu():
 
             result = show_package_details(api_key, tokens, option_code, selected_pkg["is_enterprise"])
             if result == "MAIN":
-                return
+                return  # keluar ke menu utama
             elif result == "BACK":
-                return
+                continue  # kembali ke daftar HOT
             elif result is True:
-                return
-        else:
-            print_panel("⚠️ Error", "Input tidak valid. Silakan masukkan nomor yang tersedia.")
-            pause()
+                continue  # kembali ke daftar HOT setelah aksi berhasil
+
 
 def show_hot_menu2():
     theme = get_theme()
