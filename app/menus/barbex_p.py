@@ -165,17 +165,17 @@ def show_barbex_menu2():
                 "https://raw.githubusercontent.com/dratx1/engsel/refs/heads/main/family/anu2.json",
                 timeout=30
             ).json(),
-            text="Memuat Daftar Paket Lainnya v2...",
+            text="Memuat Daftar Paket Barbex v2...",
             theme=theme
         )
 
         if not barbex_packages:
-            print_panel("⚠️ Error", "Gagal mengambil data Barbex Package.")
+            print_panel("⚠️ Error", "Tidak ada data pembayaran yang valid.")
             pause()
             return
 
         console.print(Panel(
-            Align.center("✨ Paket Lainnya v2 ✨", vertical="middle"),
+            Align.center("✨ Paket Barbex v2 ✨", vertical="middle"),
             border_style=theme["border_info"],
             padding=(1, 2),
             expand=True
@@ -204,53 +204,50 @@ def show_barbex_menu2():
             return
 
         if not choice.isdigit():
-            print_panel("⚠️ Error", "Masukkan angka sesuai daftar paket.")
+            print_panel("⚠️ Error", "Tidak ada data pembayaran yang valid.")
             pause()
             continue
 
         choice_num = int(choice)
         if choice_num < 1 or choice_num > len(barbex_packages):
-            print_panel("⚠️ Error", f"Paket nomor {choice_num} tidak tersedia.")
+            print_panel("⚠️ Error", "Tidak ada data pembayaran yang valid.")
             pause()
             continue
 
         selected_package = barbex_packages[choice_num - 1]
         packages = selected_package.get("packages", [])
         if not packages:
-            print_panel("⚠️ Error", "Paket tidak tersedia.")
+            print_panel("⚠️ Error", "Tidak ada data pembayaran yang valid.")
             pause()
             continue
 
         payment_items = []
         for package in packages:
-            package_detail = live_loading(
-                task=lambda: get_package_details(
+            try:
+                detail = get_package_details(
                     api_key,
                     tokens,
-                    package["family_code"],
-                    package["variant_code"],
-                    package["order"],
-                    package["is_enterprise"],
-                ),
-                text=f"Memuat detail paket {package['family_code']}...",
-                theme=theme
-            )
-
-            if not package_detail or "package_option" not in package_detail or "token_confirmation" not in package_detail:
-                print_panel("⚠️ Error", f"Gagal mengambil detail paket untuk {package['family_code']}.")
-                pause()
-                continue
-
-            payment_items.append(
-                PaymentItem(
-                    item_code=package_detail["package_option"]["package_option_code"],
-                    product_type="",
-                    item_price=package_detail["package_option"]["price"],
-                    item_name=package_detail["package_option"]["name"],
-                    tax=0,
-                    token_confirmation=package_detail["token_confirmation"],
+                    package.get("family_code"),
+                    package.get("variant_code"),
+                    package.get("order"),
+                    package.get("is_enterprise"),
                 )
-            )
+                if (
+                    detail and
+                    "package_option" in detail and
+                    "token_confirmation" in detail and
+                    "package_option_code" in detail["package_option"]
+                ):
+                    payment_items.append(PaymentItem(
+                        item_code=detail["package_option"]["package_option_code"],
+                        product_type="",
+                        item_price=detail["package_option"]["price"],
+                        item_name=detail["package_option"]["name"],
+                        tax=0,
+                        token_confirmation=detail["token_confirmation"],
+                    ))
+            except Exception:
+                continue  # skip silently
 
         if not payment_items:
             print_panel("⚠️ Error", "Tidak ada data pembayaran yang valid.")
@@ -314,6 +311,5 @@ def show_barbex_menu2():
                 live_loading(text="Kembali ke menu utama...", theme=theme)
                 return
             else:
-                print_panel("⚠️ Error", "Metode tidak valid. Silahkan coba lagi.")
+                print_panel("⚠️ Error", "Tidak ada data pembayaran yang valid.")
                 pause()
-
