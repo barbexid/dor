@@ -1,15 +1,17 @@
-import json
+
 from rich.console import Console
 from rich.panel import Panel
 from rich.align import Align
 from rich.table import Table
+from rich.text import Text
 from rich.box import MINIMAL_DOUBLE_HEAD
+
 from app.client.engsel2 import get_otp, submit_otp
-from app.menus.util import clear_screen
-from app.menus.anu_util import pause, print_panel
 from app.service.auth import AuthInstance
-from app.config.theme_config import get_theme
 from app.service.unlock import load_unlock_status, save_unlock_status
+from app.config.theme_config import get_theme
+from app.menus.util import clear_screen
+from app.menus.anu_util import pause, print_panel, live_loading
 
 console = Console()
 
@@ -39,7 +41,6 @@ def login_prompt(api_key: str):
         raw_input = console.input(f"[{theme['text_sub']}]Masukan nomor XL:[/{theme['text_sub']}] ").strip()
         if raw_input == "00":
             print_panel("Dibatalkan", "Login dibatalkan oleh pengguna.")
-            #pause()
             return None, None
 
         phone_number = normalize_number(raw_input)
@@ -49,8 +50,11 @@ def login_prompt(api_key: str):
         break
 
     try:
-        console.print(f"[{theme['text_sub']}]Mengirim OTP...[/]")
-        subscriber_id = get_otp(phone_number)
+        subscriber_id = live_loading(
+            task=lambda: get_otp(phone_number),
+            text="Mengirim OTP...",
+            theme=theme
+        )
         if not subscriber_id:
             print_panel("Error", "Gagal mengirim OTP.")
             pause()
@@ -65,17 +69,19 @@ def login_prompt(api_key: str):
             otp = console.input(f"[{theme['text_sub']}]Masukkan OTP (percobaan {attempts+1}/5):[/{theme['text_sub']}] ").strip()
             if otp == "00":
                 print_panel("Dibatalkan", "Login dibatalkan oleh pengguna.")
-                #pause()
                 return None, None
             if not otp.isdigit() or len(otp) != 6:
                 print_panel("Error", "OTP tidak valid. Harus 6 digit angka.")
                 attempts += 1
                 continue
 
-            console.print(f"[{theme['text_sub']}]Memverifikasi OTP...[/]")
-            tokens = submit_otp(api_key, phone_number, otp)
+            tokens = live_loading(
+                task=lambda: submit_otp(api_key, phone_number, otp),
+                text="Memverifikasi OTP...",
+                theme=theme
+            )
             if tokens:
-                AuthInstance.add_refresh_token(int(phone_number), tokens["refresh_token"])
+                AuthInstance.add_refresh_token(int(phone_number), tokens["refresh_token"], name="Tanpa Nama")
                 print_panel("Berhasil", "Login berhasil!")
                 return phone_number, tokens["refresh_token"]
             else:
@@ -111,7 +117,7 @@ def show_account_menu():
 
         if is_adding_user and len(users) >= MAX_FREE_ACCOUNTS and not is_unlocked:
             console.print(Panel(
-                Align.center("!!! Batas maksimal akun sudah tercapai.\nMasukkan kode unlock untuk menambah lebih banyak akun.", vertical="middle"),
+                Align.center("!! Batas maksimal akun sudah tercapai.\nMasukkan kode unlock untuk menambah lebih banyak akun.", vertical="middle"),
                 border_style=theme["border_warning"],
                 padding=(1, 2),
                 expand=True
@@ -124,7 +130,11 @@ def show_account_menu():
                 is_adding_user = False
                 continue
             else:
-                save_unlock_status(True)
+                live_loading(
+                    task=lambda: save_unlock_status(True),
+                    text="Menyimpan status unlock...",
+                    theme=theme
+                )
                 is_unlocked = True
                 print_panel("Berhasil", "Akses akun tambahan telah dibuka.")
                 pause()
@@ -152,7 +162,13 @@ def show_account_menu():
         ))
 
         account_table = Table(box=MINIMAL_DOUBLE_HEAD, expand=True)
+        
+        #account_table.add_column("No", justify="right", style=theme["text_key"], width=6)
+        #account_table.add_column("Nomor XL", style=theme["text_body"])
+        #account_table.add_column("Status", style=theme["text_sub"], justify="center")
+
         account_table.add_column("No", justify="right", style=theme["text_key"], width=6)
+        account_table.add_column("Nama", style=theme["text_body"])
         account_table.add_column("Nomor XL", style=theme["text_body"])
         account_table.add_column("Status", style=theme["text_sub"], justify="center")
 
@@ -162,7 +178,12 @@ def show_account_menu():
             for idx, user in enumerate(users):
                 is_active = active_user and user["number"] == active_user["number"]
                 status = "Aktif" if is_active else "-"
-                account_table.add_row(str(idx + 1), str(user["number"]), status)
+                account_table.add_row(
+                    str(idx + 1),
+                    user.get("name", "Tanpa Nama"),
+                    str(user["number"]),
+                    status
+                )
 
         console.print(Panel(account_table, border_style=theme["border_primary"], padding=(0, 1), expand=True))
 
@@ -171,6 +192,7 @@ def show_account_menu():
         command_table.add_column("Pilih Aksi", style=theme["text_body"])
         command_table.add_row(f"(1 - {len(users)})", "Pilih nomor akun untuk berganti")
         command_table.add_row("T", "Tambah akun")
+        command_table.add_row("E", "Edit nama akun")
         command_table.add_row("H", f"[{theme['text_err']}]Hapus akun tersimpan[/]")
         command_table.add_row("00", f"[{theme['text_sub']}]Kembali ke menu utama[/]")
 
@@ -179,10 +201,46 @@ def show_account_menu():
         user_input = console.input(f"[{theme['text_sub']}]Pilihan:[/{theme['text_sub']}] ").strip()
 
         if user_input == "00":
+            live_loading(text="Kembali ke menu utama...", theme=theme)
             return active_user["number"] if active_user else None
 
         elif user_input.upper() == "T":
             is_adding_user = True
+
+        elif user_input.upper() == "E":
+            if not users:
+                print_panel("Error", "Tidak ada akun untuk diedit.")
+                pause()
+                continue
+
+            nomor_input = console.input(f"[{theme['text_sub']}]Nomor akun yang ingin diedit (1 - {len(users)}):[/{theme['text_sub']}] ").strip()
+            if nomor_input == "00":
+                print_panel("Dibatalkan", "Edit nama akun dibatalkan.")
+                pause()
+                continue
+
+            if nomor_input.isdigit():
+                nomor = int(nomor_input)
+                if 1 <= nomor <= len(users):
+                    selected_user = users[nomor - 1]
+                    new_name = console.input(f"[{theme['text_sub']}]Masukkan nama baru untuk akun {selected_user['number']}:[/{theme['text_sub']}] ").strip()
+                    if new_name:
+                        AuthInstance.edit_account_name(selected_user["number"], new_name)
+                        AuthInstance.load_tokens()
+                        users = AuthInstance.refresh_tokens
+                        active_user = AuthInstance.get_active_user()
+                        print_panel("Berhasil", f"Nama akun berhasil diubah menjadi '{new_name}'.")
+                        pause()
+                    else:
+                        print_panel("Error", "Nama tidak boleh kosong.")
+                        pause()
+                else:
+                    print_panel("Error", f"Nomor akun di luar jangkauan (1 - {len(users)}).")
+                    pause()
+            else:
+                print_panel("Error", "Input tidak valid. Masukkan angka atau 00 untuk batal.")
+                pause()
+
 
         elif user_input.upper() == "H":
             if not users:
@@ -204,7 +262,11 @@ def show_account_menu():
                         f"[{theme['text_sub']}]Yakin ingin hapus akun {selected_user['number']}? (y/n):[/{theme['text_sub']}] "
                     ).strip().lower()
                     if confirm == "y":
-                        AuthInstance.remove_refresh_token(selected_user["number"])
+                        live_loading(
+                            task=lambda: AuthInstance.remove_refresh_token(selected_user["number"]),
+                            text=f"Menghapus akun {selected_user['number']}...",
+                            theme=theme
+                        )
                         AuthInstance.load_tokens()
                         users = AuthInstance.refresh_tokens
                         active_user = AuthInstance.get_active_user()
@@ -213,11 +275,13 @@ def show_account_menu():
                         continue
                     else:
                         print_panel("Info", "Penghapusan akun dibatalkan.")
+                        pause()
                 else:
                     print_panel("Error", f"Nomor akun di luar jangkauan (1 - {len(users)}).")
+                    pause()
             else:
                 print_panel("Error", "Input tidak valid. Masukkan angka atau 00 untuk batal.")
-            pause()
+                pause()
 
         elif user_input.isdigit():
             nomor = int(user_input)
