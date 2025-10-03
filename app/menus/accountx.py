@@ -114,7 +114,7 @@ def show_account_menu():
                 status = f" ({'Aktif'})" if is_active else ""
                 print(f"{idx + 1}. {user['number']}{status}")
 
-        print("----------------------------------")
+        print("")
         print("Command:")
         print("0: Tambah Akun")
         print("00: Kembali ke menu utama")
