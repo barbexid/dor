@@ -1,3 +1,4 @@
+import time
 import requests
 import json
 import sys
@@ -19,21 +20,30 @@ from rich.console import Console
 from rich.align import Align
 from rich.box import MINIMAL_DOUBLE_HEAD
 from rich.text import Text
+from rich.live import Live
+from rich.spinner import Spinner
+
 from app.config.theme_config import get_theme
+
 
 console = Console()
 
 
 def show_package_details(api_key, tokens, package_option_code, is_enterprise, option_order=-1):
-    clear_screen()
     theme = get_theme()
-    package = get_package(api_key, tokens, package_option_code)
+
+    # Animasi saat memuat detail paket
+    with Live(Spinner("dots", text="Memuat detail paket..."), refresh_per_second=10):
+        package = get_package(api_key, tokens, package_option_code)
+
+    clear_screen()
 
     if not package:
         print_panel("⚠️ Error", "Gagal memuat detail paket.")
         pause()
         return "BACK"
 
+    # Ambil data paket
     price = package["package_option"]["price"]
     formatted_price = get_rupiah(price)
     validity = package["package_option"]["validity"]
@@ -60,6 +70,7 @@ def show_package_details(api_key, tokens, package_option_code, is_enterprise, op
         )
     ]
 
+    # Tampilkan informasi paket
     console.print(Panel(
         Align.center(f"[{theme['text_title']}]📦 Paket {family_name}[/]", vertical="middle"),
         border_style=theme["border_primary"],
@@ -70,7 +81,7 @@ def show_package_details(api_key, tokens, package_option_code, is_enterprise, op
     info_table = Table.grid(padding=(0, 1))
     info_table.add_column(justify="left", style=theme["text_body"])
     info_table.add_column(justify="left")
-    info_table.add_row("Nama", f": [bolt {theme['text_body']}]{title}[/]")
+    info_table.add_row("Nama", f": [bold {theme['text_body']}]{title}[/]")
     info_table.add_row("Harga", f": Rp [{theme['text_money']}]{formatted_price}[/]")
     info_table.add_row("Masa Aktif", f": [{theme['text_date']}]{validity}[/]")
     info_table.add_row("Point", f": [{theme['text_body']}]{point}[/]")
@@ -85,6 +96,7 @@ def show_package_details(api_key, tokens, package_option_code, is_enterprise, op
         expand=True
     ))
 
+    # Tampilkan benefit jika ada
     benefits = package["package_option"].get("benefits", [])
     if benefits:
         benefit_table = Table(box=MINIMAL_DOUBLE_HEAD, expand=True)
@@ -132,6 +144,7 @@ def show_package_details(api_key, tokens, package_option_code, is_enterprise, op
             expand=True
         ))
 
+    # Tampilkan S&K
     console.print(Panel(
         detail,
         title=f"[{theme['text_title']}]✨ Syarat & Ketentuan ✨[/]",
@@ -140,6 +153,7 @@ def show_package_details(api_key, tokens, package_option_code, is_enterprise, op
         expand=True
     ))
 
+    # Tampilkan opsi pembelian
     option_table = Table(show_header=False, box=MINIMAL_DOUBLE_HEAD, expand=True)
     option_table.add_column(justify="right", style=theme["text_key"], width=6)
     option_table.add_column(justify="left", style=theme["text_body"])
@@ -161,9 +175,12 @@ def show_package_details(api_key, tokens, package_option_code, is_enterprise, op
         expand=True
     ))
 
+    # Input pilihan
     while True:
         choice = console.input(f"[{theme['text_sub']}]Pilihan:[/{theme['text_sub']}] ").strip()
         if choice == "99":
+            with Live(Spinner("line", text="Kembali ke menu utama..."), refresh_per_second=10):
+                time.sleep(1.5)
             return "MAIN"
         elif choice == "00":
             return "BACK"
@@ -205,7 +222,7 @@ def show_package_details(api_key, tokens, package_option_code, is_enterprise, op
             return True
         else:
             print_panel("⚠️ Error", "Pilihan tidak valid. Pastikan input sesuai dengan nomor yang ada di menu.")
-            #pause()
+
 
 
 def get_packages_by_family(
