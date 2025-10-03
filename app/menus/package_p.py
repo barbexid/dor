@@ -359,7 +359,9 @@ def get_packages_by_family(
             continue  # kembali ke daftar paket setelah pembelian
 
 
-
+def loading_animation(text="Memuat..."):
+    with Live(Spinner("dots", text=text), refresh_per_second=10):
+        time.sleep(1.5)
 
 def fetch_my_packages():
     api_key = AuthInstance.api_key
@@ -383,14 +385,10 @@ def fetch_my_packages():
     while True:  # 🔁 Loop utama untuk reload menu
         clear_screen()
 
-        console.print(Panel(
-            "[bold]Mengambil daftar paket aktif Anda...[/]",
-            border_style=theme["border_info"],
-            padding=(0, 1),
-            expand=True
-        ))
+        # Animasi saat mengambil daftar paket
+        with Live(Spinner("dots", text="Mengambil daftar paket aktif Anda..."), refresh_per_second=10):
+            res = send_api_request(api_key, path, payload, id_token, "POST")
 
-        res = send_api_request(api_key, path, payload, id_token, "POST")
         if res.get("status") != "SUCCESS":
             print_panel("⚠️ Error", "Gagal mengambil paket.")
             pause()
@@ -471,7 +469,6 @@ def fetch_my_packages():
                     "⚠️ Error",
                     f"Nomor paket tidak ditemukan.\nSilakan masukkan nomor yang benar {package_range} atau 00, untuk kembali."
                 )
-                #pause()
                 continue  # ulangi input, tidak reload
 
             result = show_package_details(api_key, tokens, selected_pkg["quota_code"], False)
@@ -479,8 +476,9 @@ def fetch_my_packages():
             if result == "MAIN":
                 return None  # keluar ke menu utama
             elif result == "BACK":
-                loading_animation("Kembali ke daftar paket")  # animasi transisi
+                loading_animation("Kembali ke daftar paket...")
                 break  # reload ulang menu fetch_my_packages
             elif result is True:
                 return None  # selesai pembelian
+
 
