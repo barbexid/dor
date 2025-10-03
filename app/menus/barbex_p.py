@@ -51,6 +51,7 @@ def show_barbex_main_menu():
         elif choice == "2":
             show_barbex_menu2()
         elif choice == "00":
+            live_loading(text="Kembali ke menu utama...", theme=theme)
             return
         else:
             print_panel("⚠️ Error", "Input tidak valid. Silahkan coba lagi.")
@@ -300,6 +301,7 @@ def show_barbex_menu2():
                 elif input_method == "00":
                     break
                 elif input_method == "99":
+                    live_loading(text="Kembali ke menu utama...", theme=theme)
                     return
                 else:
                     print_panel("⚠️ Error", "Metode tidak valid. Silahkan coba lagi.")
