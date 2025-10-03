@@ -1,14 +1,15 @@
-import json
 from rich.console import Console
 from rich.panel import Panel
 from rich.align import Align
 from rich.table import Table
+from rich.text import Text
 from rich.box import MINIMAL_DOUBLE_HEAD
+
 from app.client.engsel2 import get_otp, submit_otp
-from app.menus.util import clear_screen
 from app.service.auth import AuthInstance
-from app.config.theme_config import get_theme
 from app.service.unlock import load_unlock_status, save_unlock_status
+from app.config.theme_config import get_theme
+from app.menus.util import clear_screen
 from app.menus.anu_util import pause, print_panel, live_loading
 
 console = Console()
@@ -22,7 +23,6 @@ def normalize_number(raw_input: str) -> str:
     elif raw_input.startswith("628"):
         return raw_input
     return raw_input
-
 
 def login_prompt(api_key: str):
     clear_screen()
@@ -96,7 +96,6 @@ def login_prompt(api_key: str):
         pause()
         return None, None
 
-
 def show_account_menu():
     clear_screen()
     theme = get_theme()
@@ -130,7 +129,11 @@ def show_account_menu():
                 is_adding_user = False
                 continue
             else:
-                save_unlock_status(True)
+                live_loading(
+                    task=lambda: save_unlock_status(True),
+                    text="Menyimpan status unlock...",
+                    theme=theme
+                )
                 is_unlocked = True
                 print_panel("✅ Berhasil", "Akses akun tambahan telah dibuka.")
                 pause()
@@ -210,7 +213,11 @@ def show_account_menu():
                         f"[{theme['text_sub']}]Yakin ingin hapus akun {selected_user['number']}? (y/n):[/{theme['text_sub']}] "
                     ).strip().lower()
                     if confirm == "y":
-                        AuthInstance.remove_refresh_token(selected_user["number"])
+                        live_loading(
+                            task=lambda: AuthInstance.remove_refresh_token(selected_user["number"]),
+                            text=f"Menghapus akun {selected_user['number']}...",
+                            theme=theme
+                        )
                         AuthInstance.load_tokens()
                         users = AuthInstance.refresh_tokens
                         active_user = AuthInstance.get_active_user()
@@ -219,11 +226,13 @@ def show_account_menu():
                         continue
                     else:
                         print_panel("ℹ️ Info", "Penghapusan akun dibatalkan.")
+                        pause()
                 else:
                     print_panel("⚠️ Error", f"Nomor akun di luar jangkauan (1 - {len(users)}).")
+                    pause()
             else:
                 print_panel("⚠️ Error", "Input tidak valid. Masukkan angka atau 00 untuk batal.")
-            pause()
+                pause()
 
         elif user_input.isdigit():
             nomor = int(user_input)
