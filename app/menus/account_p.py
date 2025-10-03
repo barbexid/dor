@@ -6,7 +6,7 @@ from rich.text import Text
 from rich.box import MINIMAL_DOUBLE_HEAD
 
 from app.client.engsel2 import get_otp, submit_otp
-from app.service.auth2 import AuthInstance
+from app.service.auth import AuthInstance
 from app.service.unlock import load_unlock_status, save_unlock_status
 from app.config.theme_config import get_theme
 from app.menus.util import clear_screen
