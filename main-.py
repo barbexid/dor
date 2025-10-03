@@ -8,17 +8,17 @@ from datetime import datetime
 
 from app.client.engsel2 import *
 from app.service.auth import AuthInstance
-from app.menus.bookmark3 import show_bookmark_menu
-from app.menus.donate3 import show_donate_menu
-from app.menus.account3 import show_account_menu
-from app.menus.package3 import (
+from app.menus.bookmark- import show_bookmark_menu
+from app.menus.donate- import show_donate_menu
+from app.menus.account- import show_account_menu
+from app.menus.package- import (
     fetch_my_packages,
     get_packages_by_family,
     show_package_details,
 )
-from app.menus.hot3 import show_hot_menu, show_hot_menu2
-from app.menus.familys3 import show_family_menu
-from app.menus.barbex3 import show_barbex_main_menu
+from app.menus.hot- import show_hot_menu, show_hot_menu2
+from app.menus.familys- import show_family_menu
+from app.menus.barbex- import show_barbex_main_menu
 from app.service.sentry import enter_sentry_mode
 from app.config.theme_config import (
     get_active_theme_name,
