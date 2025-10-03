@@ -22,18 +22,24 @@ def live_loading(task=None, text="Memuat...", spinner_type="dots", refresh_rate=
     - spinner_type: jenis spinner Rich (default: "dots")
     - refresh_rate: kecepatan refresh spinner (default: 10 fps)
     - theme: dict tema aktif, gunakan get_theme() jika tidak diberikan
+
+    Returns:
+    - Hasil dari task() jika diberikan, atau None
     """
-    console = Console()
     if theme is None:
         theme = get_theme()
 
-    spinner_color = theme.get("border_info", "cyan")  # fallback ke cyan jika tidak ada
-
+    spinner_color = theme.get("border_info", "cyan")
     spinner = Spinner(spinner_type, text=text, style=spinner_color)
 
     if callable(task):
+        result = None
         with Live(spinner, refresh_per_second=refresh_rate):
-            return task()
+            try:
+                result = task()
+            except Exception as e:
+                console.print(f"[bold red]❌ Terjadi kesalahan:[/] {e}")
+        return result
     else:
         with Live(spinner, refresh_per_second=refresh_rate):
             time.sleep(1.5)
