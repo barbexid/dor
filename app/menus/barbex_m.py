@@ -193,8 +193,8 @@ def show_barbex_menu2():
         table.add_column("Harga", style=theme["text_money"])
 
         for idx, p in enumerate(barbex_packages):
-            formatted_price = get_rupiah(p["price"])
-            table.add_row(str(idx + 1), p["name"], formatted_price)
+            formatted_price = get_rupiah(p.get("price", 0))
+            table.add_row(str(idx + 1), p.get("name", "Tanpa Nama"), formatted_price)
 
         console.print(Panel(
             table,
@@ -229,38 +229,51 @@ def show_barbex_menu2():
 
             payment_items = []
             for package in packages:
-                package_detail = get_package_details(
-                    api_key,
-                    tokens,
-                    package["family_code"],
-                    package["variant_code"],
-                    package["order"],
-                    package["is_enterprise"],
-                )
+                required_keys = ["family_code", "variant_code", "order", "is_enterprise"]
+                if not all(k in package for k in required_keys):
+                    print_panel("Error", f"Data paket tidak lengkap: {package}")
+                    pause()
+                    continue
 
-                if not package_detail:
-                    print_panel("Error", f"Gagal mengambil detail paket untuk {package['family_code']}.")
-                    return
+                try:
+                    package_detail = get_package_details(
+                        api_key,
+                        tokens,
+                        package["family_code"],
+                        package["variant_code"],
+                        package["order"],
+                        package["is_enterprise"],
+                    )
+                except Exception as e:
+                    print_panel("Error", f"Gagal mengambil detail paket: {str(e)}")
+                    pause()
+                    continue
+
+                if not package_detail or "package_option" not in package_detail:
+                    print_panel("Error", f"Detail paket tidak tersedia untuk {package['family_code']}.")
+                    pause()
+                    continue
 
                 payment_items.append(
                     PaymentItem(
-                        item_code=package_detail["package_option"]["package_option_code"],
+                        item_code=package_detail["package_option"].get("package_option_code", ""),
                         product_type="",
-                        item_price=package_detail["package_option"]["price"],
-                        item_name=package_detail["package_option"]["name"],
+                        item_price=package_detail["package_option"].get("price", 0),
+                        item_name=package_detail["package_option"].get("name", "Tanpa Nama"),
                         tax=0,
-                        token_confirmation=package_detail["token_confirmation"],
+                        token_confirmation=package_detail.get("token_confirmation", ""),
                     )
                 )
 
             clear_screen()
 
             info_text = Text()
-            info_text.append(f"{selected_package['name']}\n", style="bold")
-            info_text.append(f"Harga: {get_rupiah(selected_package['price'])}\n", style=theme["text_money"])
+            info_text.append(f"{selected_package.get('name', 'Tanpa Nama')}\n", style="bold")
+            info_text.append(f"Harga: {get_rupiah(selected_package.get('price', 0))}\n", style=theme["text_money"])
             info_text.append("Detail:\n", style=theme["text_body"])
 
-            for line in selected_package["detail"].split("\n"):
+            detail_text = selected_package.get("detail", "")
+            for line in detail_text.split("\n"):
                 cleaned = line.strip()
                 if cleaned:
                     info_text.append(f"- {cleaned}\n", style=theme["text_body"])
@@ -279,7 +292,6 @@ def show_barbex_menu2():
                 payment_table.add_column(justify="left", style=theme["text_body"])
                 payment_table.add_row("1", "E-Wallet")
                 payment_table.add_row("2", "QRIS")
-                #payment_table.add_row("3", "Saldo Langsung")
                 payment_table.add_row("00", f"[{theme['text_sub']}]Kembali ke daftar paket[/]")
                 payment_table.add_row("99", f"[{theme['text_err']}]Kembali ke menu utama[/]")
 
