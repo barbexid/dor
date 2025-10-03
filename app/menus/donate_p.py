@@ -52,8 +52,9 @@ def show_donate_menu():
         title_align="center"
     ))
 
-    pause()
     live_loading(text="Kembali ke menu utama...", theme=theme)
+    pause()
+
 
 def generate_qr_ascii(data: str) -> str:
     import qrcode
