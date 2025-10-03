@@ -70,6 +70,19 @@ def show_hot_main_menu():
             print_panel("⚠️ Error", "Input tidak valid. Silahkan coba lagi.")
             pause()
 
+def validate_family_data(data):
+    return (
+        data and
+        isinstance(data, dict) and
+        "package_variants" in data
+    )
+
+def refresh_family_data(family_code, is_enterprise, api_key, tokens, cache):
+    data = get_family_v2(api_key, tokens, family_code, is_enterprise)
+    if validate_family_data(data):
+        cache[(family_code, is_enterprise)] = data
+    return data
+
 def show_hot_menu():
     theme = get_theme()
     api_key = AuthInstance.api_key
@@ -112,31 +125,29 @@ def show_hot_menu():
                 fc_key = (p["family_code"], p["is_enterprise"])
                 family_data = family_cache.get(fc_key)
 
-                # Validasi isi cache
-                is_valid_cache = (
-                    family_data and
-                    isinstance(family_data, dict) and
-                    "package_variants" in family_data
-                )
+                if not validate_family_data(family_data):
+                    family_data = refresh_family_data(p["family_code"], p["is_enterprise"], api_key, tokens, family_cache)
 
-                if not is_valid_cache:
-                    family_data = get_family_v2(api_key, tokens, p["family_code"], p["is_enterprise"])
-                    if family_data:
-                        family_cache[fc_key] = family_data
+                if not validate_family_data(family_data):
+                    continue
 
-                if family_data:
-                    for variant in family_data.get("package_variants", []):
-                        if variant.get("name") == p.get("variant_name"):
-                            for option in variant.get("package_options", []):
-                                if option.get("order") == p.get("order"):
-                                    p["option_code"] = option.get("package_option_code")
-                                    p["price"] = option.get("price")
-                                    p["option_name"] = option.get("name", "-")
-                                    break
+                for variant in family_data.get("package_variants", []):
+                    if variant.get("name") == p.get("variant_name"):
+                        for option in variant.get("package_options", []):
+                            if option.get("order") == p.get("order"):
+                                p["option_code"] = option.get("package_option_code")
+                                p["price"] = option.get("price")
+                                p["option_name"] = option.get("name", "-")
+                                break
                 enriched_packages.append(p)
 
         live_loading(task=enrich_packages, text="Memproses data paket...", theme=theme)
         save_family_cache({str(k): v for k, v in family_cache.items()})
+
+        if not enriched_packages:
+            print_panel("⚠️ Error", "Gagal memproses data paket. Silakan coba lagi nanti.")
+            pause()
+            return
 
         console.print(Panel(
             Align.center("✨ Paket HOT v1 ✨", vertical="middle"),
@@ -193,21 +204,52 @@ def show_hot_menu():
             pause()
 
 
+def validate_package_detail(detail):
+    return (
+        detail and
+        isinstance(detail, dict) and
+        "package_option" in detail and
+        "token_confirmation" in detail and
+        isinstance(detail["package_option"], dict) and
+        "package_option_code" in detail["package_option"] and
+        "price" in detail["package_option"] and
+        "name" in detail["package_option"]
+    )
 
-HOT2_CACHE_FILE = "hot2_cache.json"
+def refresh_package_details(packages, api_key, tokens, cache):
+    payment_items = []
 
-def load_hot2_cache():
-    if os.path.exists(HOT2_CACHE_FILE):
-        try:
-            with open(HOT2_CACHE_FILE, "r") as f:
-                return json.load(f)
-        except:
-            return {}
-    return {}
+    for package in packages:
+        cache_key = f"{package['family_code']}-{package['variant_code']}-{package['order']}-{package['is_enterprise']}"
+        detail = cache.get(cache_key)
 
-def save_hot2_cache(cache):
-    with open(HOT2_CACHE_FILE, "w") as f:
-        json.dump(cache, f)
+        if not validate_package_detail(detail):
+            detail = get_package_details(
+                api_key,
+                tokens,
+                package["family_code"],
+                package["variant_code"],
+                package["order"],
+                package["is_enterprise"],
+            )
+            if detail:
+                cache[cache_key] = detail
+
+        if not validate_package_detail(detail):
+            continue
+
+        payment_items.append(
+            PaymentItem(
+                item_code=detail["package_option"]["package_option_code"],
+                product_type="",
+                item_price=detail["package_option"]["price"],
+                item_name=detail["package_option"]["name"],
+                tax=0,
+                token_confirmation=detail["token_confirmation"],
+            )
+        )
+
+    return payment_items
 
 def show_hot_menu2():
     theme = get_theme()
@@ -273,54 +315,27 @@ def show_hot_menu2():
                 pause()
                 continue
 
-            payment_items = []
+            payment_items = live_loading(
+                task=lambda: refresh_package_details(packages, api_key, tokens, hot2_cache),
+                text="Memuat detail semua paket...",
+                theme=theme
+            )
 
-            def load_all_details():
-                for package in packages:
-                    cache_key = f"{package['family_code']}-{package['variant_code']}-{package['order']}-{package['is_enterprise']}"
-                    package_detail = hot2_cache.get(cache_key)
+            if not payment_items:
+                print_panel("⚠️ Cache tidak valid", "Data pembayaran tidak tersedia. Mengambil ulang data paket...")
+                hot2_cache = {}
+                save_hot2_cache(hot2_cache)
+                payment_items = live_loading(
+                    task=lambda: refresh_package_details(packages, api_key, tokens, hot2_cache),
+                    text="Mengambil ulang detail paket...",
+                    theme=theme
+                )
 
-                    # Validasi isi cache
-                    is_valid_cache = (
-                        package_detail and
-                        isinstance(package_detail, dict) and
-                        "package_option" in package_detail and
-                        "token_confirmation" in package_detail and
-                        isinstance(package_detail["package_option"], dict) and
-                        "package_option_code" in package_detail["package_option"] and
-                        "price" in package_detail["package_option"] and
-                        "name" in package_detail["package_option"]
-                    )
+            if not payment_items:
+                print_panel("⚠️ Error", "Gagal memuat data pembayaran setelah refresh. Silakan coba lagi nanti.")
+                pause()
+                continue
 
-                    if not is_valid_cache:
-                        package_detail = get_package_details(
-                            api_key,
-                            tokens,
-                            package["family_code"],
-                            package["variant_code"],
-                            package["order"],
-                            package["is_enterprise"],
-                        )
-                        if package_detail:
-                            hot2_cache[cache_key] = package_detail
-
-                    if not is_valid_cache and not package_detail:
-                        print_panel("⚠️ Error", f"Gagal mengambil detail paket untuk {package['family_code']}.")
-                        pause()
-                        continue
-
-                    payment_items.append(
-                        PaymentItem(
-                            item_code=package_detail["package_option"]["package_option_code"],
-                            product_type="",
-                            item_price=package_detail["package_option"]["price"],
-                            item_name=package_detail["package_option"]["name"],
-                            tax=0,
-                            token_confirmation=package_detail["token_confirmation"],
-                        )
-                    )
-
-            live_loading(task=load_all_details, text="Memuat detail semua paket...", theme=theme)
             save_hot2_cache(hot2_cache)
             clear_screen()
 
@@ -361,18 +376,10 @@ def show_hot_menu2():
 
                 input_method = console.input(f"[{theme['text_sub']}]Pilih metode:[/{theme['text_sub']}] ").strip()
                 if input_method == "1":
-                    if not payment_items:
-                        print_panel("⚠️ Error", "Data pembayaran tidak tersedia. Tidak dapat melanjutkan E-Wallet.")
-                        pause()
-                        continue
                     show_multipayment_v2(api_key, tokens, payment_items, "BUY_PACKAGE", True)
                     console.input(f"[{theme['text_sub']}]Tekan enter untuk kembali...[/{theme['text_sub']}] ")
                     return
                 elif input_method == "2":
-                    if not payment_items:
-                        print_panel("⚠️ Error", "Data pembayaran tidak tersedia. Tidak dapat melanjutkan QRIS.")
-                        pause()
-                        continue
                     show_qris_payment_v2(api_key, tokens, payment_items, "BUY_PACKAGE", True)
                     console.input(f"[{theme['text_sub']}]Tekan enter untuk kembali...[/{theme['text_sub']}] ")
                     return
