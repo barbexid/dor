@@ -1,43 +1,42 @@
+import os
+import json
 import requests
-from rich.table import Table
-from rich.panel import Panel
 from rich.console import Console
+from rich.panel import Panel
+from rich.table import Table
 from rich.align import Align
-from rich.box import MINIMAL_DOUBLE_HEAD
 from rich.text import Text
+from rich.box import MINIMAL_DOUBLE_HEAD
+
 from app.client.balance import settlement_balance
-from app.client.engsel2 import get_family_v2, get_package_details
+from app.client.engsel2 import get_family_v2
 from app.menus.package_p import show_package_details
 from app.service.auth import AuthInstance
 from app.menus.util import clear_screen
-from app.menus.anu_util import pause, print_panel, get_rupiah
+from app.menus.anu_util import pause, print_panel, get_rupiah, live_loading
 from app.client.ewallet import show_multipayment_v2
 from app.client.qris2 import show_qris_payment_v2
 from app.type_dict import PaymentItem
 from app.config.theme_config import get_theme
 
-import json
-import os
-
-from rich.live import Live
-from rich.spinner import Spinner
-import time
-
-
 console = Console()
+CACHE_FILE = "family_cache.json"
 
-def loading_animation(text="Memuat..."):
-    with Live(Spinner("dots", text=text), refresh_per_second=10):
-        time.sleep(1.5)
+def load_family_cache():
+    if os.path.exists(CACHE_FILE):
+        with open(CACHE_FILE, "r", encoding="utf-8") as f:
+            return json.load(f)
+    return {}
 
+def save_family_cache(cache):
+    with open(CACHE_FILE, "w", encoding="utf-8") as f:
+        json.dump(cache, f, ensure_ascii=False, indent=2)
 
 def show_hot_main_menu():
     theme = get_theme()
-    in_main_menu = True
-    while in_main_menu:
+    while True:
         clear_screen()
 
-        # Panel judul terpisah
         console.print(Panel(
             Align.center("✨ Paket HOT ✨", vertical="middle"),
             border_style=theme["border_info"],
@@ -45,7 +44,6 @@ def show_hot_main_menu():
             expand=True
         ))
 
-        # Tabel menu paket
         menu_table = Table(box=MINIMAL_DOUBLE_HEAD, expand=True)
         menu_table.add_column("Kode", justify="right", style=theme["text_key"], width=6)
         menu_table.add_column("Menu Paket", style=theme["text_body"])
@@ -60,33 +58,17 @@ def show_hot_main_menu():
             expand=True
         ))
 
-        # Input pilihan
         choice = console.input(f"[{theme['text_sub']}]Pilih menu:[/{theme['text_sub']}] ").strip()
         if choice == "1":
             show_hot_menu()
         elif choice == "2":
-            show_hot_menu2()
+            show_hot_menu2()  # jika tersedia
         elif choice == "00":
-            loading_animation("Kembali ke menu utama...")
-            in_main_menu = False
+            live_loading(text="Kembali ke menu utama...", theme=theme)
+            return
         else:
             print_panel("⚠️ Error", "Input tidak valid. Silahkan coba lagi.")
             pause()
-
-
-
-CACHE_FILE = "family_cache.json"
-
-def load_family_cache():
-    if os.path.exists(CACHE_FILE):
-        with open(CACHE_FILE, "r", encoding="utf-8") as f:
-            return json.load(f)
-    return {}
-
-def save_family_cache(cache):
-    with open(CACHE_FILE, "w", encoding="utf-8") as f:
-        json.dump(cache, f, ensure_ascii=False, indent=2)
-
 
 def show_hot_menu():
     theme = get_theme()
@@ -98,26 +80,26 @@ def show_hot_menu():
         pause()
         return
 
-    # Load cache awal
     raw_cache = load_family_cache()
     family_cache = {eval(k): v for k, v in raw_cache.items()}
 
     while True:
         clear_screen()
 
-        # Ambil data HOT dari server
         try:
-            response = requests.get("https://me.mashu.lol/pg-hot.json", timeout=30)
-            response.raise_for_status()
-            hot_packages = response.json()
+            hot_packages = live_loading(
+                task=lambda: requests.get("https://me.mashu.lol/pg-hot.json", timeout=30).json(),
+                text="Mengambil data HOT Package...",
+                theme=theme
+            )
         except Exception:
             print_panel("⚠️ Error", "Gagal mengambil data HOT Package.")
             pause()
             return
 
-        # Enrich data dengan cache dan API
         enriched_packages = []
-        with Live(Spinner("dots", text="Memproses data paket..."), refresh_per_second=10):
+
+        def enrich_packages():
             for p in hot_packages:
                 fc_key = (p["family_code"], p["is_enterprise"])
                 family_data = family_cache.get(fc_key)
@@ -137,10 +119,9 @@ def show_hot_menu():
                                     break
                 enriched_packages.append(p)
 
-        # Simpan cache terbaru
+        live_loading(task=enrich_packages, text="Memproses data paket...", theme=theme)
         save_family_cache({str(k): v for k, v in family_cache.items()})
 
-        # Tampilkan daftar paket HOT
         console.print(Panel(
             Align.center("✨ Paket HOT v1 ✨", vertical="middle"),
             border_style=theme["border_info"],
@@ -167,10 +148,9 @@ def show_hot_menu():
 
         console.print(Panel(nav_table, border_style=theme["border_info"], padding=(0, 1), expand=True))
 
-        # Input pilihan
         choice = console.input(f"[{theme['text_sub']}]Pilih paket:[/{theme['text_sub']}] ").strip()
         if choice == "00":
-            loading_animation("Kembali ke menu sebelumnya...")
+            live_loading(text="Kembali ke menu sebelumnya...", theme=theme)
             return
 
         if choice.isdigit() and 1 <= int(choice) <= len(enriched_packages):
@@ -185,30 +165,26 @@ def show_hot_menu():
             if result == "MAIN":
                 return
             elif result in ("BACK", True):
-                continue  # reload ulang daftar HOT
+                continue
         else:
             print_panel("⚠️ Error", "Input tidak valid. Silakan masukkan nomor yang tersedia.")
             pause()
 
 
+HOT2_CACHE_FILE = "hot2_cache.json"
 
-# Fungsi cache
 def load_hot2_cache():
-    if os.path.exists("hot2_cache.json"):
+    if os.path.exists(HOT2_CACHE_FILE):
         try:
-            with open("hot2_cache.json", "r") as f:
+            with open(HOT2_CACHE_FILE, "r") as f:
                 return json.load(f)
         except:
             return {}
     return {}
 
 def save_hot2_cache(cache):
-    with open("hot2_cache.json", "w") as f:
+    with open(HOT2_CACHE_FILE, "w") as f:
         json.dump(cache, f)
-
-def loading_animation(text="Memuat..."):
-    with Live(Spinner("dots", text=text), refresh_per_second=10):
-        time.sleep(1.5)
 
 def show_hot_menu2():
     theme = get_theme()
@@ -216,20 +192,20 @@ def show_hot_menu2():
     tokens = AuthInstance.get_active_tokens()
 
     hot2_cache = load_hot2_cache()
-    in_hot_menu = True
 
-    while in_hot_menu:
+    while True:
         clear_screen()
 
-        with Live(Spinner("dots", text="Mengambil daftar paket HOT v2..."), refresh_per_second=10):
-            try:
-                response = requests.get("https://me.mashu.lol/pg-hot2.json", timeout=30)
-                response.raise_for_status()
-                hot_packages = response.json()
-            except Exception:
-                print_panel("⚠️ Error", "Gagal mengambil data HOT Package.")
-                pause()
-                return
+        try:
+            hot_packages = live_loading(
+                task=lambda: requests.get("https://me.mashu.lol/pg-hot2.json", timeout=30).json(),
+                text="Mengambil daftar paket HOT v2...",
+                theme=theme
+            )
+        except Exception:
+            print_panel("⚠️ Error", "Gagal mengambil data HOT Package.")
+            pause()
+            return
 
         console.print(Panel(
             Align.center("✨ Paket HOT v2 ✨", vertical="middle"),
@@ -258,7 +234,7 @@ def show_hot_menu2():
 
         choice = console.input(f"[{theme['text_sub']}]Pilih paket:[/{theme['text_sub']}] ").strip()
         if choice == "00":
-            loading_animation("Kembali ke menu sebelumnya...")
+            live_loading(text="Kembali ke menu sebelumnya...", theme=theme)
             return
 
         if choice.isdigit() and 1 <= int(choice) <= len(hot_packages):
@@ -270,7 +246,8 @@ def show_hot_menu2():
                 continue
 
             payment_items = []
-            with Live(Spinner("dots", text="Memuat detail semua paket..."), refresh_per_second=10):
+
+            def load_all_details():
                 for package in packages:
                     cache_key = f"{package['family_code']}-{package['variant_code']}-{package['order']}-{package['is_enterprise']}"
                     if cache_key in hot2_cache:
@@ -303,6 +280,7 @@ def show_hot_menu2():
                         )
                     )
 
+            live_loading(task=load_all_details, text="Memuat detail semua paket...", theme=theme)
             save_hot2_cache(hot2_cache)
             clear_screen()
 
@@ -324,8 +302,7 @@ def show_hot_menu2():
                 expand=True
             ))
 
-            in_payment_menu = True
-            while in_payment_menu:
+            while True:
                 payment_table = Table(show_header=False, box=MINIMAL_DOUBLE_HEAD, expand=True)
                 payment_table.add_column(justify="right", style=theme["text_key"], width=6)
                 payment_table.add_column(justify="left", style=theme["text_body"])
@@ -352,11 +329,10 @@ def show_hot_menu2():
                     console.input(f"[{theme['text_sub']}]Tekan enter untuk kembali...[/{theme['text_sub']}] ")
                     return
                 elif input_method == "00":
-                    loading_animation("Kembali ke daftar paket HOT v2...")
-                    in_payment_menu = False
+                    live_loading(text="Kembali ke daftar paket HOT v2...", theme=theme)
+                    break
                 elif input_method == "99":
-                    loading_animation("Kembali ke menu utama...")
-                    in_hot_menu = False
+                    live_loading(text="Kembali ke menu utama...", theme=theme)
                     return
                 else:
                     print_panel("⚠️ Error", "Metode tidak valid. Silahkan coba lagi.")
