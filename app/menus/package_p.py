@@ -33,8 +33,11 @@ def show_package_details(api_key, tokens, package_option_code, is_enterprise, op
     theme = get_theme()
 
     # Animasi saat memuat detail paket
-    with Live(Spinner("dots", text="Memuat detail paket..."), refresh_per_second=10):
-        package = get_package(api_key, tokens, package_option_code)
+    package = live_loading(
+        task=lambda: get_package(api_key, tokens, package_option_code),
+        text="Memuat detail paket...",
+        theme=theme
+    )
 
     clear_screen()
 
@@ -179,8 +182,7 @@ def show_package_details(api_key, tokens, package_option_code, is_enterprise, op
     while True:
         choice = console.input(f"[{theme['text_sub']}]Pilihan:[/{theme['text_sub']}] ").strip()
         if choice == "99":
-            with Live(Spinner("line", text="Kembali ke menu utama..."), refresh_per_second=10):
-                time.sleep(1.5)
+            live_loading(text="Kembali ke menu utama...", theme=theme)
             return "MAIN"
         elif choice == "00":
             return "BACK"
@@ -232,7 +234,6 @@ def get_packages_by_family(
     api_key = AuthInstance.api_key
     tokens = AuthInstance.get_active_tokens()
     theme = get_theme()
-    console = Console()
 
     if not tokens:
         print_panel("⚠️ Error", "Tidak ditemukan token pengguna aktif.")
@@ -240,8 +241,11 @@ def get_packages_by_family(
         return "BACK"
 
     # Animasi saat memuat data paket family
-    with Live(Spinner("dots", text="Memuat data paket family..."), refresh_per_second=10):
-        data = get_family_v2(api_key, tokens, family_code, is_enterprise, migration_type)
+    data = live_loading(
+        task=lambda: get_family_v2(api_key, tokens, family_code, is_enterprise, migration_type),
+        text="Memuat data paket family...",
+        theme=theme
+    )
 
     if not data:
         print_panel("⚠️ Error", "Gagal memuat data paket family.")
@@ -328,8 +332,7 @@ def get_packages_by_family(
         if pkg_choice == "00":
             return "BACK"
         elif pkg_choice == "99":
-            with Live(Spinner("line", text="Kembali ke menu utama..."), refresh_per_second=10):
-                time.sleep(1.5)
+            live_loading(text="Kembali ke menu utama...", theme=theme)
             return "MAIN"
 
         if not pkg_choice.isdigit():
@@ -359,15 +362,10 @@ def get_packages_by_family(
             continue  # kembali ke daftar paket setelah pembelian
 
 
-def loading_animation(text="Memuat..."):
-    with Live(Spinner("dots", text=text), refresh_per_second=10):
-        time.sleep(1.5)
-
 def fetch_my_packages():
     api_key = AuthInstance.api_key
     tokens = AuthInstance.get_active_tokens()
     theme = get_theme()
-    console = Console()
 
     if not tokens:
         print_panel("⚠️ Error", "Tidak ditemukan token pengguna aktif.")
@@ -386,8 +384,11 @@ def fetch_my_packages():
         clear_screen()
 
         # Animasi saat mengambil daftar paket
-        with Live(Spinner("dots", text="Mengambil daftar paket aktif Anda..."), refresh_per_second=10):
-            res = send_api_request(api_key, path, payload, id_token, "POST")
+        res = live_loading(
+            task=lambda: send_api_request(api_key, path, payload, id_token, "POST"),
+            text="Mengambil daftar paket aktif Anda...",
+            theme=theme
+        )
 
         if res.get("status") != "SUCCESS":
             print_panel("⚠️ Error", "Gagal mengambil paket.")
@@ -415,7 +416,11 @@ def fetch_my_packages():
             family_code = "N/A"
 
             console.print(f"[dim]Mengambil detail paket no. {num}...[/]")
-            package_details = get_package(api_key, tokens, quota_code)
+            package_details = live_loading(
+                task=lambda: get_package(api_key, tokens, quota_code),
+                text=f"Memuat detail paket {num}...",
+                theme=theme
+            )
             if package_details:
                 family_code = package_details["package_family"]["package_family_code"]
 
@@ -461,9 +466,8 @@ def fetch_my_packages():
         while True:
             choice = console.input(f"[{theme['text_sub']}]Masukkan nomor paket {package_range} atau 00, untuk kembali:[/{theme['text_sub']}] ").strip()
             if choice == "00":
-                loading_animation("Kembali ke menu utama...")
+                live_loading(text="Kembali ke menu utama...", theme=theme)
                 return None
-
 
             selected_pkg = next((pkg for pkg in my_packages if str(pkg["number"]) == choice), None)
             if not selected_pkg:
@@ -478,9 +482,8 @@ def fetch_my_packages():
             if result == "MAIN":
                 return None  # keluar ke menu utama
             elif result == "BACK":
-                live_loading("Kembali ke daftar paket...")
+                live_loading(text="Kembali ke daftar paket...", theme=theme)
                 break  # reload ulang menu fetch_my_packages
             elif result is True:
                 return None  # selesai pembelian
-
 
