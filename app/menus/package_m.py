@@ -12,7 +12,7 @@ from app.client.ewallet import show_multipayment_v2
 from app.client.balance import settlement_balance
 from app.type_dict import PaymentItem
 
-from app.menus.anu_util import pause, print_panel, get_rupiah, loading_animation
+from app.menus.anu_util import pause, print_panel, get_rupiah, live_loading
 from rich.table import Table
 from rich.panel import Panel
 from rich.console import Console
@@ -455,7 +455,7 @@ def fetch_my_packages():
             if result == "MAIN":
                 return None  # keluar ke menu utama
             elif result == "BACK":
-                loading_animation("Kembali ke daftar paket")  # animasi transisi
+                #live_loading("Kembali ke daftar paket")  # animasi transisi
                 break  # reload ulang menu fetch_my_packages
             elif result is True:
                 return None  # selesai pembelian
