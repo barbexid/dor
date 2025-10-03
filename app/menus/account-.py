@@ -4,7 +4,7 @@ from rich.panel import Panel
 from rich.align import Align
 from rich.table import Table
 from rich.box import MINIMAL_DOUBLE_HEAD
-from app.client.engsel import get_otp, submit_otp
+from app.client.engsel2 import get_otp, submit_otp
 from app.menus.util import clear_screen
 from app.menus.anu_util import pause, print_panel
 from app.service.auth import AuthInstance
