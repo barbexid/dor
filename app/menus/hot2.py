@@ -92,12 +92,12 @@ def show_hot_menu():
 
     clear_screen()
 
-    console.print(Panel(
-        "[bold]Memuat Daftar Paket HOT v1...[/]",
-        border_style=theme["border_info"],
-        padding=(0, 1),
-        expand=True
-    ))
+    #console.print(Panel(
+        #"[bold]Memuat Daftar Paket HOT v1...[/]",
+        #border_style=theme["border_info"],
+        #padding=(0, 1),
+        #expand=True
+    #))
 
     url = "https://me.mashu.lol/pg-hot.json"
     try:
