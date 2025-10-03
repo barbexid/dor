@@ -155,7 +155,6 @@ def main():
             else:
                 print_panel("⚠️ Gagal", "Tidak ada akun yang dipilih.")
                 pause()
-                live_loading(text=" ", theme=theme)
             continue
 
         api_key = AuthInstance.api_key
@@ -193,7 +192,6 @@ def main():
             else:
                 print_panel("⚠️ Gagal", "Tidak ada akun yang dipilih.")
                 pause()
-                live_loading(text=" ", theme=theme)
             continue
 
         elif choice == "2":
@@ -239,6 +237,7 @@ def main():
             res = get_package(api_key, tokens, "")
             print(json.dumps(res, indent=2))
             input("Tekan Enter untuk kembali...")
+            live_loading(text=" ", theme=theme)
 
         elif choice == "s":
             enter_sentry_mode()
@@ -246,7 +245,6 @@ def main():
         else:
             print_panel("⚠️ Error", "Pilihan tidak valid.")
             pause()
-            live_loading(text=" ", theme=theme)
 
 if __name__ == "__main__":
     try:
