@@ -119,7 +119,7 @@ class Auth:
                 self.active_user["tokens"] = tokens
                 self.last_refresh_time = int(time.time())
 
-                # ✅ Pastikan nama akun tidak hilang saat refresh
+                # Pastikan nama akun tidak hilang saat refresh
                 existing = next((rt for rt in self.refresh_tokens if rt["number"] == self.active_user["number"]), {})
                 name = existing.get("name", "Tanpa Nama")
 
