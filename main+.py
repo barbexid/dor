@@ -151,6 +151,7 @@ def main():
             selected_user_number = show_account_menu()
             if selected_user_number:
                 AuthInstance.set_active_user(selected_user_number)
+                live_loading(text="Memuat informasi akun...", theme=theme)
                 clear_screen()
             else:
                 print_panel("⚠️ Gagal", "Tidak ada akun yang dipilih.")
