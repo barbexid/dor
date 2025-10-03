@@ -9,7 +9,7 @@ from rich.text import Text
 from rich.box import MINIMAL_DOUBLE_HEAD
 
 from app.client.balance import settlement_balance
-from app.client.engsel2 import get_family_v2
+from app.client.engsel2 import get_family_v2, get_package_details
 from app.menus.package_p import show_package_details
 from app.service.auth import AuthInstance
 from app.menus.util import clear_screen
