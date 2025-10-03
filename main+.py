@@ -116,7 +116,7 @@ def show_theme_menu():
         choice = console.input(f"[{theme['text_sub']}]Pilih nomor tema:[/{theme['text_sub']}] ").strip()
 
         if choice == "00":
-            live_loading(text="Kembali ke menu utama...", theme=theme)
+            live_loading(text="Kembali...", theme=theme)
             return
 
         if choice.isdigit() and 1 <= int(choice) <= len(theme_names):
@@ -237,7 +237,6 @@ def main():
             res = get_package(api_key, tokens, "")
             print(json.dumps(res, indent=2))
             input("Tekan Enter untuk kembali...")
-            live_loading(text=" ", theme=theme)
 
         elif choice == "s":
             enter_sentry_mode()
