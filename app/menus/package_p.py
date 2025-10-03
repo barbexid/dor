@@ -277,7 +277,7 @@ def get_packages_by_family(
         package_table.add_column("No", justify="right", style=theme["text_key"], width=4)
         package_table.add_column("Varian", style=theme["text_body"])
         package_table.add_column("Nama Paket", style=theme["text_body"])
-        package_table.add_column("Harga", style=theme["text_money"], justify="left")
+        package_table.add_column("Harga", style=theme["text_money"], justify="right")
 
         packages.clear()
         option_number = 1
