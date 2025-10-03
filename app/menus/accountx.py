@@ -57,7 +57,7 @@ def login_prompt(api_key: str):
         pause()
         return None, None
 
-def show_account_menu(auto_login: bool = True):
+def show_account_menu():
     clear_screen()
     AuthInstance.load_tokens()
     users = AuthInstance.refresh_tokens
@@ -65,12 +65,6 @@ def show_account_menu(auto_login: bool = True):
 
     unlock_data = load_unlock_status()
     is_unlocked = unlock_data.get("is_unlocked", False)
-
-    # Auto-login jika diaktifkan dan akun aktif tersedia
-    if auto_login and active_user:
-        print(f"Auto-login sebagai {active_user['number']}")
-        pause()
-        return active_user["number"]
 
     in_account_menu = True
     add_user = False
@@ -80,7 +74,7 @@ def show_account_menu(auto_login: bool = True):
 
         if add_user and len(users) >= MAX_FREE_ACCOUNTS and not is_unlocked:
             print("-------------------------------------------------------")
-            print("!!! Batas maksimal akun sudah tercapai.")
+            print("🚫 Batas maksimal akun sudah tercapai.")
             print("Masukkan kode unlock untuk menambah lebih banyak akun.")
             print("-------------------------------------------------------")
             unlock_input = input("Kode Unlock: ").strip()
@@ -111,7 +105,7 @@ def show_account_menu(auto_login: bool = True):
             continue
 
         print("-------------------------------------------------------")
-        print("Akun Tersimpan:")
+        print("📱 Akun Tersimpan:")
         if not users:
             print("Tidak ada akun tersimpan.")
         else:
