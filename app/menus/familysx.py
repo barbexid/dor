@@ -1,8 +1,7 @@
 import os
 import json
 from app.menus.package import get_packages_by_family
-from app.menus.util import clear_screen
-from app.menus.anu_util import pause, print_panel
+from app.menus.util import clear_screen, pause, print_panel
 
 FAMILY_FILE = os.path.abspath("family_codes.json")
 
