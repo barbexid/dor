@@ -1,6 +1,6 @@
 import os
 import json
-from app.menus.package2 import get_packages_by_family
+from app.menus.package+ import get_packages_by_family
 from app.menus.util import clear_screen
 
 from app.menus.anu_util import pause, print_panel, get_rupiah
