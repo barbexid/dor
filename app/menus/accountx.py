@@ -111,10 +111,10 @@ def show_account_menu():
         else:
             for idx, user in enumerate(users):
                 is_active = active_user and user["number"] == active_user["number"]
-                status = "Aktif" if is_active else ""
-                print(f"{idx + 1}. {user['number']} ({status})")
+                status = f" ({'Aktif'})" if is_active else ""
+                print(f"{idx + 1}. {user['number']}{status}")
 
-        print("-------------------------------------------------------")
+        print("----------------------------------")
         print("Command:")
         print("0: Tambah Akun")
         print("00: Kembali ke menu utama")
