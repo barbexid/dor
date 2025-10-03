@@ -9,8 +9,8 @@ from app.menus.package_p import show_package_details
 from app.service.auth import AuthInstance
 from app.menus.util import clear_screen
 from app.service.bookmark import BookmarkInstance
-from app.menus.anu_util import pause, print_panel
 from app.config.theme_config import get_theme
+from app.menus.anu_util import pause, print_panel, live_loading
 
 def show_bookmark_menu():
     api_key = AuthInstance.api_key
@@ -62,11 +62,15 @@ def show_bookmark_menu():
             del_choice = console.input("Masukkan nomor bookmark yang ingin dihapus: ").strip()
             if del_choice.isdigit() and 1 <= int(del_choice) <= len(bookmarks):
                 del_bm = bookmarks[int(del_choice) - 1]
-                BookmarkInstance.remove_bookmark(
-                    del_bm["family_code"],
-                    del_bm["is_enterprise"],
-                    del_bm["variant_name"],
-                    del_bm["order"],
+                live_loading(
+                    task=lambda: BookmarkInstance.remove_bookmark(
+                        del_bm["family_code"],
+                        del_bm["is_enterprise"],
+                        del_bm["variant_name"],
+                        del_bm["order"],
+                    ),
+                    text="Menghapus bookmark...",
+                    theme=theme
                 )
                 print_panel("✅ Info", "Bookmark berhasil dihapus.")
             else:
@@ -79,7 +83,12 @@ def show_bookmark_menu():
             family_code = selected_bm["family_code"]
             is_enterprise = selected_bm["is_enterprise"]
 
-            family_data = get_family(api_key, tokens, family_code, is_enterprise)
+            family_data = live_loading(
+                task=lambda: get_family(api_key, tokens, family_code, is_enterprise),
+                text="Memuat data family...",
+                theme=theme
+            )
+
             if not family_data:
                 print_panel("❌ Error", "Gagal mengambil data family.")
                 pause()
@@ -113,4 +122,5 @@ def show_bookmark_menu():
         else:
             print_panel("❌ Error", "Input tidak valid. Silakan coba lagi.")
             pause()
+
 
