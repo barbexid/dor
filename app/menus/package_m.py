@@ -455,7 +455,6 @@ def fetch_my_packages():
             if result == "MAIN":
                 return None  # keluar ke menu utama
             elif result == "BACK":
-                #live_loading("Kembali ke daftar paket")  # animasi transisi
                 break  # reload ulang menu fetch_my_packages
             elif result is True:
                 return None  # selesai pembelian
