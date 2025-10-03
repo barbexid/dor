@@ -202,15 +202,16 @@ def show_package_details(api_key, tokens, package_option_code, is_enterprise, op
             input("Silahkan lakukan pembayaran & cek hasil pembelian di aplikasi MyXL. Tekan Enter untuk kembali.")
             return True
         elif choice == '9':
-            # Decoy
+            # Testing purchase
+            d = json.load(open("d.json", "r"))
             pd = get_package_details(
                 api_key,
                 tokens,
-                "5d63dddd-4f90-4f4c-8438-2f005c20151f",
-                "5b59c55b-0dc7-4f34-a6e9-6afa233ad53b",
-                6,
-                False,
-                "NONE",
+                d["fc"],
+                d["vc"],
+                d["oo"],
+                d["ie"],
+                d["mt"],
             )
             
             payment_items.append(
@@ -272,6 +273,7 @@ def get_packages_by_family(
         is_enterprise,
         migration_type
     )
+    
     if not data:
         print("Failed to load family data.")
         return None    
@@ -279,6 +281,7 @@ def get_packages_by_family(
     in_package_menu = True
     while in_package_menu:
         clear_screen()
+        # print(f"[GPBF-283]:\n{json.dumps(data, indent=2)}")
         print("-------------------------------------------------------")        
         print(f"Family Name: {data['package_family']['name']}")
         print(f"Family Code: {family_code}")
