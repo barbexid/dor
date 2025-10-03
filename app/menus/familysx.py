@@ -148,13 +148,10 @@ def show_family_menu():
                     if result == "MAIN":
                         return
                     elif result == "BACK":
-                        continue
+                        continue  # langsung lanjut ke iterasi berikutnya tanpa pause
                 except Exception as e:
                     print(f"Gagal menampilkan paket: {e}")
+                    pause()
             else:
                 print("Nomor tidak valid.")
-            pause()
-
-        else:
-            print("Pilihan tidak valid.")
-            pause()
+                pause()
