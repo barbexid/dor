@@ -53,7 +53,7 @@ def show_donate_menu():
     ))
 
     pause()
-    live_loading(text="Kembali ke menu utama...", theme=theme)
+    live_loading(text="Kembali...", theme=theme)
 
 
 def generate_qr_ascii(data: str) -> str:
