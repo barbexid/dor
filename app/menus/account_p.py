@@ -188,6 +188,7 @@ def show_account_menu():
         user_input = console.input(f"[{theme['text_sub']}]Pilihan:[/{theme['text_sub']}] ").strip()
 
         if user_input == "00":
+            live_loading(text="Kembali ke menu utama...", theme=theme)
             return active_user["number"] if active_user else None
 
         elif user_input.upper() == "T":
