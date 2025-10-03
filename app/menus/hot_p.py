@@ -200,22 +200,15 @@ def show_hot_menu2():
     while in_hot_menu:
         clear_screen()
 
-        console.print(Panel(
-            "[bold]Memuat Daftar Paket HOT v2...[/]",
-            border_style=theme["border_info"],
-            padding=(0, 1),
-            expand=True
-        ))
-
-        url = "https://me.mashu.lol/pg-hot2.json"
-        try:
-            response = requests.get(url, timeout=30)
-            response.raise_for_status()
-            hot_packages = response.json()
-        except Exception:
-            print_panel("⚠️ Error", "Gagal mengambil data HOT Package.")
-            pause()
-            return
+        with Live(Spinner("dots", text="Mengambil daftar paket HOT v2..."), refresh_per_second=10):
+            try:
+                response = requests.get("https://me.mashu.lol/pg-hot2.json", timeout=30)
+                response.raise_for_status()
+                hot_packages = response.json()
+            except Exception:
+                print_panel("⚠️ Error", "Gagal mengambil data HOT Package.")
+                pause()
+                return
 
         console.print(Panel(
             Align.center("✨ Paket HOT v2 ✨", vertical="middle"),
@@ -233,24 +226,14 @@ def show_hot_menu2():
             formatted_price = get_rupiah(p["price"])
             table.add_row(str(idx + 1), p["name"], formatted_price)
 
-        console.print(Panel(
-            table,
-            border_style=theme["border_primary"],
-            padding=(0, 0),
-            expand=True
-        ))
+        console.print(Panel(table, border_style=theme["border_primary"], padding=(0, 0), expand=True))
 
         nav_table = Table(show_header=False, box=MINIMAL_DOUBLE_HEAD, expand=True)
         nav_table.add_column(justify="right", style=theme["text_key"], width=4)
         nav_table.add_column(style=theme["text_body"])
         nav_table.add_row("00", f"[{theme['text_sub']}]Kembali ke menu sebelumnya[/]")
 
-        console.print(Panel(
-            nav_table,
-            border_style=theme["border_info"],
-            padding=(0, 1),
-            expand=True
-        ))
+        console.print(Panel(nav_table, border_style=theme["border_info"], padding=(0, 1), expand=True))
 
         choice = console.input(f"[{theme['text_sub']}]Pilih paket:[/{theme['text_sub']}] ").strip()
         if choice == "00":
@@ -266,30 +249,31 @@ def show_hot_menu2():
                 continue
 
             payment_items = []
-            for package in packages:
-                package_detail = get_package_details(
-                    api_key,
-                    tokens,
-                    package["family_code"],
-                    package["variant_code"],
-                    package["order"],
-                    package["is_enterprise"],
-                )
-
-                if not package_detail:
-                    print_panel("⚠️ Error", f"Gagal mengambil detail paket untuk {package['family_code']}.")
-                    return
-
-                payment_items.append(
-                    PaymentItem(
-                        item_code=package_detail["package_option"]["package_option_code"],
-                        product_type="",
-                        item_price=package_detail["package_option"]["price"],
-                        item_name=package_detail["package_option"]["name"],
-                        tax=0,
-                        token_confirmation=package_detail["token_confirmation"],
+            with Live(Spinner("dots", text="Memuat detail semua paket..."), refresh_per_second=10):
+                for package in packages:
+                    package_detail = get_package_details(
+                        api_key,
+                        tokens,
+                        package["family_code"],
+                        package["variant_code"],
+                        package["order"],
+                        package["is_enterprise"],
                     )
-                )
+
+                    if not package_detail:
+                        print_panel("⚠️ Error", f"Gagal mengambil detail paket untuk {package['family_code']}.")
+                        return
+
+                    payment_items.append(
+                        PaymentItem(
+                            item_code=package_detail["package_option"]["package_option_code"],
+                            product_type="",
+                            item_price=package_detail["package_option"]["price"],
+                            item_name=package_detail["package_option"]["name"],
+                            tax=0,
+                            token_confirmation=package_detail["token_confirmation"],
+                        )
+                    )
 
             clear_screen()
 
