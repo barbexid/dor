@@ -112,7 +112,14 @@ def show_hot_menu():
                 fc_key = (p["family_code"], p["is_enterprise"])
                 family_data = family_cache.get(fc_key)
 
-                if not family_data:
+                # Validasi isi cache
+                is_valid_cache = (
+                    family_data and
+                    isinstance(family_data, dict) and
+                    "package_variants" in family_data
+                )
+
+                if not is_valid_cache:
                     family_data = get_family_v2(api_key, tokens, p["family_code"], p["is_enterprise"])
                     if family_data:
                         family_cache[fc_key] = family_data
@@ -124,6 +131,7 @@ def show_hot_menu():
                                 if option.get("order") == p.get("order"):
                                     p["option_code"] = option.get("package_option_code")
                                     p["price"] = option.get("price")
+                                    p["option_name"] = option.get("name", "-")
                                     break
                 enriched_packages.append(p)
 
@@ -183,6 +191,7 @@ def show_hot_menu():
         else:
             print_panel("⚠️ Error", "Input tidak valid. Silakan masukkan nomor yang tersedia.")
             pause()
+
 
 
 HOT2_CACHE_FILE = "hot2_cache.json"
@@ -269,9 +278,21 @@ def show_hot_menu2():
             def load_all_details():
                 for package in packages:
                     cache_key = f"{package['family_code']}-{package['variant_code']}-{package['order']}-{package['is_enterprise']}"
-                    if cache_key in hot2_cache:
-                        package_detail = hot2_cache[cache_key]
-                    else:
+                    package_detail = hot2_cache.get(cache_key)
+
+                    # Validasi isi cache
+                    is_valid_cache = (
+                        package_detail and
+                        isinstance(package_detail, dict) and
+                        "package_option" in package_detail and
+                        "token_confirmation" in package_detail and
+                        isinstance(package_detail["package_option"], dict) and
+                        "package_option_code" in package_detail["package_option"] and
+                        "price" in package_detail["package_option"] and
+                        "name" in package_detail["package_option"]
+                    )
+
+                    if not is_valid_cache:
                         package_detail = get_package_details(
                             api_key,
                             tokens,
@@ -283,8 +304,8 @@ def show_hot_menu2():
                         if package_detail:
                             hot2_cache[cache_key] = package_detail
 
-                    if not package_detail or "package_option" not in package_detail or "token_confirmation" not in package_detail:
-                        print_panel("⚠️ Error", f"Detail paket tidak lengkap untuk {package['family_code']}.")
+                    if not is_valid_cache and not package_detail:
+                        print_panel("⚠️ Error", f"Gagal mengambil detail paket untuk {package['family_code']}.")
                         pause()
                         continue
 
@@ -367,4 +388,3 @@ def show_hot_menu2():
         else:
             print_panel("⚠️ Error", "Input tidak valid. Silahkan coba lagi.")
             pause()
-
