@@ -8,6 +8,7 @@ from app.client.engsel import *
 from app.service.auth import AuthInstance
 from app.menus.bookmark import show_bookmark_menu
 from app.menus.accountx import show_account_menu
+from app.menus.familysx import show_family_menu
 from app.menus.package import fetch_my_packages, get_packages_by_family, show_package_details
 from app.menus.hot import show_hot_menu, show_hot_menu2
 from app.service.sentry import enter_sentry_mode
@@ -31,6 +32,7 @@ def show_main_menu(number, balance, balance_expired_at):
     print("3. Beli Paket 🔥 HOT 🔥")
     print("4. Beli Paket 🔥 HOT-2 🔥")
     print("5. Beli Paket Berdasarkan Family Code")
+    print("6. Simpan/Kelola Family Code")
     print("00. Bookmark Paket")
     print("99. Tutup aplikasi")
     print("-------------------------------------------------------")
@@ -69,6 +71,8 @@ def main():
                 if family_code == "99":
                     continue
                 get_packages_by_family(family_code)
+            elif choice == "6":
+                show_family_menu()
             elif choice == "00":
                 show_bookmark_menu()
             elif choice == "99":
