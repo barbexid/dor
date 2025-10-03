@@ -18,11 +18,18 @@ from app.config.theme_config import get_theme
 
 import json
 import os
-from rich.spinner import Spinner
+
 from rich.live import Live
+from rich.spinner import Spinner
+import time
 
 
 console = Console()
+
+def loading_animation(text="Memuat..."):
+    with Live(Spinner("dots", text=text), refresh_per_second=10):
+        time.sleep(1.5)
+
 
 def show_hot_main_menu():
     theme = get_theme()
@@ -48,7 +55,6 @@ def show_hot_main_menu():
 
         console.print(Panel(
             menu_table,
-            #title=f"[{theme['text_title']}]📦 Menu Paket HOT[/]",
             border_style=theme["border_primary"],
             padding=(0, 1),
             expand=True
@@ -61,6 +67,7 @@ def show_hot_main_menu():
         elif choice == "2":
             show_hot_menu2()
         elif choice == "00":
+            loading_animation("Kembali ke menu utama...")
             in_main_menu = False
         else:
             print_panel("⚠️ Error", "Input tidak valid. Silahkan coba lagi.")
@@ -79,6 +86,7 @@ def load_family_cache():
 def save_family_cache(cache):
     with open(CACHE_FILE, "w", encoding="utf-8") as f:
         json.dump(cache, f, ensure_ascii=False, indent=2)
+
 
 def show_hot_menu():
     theme = get_theme()
@@ -162,6 +170,7 @@ def show_hot_menu():
         # Input pilihan
         choice = console.input(f"[{theme['text_sub']}]Pilih paket:[/{theme['text_sub']}] ").strip()
         if choice == "00":
+            loading_animation("Kembali ke menu sebelumnya...")
             return
 
         if choice.isdigit() and 1 <= int(choice) <= len(enriched_packages):
@@ -245,6 +254,7 @@ def show_hot_menu2():
 
         choice = console.input(f"[{theme['text_sub']}]Pilih paket:[/{theme['text_sub']}] ").strip()
         if choice == "00":
+            loading_animation("Kembali ke menu sebelumnya...")
             return
 
         if choice.isdigit() and 1 <= int(choice) <= len(hot_packages):
@@ -308,7 +318,6 @@ def show_hot_menu2():
                 payment_table.add_column(justify="left", style=theme["text_body"])
                 payment_table.add_row("1", "E-Wallet")
                 payment_table.add_row("2", "QRIS")
-                #payment_table.add_row("3", "Saldo Langsung")
                 payment_table.add_row("00", f"[{theme['text_sub']}]Kembali ke daftar paket[/]")
                 payment_table.add_row("99", f"[{theme['text_err']}]Kembali ke menu utama[/]")
 
@@ -329,13 +338,11 @@ def show_hot_menu2():
                     show_qris_payment_v2(api_key, tokens, payment_items, "BUY_PACKAGE", True)
                     console.input(f"[{theme['text_sub']}]Tekan enter untuk kembali...[/{theme['text_sub']}] ")
                     return
-                elif input_method == "3":
-                    settlement_balance(api_key, tokens, payment_items, "BUY_PACKAGE", True)
-                    console.input(f"[{theme['text_sub']}]Tekan enter untuk kembali...[/{theme['text_sub']}] ")
-                    return
                 elif input_method == "00":
+                    loading_animation("Kembali ke daftar paket HOT v2...")
                     in_payment_menu = False
                 elif input_method == "99":
+                    loading_animation("Kembali ke menu utama...")
                     in_hot_menu = False
                     return
                 else:
@@ -344,3 +351,4 @@ def show_hot_menu2():
         else:
             print_panel("⚠️ Error", "Input tidak valid. Silahkan coba lagi.")
             pause()
+
