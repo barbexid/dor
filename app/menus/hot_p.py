@@ -191,12 +191,33 @@ def show_hot_menu():
             pause()
 
 
+
+# Fungsi cache
+def load_hot2_cache():
+    if os.path.exists("hot2_cache.json"):
+        try:
+            with open("hot2_cache.json", "r") as f:
+                return json.load(f)
+        except:
+            return {}
+    return {}
+
+def save_hot2_cache(cache):
+    with open("hot2_cache.json", "w") as f:
+        json.dump(cache, f)
+
+def loading_animation(text="Memuat..."):
+    with Live(Spinner("dots", text=text), refresh_per_second=10):
+        time.sleep(1.5)
+
 def show_hot_menu2():
     theme = get_theme()
     api_key = AuthInstance.api_key
     tokens = AuthInstance.get_active_tokens()
 
+    hot2_cache = load_hot2_cache()
     in_hot_menu = True
+
     while in_hot_menu:
         clear_screen()
 
@@ -251,18 +272,25 @@ def show_hot_menu2():
             payment_items = []
             with Live(Spinner("dots", text="Memuat detail semua paket..."), refresh_per_second=10):
                 for package in packages:
-                    package_detail = get_package_details(
-                        api_key,
-                        tokens,
-                        package["family_code"],
-                        package["variant_code"],
-                        package["order"],
-                        package["is_enterprise"],
-                    )
+                    cache_key = f"{package['family_code']}-{package['variant_code']}-{package['order']}-{package['is_enterprise']}"
+                    if cache_key in hot2_cache:
+                        package_detail = hot2_cache[cache_key]
+                    else:
+                        package_detail = get_package_details(
+                            api_key,
+                            tokens,
+                            package["family_code"],
+                            package["variant_code"],
+                            package["order"],
+                            package["is_enterprise"],
+                        )
+                        if package_detail:
+                            hot2_cache[cache_key] = package_detail
 
                     if not package_detail:
                         print_panel("⚠️ Error", f"Gagal mengambil detail paket untuk {package['family_code']}.")
-                        return
+                        pause()
+                        continue
 
                     payment_items.append(
                         PaymentItem(
@@ -275,6 +303,7 @@ def show_hot_menu2():
                         )
                     )
 
+            save_hot2_cache(hot2_cache)
             clear_screen()
 
             info_text = Text()
@@ -335,4 +364,5 @@ def show_hot_menu2():
         else:
             print_panel("⚠️ Error", "Input tidak valid. Silahkan coba lagi.")
             pause()
+
 
