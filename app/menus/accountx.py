@@ -9,7 +9,7 @@ UNLOCK_CODE = "@barbex_id"
 def login_prompt(api_key: str):
     clear_screen()
     print("-------------------------------------------------------")
-    print("Login ke MyXL")
+    printt("------------------- Login ke MyXL --------------------")
     print("-------------------------------------------------------")
     print("Masukan nomor XL Prabayar (Contoh 6281234567890):")
     phone_number = input("Nomor: ")
@@ -74,8 +74,8 @@ def show_account_menu():
 
         if add_user and len(users) >= MAX_FREE_ACCOUNTS and not is_unlocked:
             print("-------------------------------------------------------")
-            print("🚫 Batas maksimal akun sudah tercapai.")
-            print("Masukkan kode unlock untuk menambah lebih banyak akun.")
+            print("-----   !!! Batas maksimal akun sudah tercapai.   -----")
+            print(" Masukkan kode unlock untuk menambah lebih banyak akun.")
             print("-------------------------------------------------------")
             unlock_input = input("Kode Unlock: ").strip()
             if unlock_input != UNLOCK_CODE:
@@ -105,7 +105,7 @@ def show_account_menu():
             continue
 
         print("-------------------------------------------------------")
-        print("📱 Akun Tersimpan:")
+        print("--------------    Akun Tersimpan:    ------------------")
         if not users:
             print("Tidak ada akun tersimpan.")
         else:
