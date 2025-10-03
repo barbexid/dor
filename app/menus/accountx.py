@@ -105,13 +105,13 @@ def show_account_menu():
             continue
 
         print("-------------------------------------------------------")
-        print("--------------    Akun Tersimpan:    ------------------")
+        print("Akun Tersimpan: ")
         if not users:
             print("Tidak ada akun tersimpan.")
         else:
             for idx, user in enumerate(users):
                 is_active = active_user and user["number"] == active_user["number"]
-                status = "Aktif" if is_active else "Tidak aktif"
+                status = "Aktif" if is_active else "-"
                 print(f"{idx + 1}. {user['number']} ({status})")
 
         print("-------------------------------------------------------")
