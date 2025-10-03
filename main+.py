@@ -249,7 +249,7 @@ if __name__ == "__main__":
     try:
         main()
     except KeyboardInterrupt:
-        live_loading(text="Menutup aplikasi...", theme=get_theme())
+        #live_loading(text="Menutup aplikasi...", theme=get_theme())
         print_panel("👋 Keluar", "Aplikasi dihentikan oleh pengguna.")
 
                         
