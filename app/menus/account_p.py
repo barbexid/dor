@@ -6,10 +6,10 @@ from rich.table import Table
 from rich.box import MINIMAL_DOUBLE_HEAD
 from app.client.engsel2 import get_otp, submit_otp
 from app.menus.util import clear_screen
-from app.menus.anu_util import pause, print_panel
 from app.service.auth import AuthInstance
 from app.config.theme_config import get_theme
 from app.service.unlock import load_unlock_status, save_unlock_status
+from app.menus.anu_util import pause, print_panel, live_loading
 
 console = Console()
 
@@ -22,6 +22,7 @@ def normalize_number(raw_input: str) -> str:
     elif raw_input.startswith("628"):
         return raw_input
     return raw_input
+
 
 def login_prompt(api_key: str):
     clear_screen()
@@ -39,7 +40,6 @@ def login_prompt(api_key: str):
         raw_input = console.input(f"[{theme['text_sub']}]Masukan nomor XL:[/{theme['text_sub']}] ").strip()
         if raw_input == "00":
             print_panel("ℹ️ Dibatalkan", "Login dibatalkan oleh pengguna.")
-            #pause()
             return None, None
 
         phone_number = normalize_number(raw_input)
@@ -49,8 +49,11 @@ def login_prompt(api_key: str):
         break
 
     try:
-        console.print(f"[{theme['text_sub']}]Mengirim OTP...[/]")
-        subscriber_id = get_otp(phone_number)
+        subscriber_id = live_loading(
+            task=lambda: get_otp(phone_number),
+            text="Mengirim OTP...",
+            theme=theme
+        )
         if not subscriber_id:
             print_panel("⚠️ Error", "Gagal mengirim OTP.")
             pause()
@@ -65,15 +68,17 @@ def login_prompt(api_key: str):
             otp = console.input(f"[{theme['text_sub']}]Masukkan OTP (percobaan {attempts+1}/5):[/{theme['text_sub']}] ").strip()
             if otp == "00":
                 print_panel("ℹ️ Dibatalkan", "Login dibatalkan oleh pengguna.")
-                #pause()
                 return None, None
             if not otp.isdigit() or len(otp) != 6:
                 print_panel("⚠️ Error", "OTP tidak valid. Harus 6 digit angka.")
                 attempts += 1
                 continue
 
-            console.print(f"[{theme['text_sub']}]Memverifikasi OTP...[/]")
-            tokens = submit_otp(api_key, phone_number, otp)
+            tokens = live_loading(
+                task=lambda: submit_otp(api_key, phone_number, otp),
+                text="Memverifikasi OTP...",
+                theme=theme
+            )
             if tokens:
                 AuthInstance.add_refresh_token(int(phone_number), tokens["refresh_token"])
                 print_panel("✅ Berhasil", "Login berhasil!")
@@ -90,6 +95,7 @@ def login_prompt(api_key: str):
         print_panel("⚠️ Error", "Terjadi kesalahan saat login.")
         pause()
         return None, None
+
 
 def show_account_menu():
     clear_screen()
