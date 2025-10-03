@@ -80,7 +80,7 @@ def login_prompt(api_key: str):
                 theme=theme
             )
             if tokens:
-                AuthInstance.add_refresh_token(int(phone_number), tokens["refresh_token"])
+                AuthInstance.add_refresh_token(int(phone_number), tokens["refresh_token"], name="Tanpa Nama")
                 print_panel("✅ Berhasil", "Login berhasil!")
                 return phone_number, tokens["refresh_token"]
             else:
@@ -165,13 +165,23 @@ def show_account_menu():
         account_table.add_column("Nomor XL", style=theme["text_body"])
         account_table.add_column("Status", style=theme["text_sub"], justify="center")
 
+        account_table.add_column("No", justify="right", style=theme["text_key"], width=6)
+        account_table.add_column("Nama", style=theme["text_body"])
+        account_table.add_column("Nomor XL", style=theme["text_body"])
+        account_table.add_column("Status", style=theme["text_sub"], justify="center")
+
         if not users:
             account_table.add_row("-", "[dim]Tidak ada akun tersimpan[/]", "")
         else:
             for idx, user in enumerate(users):
                 is_active = active_user and user["number"] == active_user["number"]
                 status = "✅ Aktif" if is_active else "❌"
-                account_table.add_row(str(idx + 1), str(user["number"]), status)
+                account_table.add_row(
+                    str(idx + 1),
+                    user.get("name", "Tanpa Nama"),
+                    str(user["number"]),
+                    status
+                )
 
         console.print(Panel(account_table, border_style=theme["border_primary"], padding=(0, 1), expand=True))
 
@@ -180,6 +190,7 @@ def show_account_menu():
         command_table.add_column("Pilih Aksi", style=theme["text_body"])
         command_table.add_row(f"(1 - {len(users)})", "Pilih nomor akun untuk berganti")
         command_table.add_row("T", "Tambah akun")
+        command_table.add_row("E", "Edit nama akun")
         command_table.add_row("H", f"[{theme['text_err']}]Hapus akun tersimpan[/]")
         command_table.add_row("00", f"[{theme['text_sub']}]Kembali ke menu utama[/]")
 
@@ -193,6 +204,41 @@ def show_account_menu():
 
         elif user_input.upper() == "T":
             is_adding_user = True
+
+        elif user_input.upper() == "E":
+            if not users:
+                print_panel("⚠️ Error", "Tidak ada akun untuk diedit.")
+                pause()
+                continue
+
+            nomor_input = console.input(f"[{theme['text_sub']}]Nomor akun yang ingin diedit (1 - {len(users)}):[/{theme['text_sub']}] ").strip()
+            if nomor_input == "00":
+                print_panel("ℹ️ Dibatalkan", "Edit nama akun dibatalkan.")
+                pause()
+                continue
+
+            if nomor_input.isdigit():
+                nomor = int(nomor_input)
+                if 1 <= nomor <= len(users):
+                    selected_user = users[nomor - 1]
+                    new_name = console.input(f"[{theme['text_sub']}]Masukkan nama baru untuk akun {selected_user['number']}:[/{theme['text_sub']}] ").strip()
+                    if new_name:
+                        AuthInstance.edit_account_name(selected_user["number"], new_name)
+                        AuthInstance.load_tokens()
+                        users = AuthInstance.refresh_tokens
+                        active_user = AuthInstance.get_active_user()
+                        print_panel("✅ Berhasil", f"Nama akun berhasil diubah menjadi '{new_name}'.")
+                        pause()
+                    else:
+                        print_panel("⚠️ Error", "Nama tidak boleh kosong.")
+                        pause()
+                else:
+                    print_panel("⚠️ Error", f"Nomor akun di luar jangkauan (1 - {len(users)}).")
+                    pause()
+            else:
+                print_panel("⚠️ Error", "Input tidak valid. Masukkan angka atau 00 untuk batal.")
+                pause()
+
 
         elif user_input.upper() == "H":
             if not users:
