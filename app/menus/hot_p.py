@@ -203,6 +203,20 @@ def show_hot_menu():
             print_panel("⚠️ Error", "Input tidak valid. Silakan masukkan nomor yang tersedia.")
             pause()
 
+HOT2_CACHE_FILE = "hot2_cache.json"
+
+def load_hot2_cache():
+    if os.path.exists(HOT2_CACHE_FILE):
+        try:
+            with open(HOT2_CACHE_FILE, "r") as f:
+                return json.load(f)
+        except:
+            return {}
+    return {}
+
+def save_hot2_cache(cache):
+    with open(HOT2_CACHE_FILE, "w") as f:
+        json.dump(cache, f)
 
 def validate_package_detail(detail):
     return (
