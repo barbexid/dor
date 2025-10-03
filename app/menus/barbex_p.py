@@ -10,13 +10,14 @@ from app.client.engsel2 import get_family_v2, get_package_details
 from app.menus.package_p import show_package_details
 from app.service.auth import AuthInstance
 from app.menus.util import clear_screen
-from app.menus.anu_util import pause, print_panel, get_rupiah
 from app.client.ewallet import show_multipayment_v2
 from app.client.qris2 import show_qris_payment_v2
 from app.type_dict import PaymentItem
 from app.config.theme_config import get_theme
+from app.menus.anu_util import pause, print_panel, get_rupiah, live_loading
 
 console = Console()
+
 
 def show_barbex_main_menu():
     theme = get_theme()
@@ -50,7 +51,7 @@ def show_barbex_main_menu():
         elif choice == "2":
             show_barbex_menu2()
         elif choice == "00":
-            return  # keluar ke menu utama
+            return
         else:
             print_panel("⚠️ Error", "Input tidak valid. Silahkan coba lagi.")
             pause()
@@ -63,21 +64,16 @@ def show_barbex_menu():
     while True:
         clear_screen()
 
-        console.print(Panel(
-            "[bold]Memuat Daftar Paket v1...[/]",
-            border_style=theme["border_info"],
-            padding=(0, 1),
-            expand=True
-        ))
+        barbex_packages = live_loading(
+            task=lambda: requests.get("https://raw.githubusercontent.com/dratx1/engsel/refs/heads/main/family/anu.json", timeout=30).json(),
+            text="Memuat daftar Paket v1...",
+            theme=theme
+        )
 
-        url = "https://raw.githubusercontent.com/dratx1/engsel/refs/heads/main/family/anu.json"
-        response = requests.get(url, timeout=30)
-        if response.status_code != 200:
+        if not barbex_packages:
             print_panel("⚠️ Error", "Gagal mengambil data barbex Package.")
             pause()
             return
-
-        barbex_packages = response.json()
 
         console.print(Panel(
             Align.center("✨ Paket v1 ✨", vertical="middle"),
@@ -101,12 +97,10 @@ def show_barbex_menu():
             expand=True
         ))
 
-        # Panel navigasi terpisah
         nav_table = Table(show_header=False, box=MINIMAL_DOUBLE_HEAD, expand=True)
         nav_table.add_column(justify="right", style=theme["text_key"], width=4)
         nav_table.add_column(style=theme["text_body"])
         nav_table.add_row("00", f"[{theme['text_sub']}]Kembali ke menu sebelumnya[/]")
-        #nav_table.add_row("99", f"[{theme['text_err']}]Kembali ke menu utama[/]")
 
         console.print(Panel(
             nav_table,
@@ -117,16 +111,19 @@ def show_barbex_menu():
 
         choice = console.input(f"[{theme['text_sub']}]Pilih paket:[/{theme['text_sub']}] ").strip()
         if choice == "00":
-            return  # kembali ke menu sebelumnya
-        #if choice == "99":
-            #return  # kembali ke menu utama
+            return
 
         if choice.isdigit() and 1 <= int(choice) <= len(barbex_packages):
             selected_bm = barbex_packages[int(choice) - 1]
             family_code = selected_bm["family_code"]
             is_enterprise = selected_bm["is_enterprise"]
 
-            family_data = get_family_v2(api_key, tokens, family_code, is_enterprise)
+            family_data = live_loading(
+                task=lambda: get_family_v2(api_key, tokens, family_code, is_enterprise),
+                text="Memuat data family...",
+                theme=theme
+            )
+
             if not family_data:
                 print_panel("⚠️ Error", "Gagal mengambil data family.")
                 pause()
@@ -144,15 +141,14 @@ def show_barbex_menu():
             if option_code:
                 result = show_package_details(api_key, tokens, option_code, is_enterprise)
                 if result == "MAIN":
-                    return  # keluar ke menu utama
+                    return
                 elif result == "BACK":
-                    continue  # reload ulang daftar paket
+                    continue
                 elif result is True:
-                    return  # selesai pembelian
+                    return
         else:
             print_panel("⚠️ Error", "Input tidak valid. Silahkan coba lagi.")
             pause()
-
 
 
 def show_barbex_menu2():
@@ -163,19 +159,13 @@ def show_barbex_menu2():
     while True:
         clear_screen()
 
-        console.print(Panel(
-            "[bold]Memuat Daftar Paket Barbex v2...[/]",
-            border_style=theme["border_info"],
-            padding=(0, 1),
-            expand=True
-        ))
+        barbex_packages = live_loading(
+            task=lambda: requests.get("https://raw.githubusercontent.com/dratx1/engsel/refs/heads/main/family/anu2.json", timeout=30).json(),
+            text="Memuat Daftar Paket Barbex v2...",
+            theme=theme
+        )
 
-        url = "https://raw.githubusercontent.com/dratx1/engsel/refs/heads/main/family/anu2.json"
-        try:
-            response = requests.get(url, timeout=30)
-            response.raise_for_status()
-            barbex_packages = response.json()
-        except Exception:
+        if not barbex_packages:
             print_panel("⚠️ Error", "Gagal mengambil data Barbex Package.")
             pause()
             return
@@ -229,13 +219,17 @@ def show_barbex_menu2():
 
             payment_items = []
             for package in packages:
-                package_detail = get_package_details(
-                    api_key,
-                    tokens,
-                    package["family_code"],
-                    package["variant_code"],
-                    package["order"],
-                    package["is_enterprise"],
+                package_detail = live_loading(
+                    task=lambda: get_package_details(
+                        api_key,
+                        tokens,
+                        package["family_code"],
+                        package["variant_code"],
+                        package["order"],
+                        package["is_enterprise"],
+                    ),
+                    text=f"Memuat detail paket {package['family_code']}...",
+                    theme=theme
                 )
 
                 if not package_detail:
@@ -279,7 +273,6 @@ def show_barbex_menu2():
                 payment_table.add_column(justify="left", style=theme["text_body"])
                 payment_table.add_row("1", "E-Wallet")
                 payment_table.add_row("2", "QRIS")
-                #payment_table.add_row("3", "Saldo Langsung")
                 payment_table.add_row("00", f"[{theme['text_sub']}]Kembali ke daftar paket[/]")
                 payment_table.add_row("99", f"[{theme['text_err']}]Kembali ke menu utama[/]")
 
@@ -314,3 +307,4 @@ def show_barbex_menu2():
         else:
             print_panel("⚠️ Error", "Input tidak valid. Silahkan coba lagi.")
             pause()
+
