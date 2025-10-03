@@ -81,7 +81,10 @@ def show_hot_menu():
         return
 
     raw_cache = load_family_cache()
-    family_cache = {eval(k): v for k, v in raw_cache.items()}
+    try:
+        family_cache = {eval(k): v for k, v in raw_cache.items()}
+    except Exception:
+        family_cache = {}
 
     while True:
         clear_screen()
@@ -94,6 +97,11 @@ def show_hot_menu():
             )
         except Exception:
             print_panel("⚠️ Error", "Gagal mengambil data HOT Package.")
+            pause()
+            return
+
+        if not hot_packages:
+            print_panel("⚠️ Error", "Tidak ada data paket tersedia.")
             pause()
             return
 
@@ -110,12 +118,12 @@ def show_hot_menu():
                         family_cache[fc_key] = family_data
 
                 if family_data:
-                    for variant in family_data["package_variants"]:
-                        if variant["name"] == p["variant_name"]:
-                            for option in variant["package_options"]:
-                                if option["order"] == p["order"]:
-                                    p["option_code"] = option["package_option_code"]
-                                    p["price"] = option["price"]
+                    for variant in family_data.get("package_variants", []):
+                        if variant.get("name") == p.get("variant_name"):
+                            for option in variant.get("package_options", []):
+                                if option.get("order") == p.get("order"):
+                                    p["option_code"] = option.get("package_option_code")
+                                    p["price"] = option.get("price")
                                     break
                 enriched_packages.append(p)
 
@@ -135,7 +143,7 @@ def show_hot_menu():
         table.add_column("Harga", justify="right", style=theme["text_money"], width=10)
 
         for idx, p in enumerate(enriched_packages):
-            label = f"{p['family_name']} - {p['variant_name']} - {p['option_name']}"
+            label = f"{p.get('family_name', '-') } - {p.get('variant_name', '-') } - {p.get('option_name', '-') }"
             harga = get_rupiah(p.get("price", 0))
             table.add_row(str(idx + 1), label, harga)
 
@@ -161,7 +169,13 @@ def show_hot_menu():
                 pause()
                 continue
 
-            result = show_package_details(api_key, tokens, option_code, selected_pkg["is_enterprise"])
+            try:
+                result = show_package_details(api_key, tokens, option_code, selected_pkg.get("is_enterprise", False))
+            except Exception:
+                print_panel("⚠️ Error", "Gagal menampilkan detail paket.")
+                pause()
+                continue
+
             if result == "MAIN":
                 return
             elif result in ("BACK", True):
@@ -204,6 +218,11 @@ def show_hot_menu2():
             )
         except Exception:
             print_panel("⚠️ Error", "Gagal mengambil data HOT Package.")
+            pause()
+            return
+
+        if not hot_packages:
+            print_panel("⚠️ Error", "Tidak ada data paket tersedia.")
             pause()
             return
 
@@ -264,8 +283,8 @@ def show_hot_menu2():
                         if package_detail:
                             hot2_cache[cache_key] = package_detail
 
-                    if not package_detail:
-                        print_panel("⚠️ Error", f"Gagal mengambil detail paket untuk {package['family_code']}.")
+                    if not package_detail or "package_option" not in package_detail or "token_confirmation" not in package_detail:
+                        print_panel("⚠️ Error", f"Detail paket tidak lengkap untuk {package['family_code']}.")
                         pause()
                         continue
 
@@ -289,7 +308,7 @@ def show_hot_menu2():
             info_text.append(f"Harga: {get_rupiah(selected_package['price'])}\n", style=theme["text_money"])
             info_text.append("Detail:\n", style=theme["text_body"])
 
-            for line in selected_package["detail"].split("\n"):
+            for line in selected_package.get("detail", "").split("\n"):
                 cleaned = line.strip()
                 if cleaned:
                     info_text.append(f"- {cleaned}\n", style=theme["text_body"])
@@ -321,10 +340,18 @@ def show_hot_menu2():
 
                 input_method = console.input(f"[{theme['text_sub']}]Pilih metode:[/{theme['text_sub']}] ").strip()
                 if input_method == "1":
+                    if not payment_items:
+                        print_panel("⚠️ Error", "Data pembayaran tidak tersedia. Tidak dapat melanjutkan E-Wallet.")
+                        pause()
+                        continue
                     show_multipayment_v2(api_key, tokens, payment_items, "BUY_PACKAGE", True)
                     console.input(f"[{theme['text_sub']}]Tekan enter untuk kembali...[/{theme['text_sub']}] ")
                     return
                 elif input_method == "2":
+                    if not payment_items:
+                        print_panel("⚠️ Error", "Data pembayaran tidak tersedia. Tidak dapat melanjutkan QRIS.")
+                        pause()
+                        continue
                     show_qris_payment_v2(api_key, tokens, payment_items, "BUY_PACKAGE", True)
                     console.input(f"[{theme['text_sub']}]Tekan enter untuk kembali...[/{theme['text_sub']}] ")
                     return
@@ -340,5 +367,4 @@ def show_hot_menu2():
         else:
             print_panel("⚠️ Error", "Input tidak valid. Silahkan coba lagi.")
             pause()
-
 
