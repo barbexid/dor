@@ -215,8 +215,8 @@ def main():
                 live_loading(text="Kembali ke menu utama...", theme=theme)
                 return
             elif result == "BACK":
-                live_loading(text="Kembali...", theme=theme)
                 continue
+                live_loading(text="Kembali ke menu utama...", theme=theme)
 
         elif choice == "7":
             show_family_menu()
