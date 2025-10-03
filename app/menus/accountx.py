@@ -9,7 +9,7 @@ UNLOCK_CODE = "@barbex_id"
 def login_prompt(api_key: str):
     clear_screen()
     print("-------------------------------------------------------")
-    printt("------------------- Login ke MyXL --------------------")
+    print("-------------------- Login ke MyXL --------------------")
     print("-------------------------------------------------------")
     print("Masukan nomor XL Prabayar (Contoh 6281234567890):")
     phone_number = input("Nomor: ")
