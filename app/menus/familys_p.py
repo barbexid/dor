@@ -1,21 +1,19 @@
 import os
 import json
+from rich.console import Console
+from rich.panel import Panel
+from rich.table import Table
+from rich.align import Align
+from rich.text import Text
+from rich.box import MINIMAL_DOUBLE_HEAD
+
 from app.menus.package_p import get_packages_by_family
 from app.menus.util import clear_screen
-
-from app.menus.anu_util import pause, print_panel, get_rupiah
-from rich.table import Table
-from rich.panel import Panel
-from rich.console import Console
-from rich.align import Align
-from rich.box import MINIMAL_DOUBLE_HEAD
-from rich.text import Text
+from app.menus.anu_util import pause, print_panel, live_loading
 from app.config.theme_config import get_theme
 
 console = Console()
-
 FAMILY_FILE = os.path.abspath("family_codes.json")
-
 
 def ensure_family_file():
     default_data = {"codes": []}
@@ -117,7 +115,6 @@ def show_family_menu():
         nav_table.add_row("T", "Tambah family code")
         nav_table.add_row("E", "Edit nama family code")
         nav_table.add_row("H", f"[{theme['text_err']}]Hapus family code[/]")
-        #nav_table.add_row("00", f"[{theme['text_sub']}]Kembali ke menu sebelumnya[/]")
         nav_table.add_row("00", f"[{theme['text_sub']}]Kembali ke menu utama[/]")
 
         console.print(Panel(
@@ -132,7 +129,12 @@ def show_family_menu():
         if aksi == "t":
             code = console.input("Masukkan family code: ").strip()
             name = console.input("Masukkan nama family: ").strip()
-            if add_family_code(code, name):
+            success = live_loading(
+                task=lambda: add_family_code(code, name),
+                text="Menambahkan family code...",
+                theme=theme
+            )
+            if success:
                 print_panel("✅ Info", "Berhasil menambahkan family code.")
             else:
                 print_panel("❌ Error", "Family code sudah ada atau input tidak valid.")
@@ -152,7 +154,11 @@ def show_family_menu():
                 kode = semua_kode[index]["code"]
                 konfirmasi = console.input(f"Yakin ingin menghapus '{nama}' ({kode})? (y/n): ").strip().lower()
                 if konfirmasi == "y":
-                    removed = remove_family_code(index)
+                    removed = live_loading(
+                        task=lambda: remove_family_code(index),
+                        text=f"Menghapus '{nama}'...",
+                        theme=theme
+                    )
                     if removed:
                         print_panel("✅ Info", f"Berhasil menghapus {removed}.")
                     else:
@@ -171,24 +177,30 @@ def show_family_menu():
                 print_panel("❌ Error", "Nomor tidak ditemukan.")
             else:
                 new_name = console.input("Masukkan nama baru: ").strip()
-                if edit_family_name(int(idx) - 1, new_name):
+                success = live_loading(
+                    task=lambda: edit_family_name(int(idx) - 1, new_name),
+                    text="Memperbarui nama family...",
+                    theme=theme
+                )
+                if success:
                     print_panel("✅ Info", "Nama berhasil diperbarui.")
                 else:
                     print_panel("❌ Error", "Gagal memperbarui nama.")
             pause()
 
-        #elif aksi == "00":
-            #break
-
         elif aksi == "00":
-            return  # keluar ke menu utama
+            return
 
         elif aksi.isdigit():
             nomor = int(aksi)
             selected = next((p for p in packages if p["number"] == nomor), None)
             if selected:
                 try:
-                    result = get_packages_by_family(selected["code"])
+                    result = live_loading(
+                        task=lambda: get_packages_by_family(selected["code"]),
+                        text=f"Memuat paket untuk {selected['name']}...",
+                        theme=theme
+                    )
                     if result == "MAIN":
                         return
                     elif result == "BACK":
