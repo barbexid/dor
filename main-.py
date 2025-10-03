@@ -69,7 +69,7 @@ def show_main_menu(number, balance, display_quota, balance_expired_at):
     info_table.add_column(justify="left", style=theme["text_body"])
     info_table.add_column(justify="left", style=theme["text_body"])
     info_table.add_row("Nomor", f": [bold {theme['text_body']}]{number}[/]")
-    info_table.add_row("Pulsa", f": [{theme['text_money']}]{get_rupiah(balance)}[/]")
+    info_table.add_row("Pulsa", f": Rp[{theme['text_money']}]{get_rupiah(balance)}[/]")
     info_table.add_row("Kuota", f": [{theme['text_date']}]{display_quota or '-'}[/]")
     info_table.add_row("Masa Aktif", f": [{theme['text_date']}]{expired_at_dt}[/]")
 
