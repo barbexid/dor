@@ -224,7 +224,6 @@ def show_package_details(api_key, tokens, package_option_code, is_enterprise, op
             print_panel("⚠️ Error", "Pilihan tidak valid. Pastikan input sesuai dengan nomor yang ada di menu.")
 
 
-
 def get_packages_by_family(
     family_code: str,
     is_enterprise: bool | None = None,
@@ -240,12 +239,16 @@ def get_packages_by_family(
         pause()
         return "BACK"
 
-    packages = []
-    data = get_family_v2(api_key, tokens, family_code, is_enterprise, migration_type)
+    # Animasi saat memuat data paket family
+    with Live(Spinner("dots", text="Memuat data paket family..."), refresh_per_second=10):
+        data = get_family_v2(api_key, tokens, family_code, is_enterprise, migration_type)
+
     if not data:
         print_panel("⚠️ Error", "Gagal memuat data paket family.")
         pause()
         return "BACK"
+
+    packages = []
 
     while True:
         clear_screen()
@@ -310,8 +313,8 @@ def get_packages_by_family(
         nav_table = Table(show_header=False, box=MINIMAL_DOUBLE_HEAD, expand=True)
         nav_table.add_column(justify="right", style=theme["text_key"], width=6)
         nav_table.add_column(style=theme["text_body"])
-        nav_table.add_row("00", f"[{theme['text_sub']}]Kembali ke awal menu[/]")
-        #nav_table.add_row("99", f"[{theme['text_err']}]Kembali ke menu utama[/]")
+        nav_table.add_row("00", f"[{theme['text_sub']}]Kembali ke menu sebelumnya[/]")
+        nav_table.add_row("99", f"[{theme['text_err']}]Kembali ke menu utama[/]")
 
         console.print(Panel(
             nav_table,
@@ -324,8 +327,11 @@ def get_packages_by_family(
         pkg_choice = console.input(f"[{theme['text_sub']}]Pilih paket (nomor):[/{theme['text_sub']}] ").strip()
         if pkg_choice == "00":
             return "BACK"
-        #if pkg_choice == "99":
-            #return "MAIN"
+        elif pkg_choice == "99":
+            with Live(Spinner("line", text="Kembali ke menu utama..."), refresh_per_second=10):
+                time.sleep(1.5)
+            return "MAIN"
+
         if not pkg_choice.isdigit():
             print_panel("⚠️ Error", "Input tidak valid. Masukkan nomor paket.")
             pause()
@@ -350,7 +356,8 @@ def get_packages_by_family(
         elif result == "BACK":
             continue
         elif result is True:
-            return "BACK"
+            continue  # kembali ke daftar paket setelah pembelian
+
 
 
 
