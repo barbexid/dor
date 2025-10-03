@@ -118,7 +118,12 @@ class Auth:
             if tokens:
                 self.active_user["tokens"] = tokens
                 self.last_refresh_time = int(time.time())
-                self.add_refresh_token(self.active_user["number"], self.active_user["tokens"]["refresh_token"])
+
+                # ✅ Pastikan nama akun tidak hilang saat refresh
+                existing = next((rt for rt in self.refresh_tokens if rt["number"] == self.active_user["number"]), {})
+                name = existing.get("name", "Tanpa Nama")
+
+                self.add_refresh_token(self.active_user["number"], tokens["refresh_token"], name=name)
                 print("Active user token renewed successfully.")
                 return True
             else:
@@ -128,6 +133,7 @@ class Auth:
             print("No active user set or missing refresh token.")
             input("Press Enter to continue...")
         return False
+
 
     def get_active_user(self):
         if not self.active_user and self.refresh_tokens:
