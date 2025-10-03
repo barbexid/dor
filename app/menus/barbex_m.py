@@ -178,7 +178,7 @@ def show_barbex_menu2():
         except Exception:
             print_panel("Error", "Gagal mengambil data Barbex Package.")
             pause()
-            return
+            continue
 
         console.print(Panel(
             Align.center("Paket Barbex v2", vertical="middle"),
@@ -196,24 +196,14 @@ def show_barbex_menu2():
             formatted_price = get_rupiah(p.get("price", 0))
             table.add_row(str(idx + 1), p.get("name", "Tanpa Nama"), formatted_price)
 
-        console.print(Panel(
-            table,
-            border_style=theme["border_primary"],
-            padding=(0, 0),
-            expand=True
-        ))
+        console.print(Panel(table, border_style=theme["border_primary"], padding=(0, 0), expand=True))
 
         nav_table = Table(show_header=False, box=MINIMAL_DOUBLE_HEAD, expand=True)
         nav_table.add_column(justify="right", style=theme["text_key"], width=4)
         nav_table.add_column(style=theme["text_body"])
         nav_table.add_row("00", f"[{theme['text_sub']}]Kembali ke menu sebelumnya[/]")
 
-        console.print(Panel(
-            nav_table,
-            border_style=theme["border_info"],
-            padding=(0, 1),
-            expand=True
-        ))
+        console.print(Panel(nav_table, border_style=theme["border_info"], padding=(0, 1), expand=True))
 
         choice = console.input(f"[{theme['text_sub']}]Pilih paket:[/{theme['text_sub']}] ").strip()
         if choice == "00":
@@ -265,6 +255,11 @@ def show_barbex_menu2():
                     )
                 )
 
+            if not payment_items:
+                print_panel("Error", "Tidak ada item pembayaran yang valid.")
+                pause()
+                continue
+
             clear_screen()
 
             info_text = Text()
@@ -278,13 +273,7 @@ def show_barbex_menu2():
                 if cleaned:
                     info_text.append(f"- {cleaned}\n", style=theme["text_body"])
 
-            console.print(Panel(
-                info_text,
-                title=f"[{theme['text_title']}]Detail Paket[/]",
-                border_style=theme["border_info"],
-                padding=(1, 2),
-                expand=True
-            ))
+            console.print(Panel(info_text, title=f"[{theme['text_title']}]Detail Paket[/]", border_style=theme["border_info"], padding=(1, 2), expand=True))
 
             while True:
                 payment_table = Table(show_header=False, box=MINIMAL_DOUBLE_HEAD, expand=True)
@@ -295,27 +284,30 @@ def show_barbex_menu2():
                 payment_table.add_row("00", f"[{theme['text_sub']}]Kembali ke daftar paket[/]")
                 payment_table.add_row("99", f"[{theme['text_err']}]Kembali ke menu utama[/]")
 
-                console.print(Panel(
-                    payment_table,
-                    title=f"[{theme['text_title']}]Pilih Metode Pembayaran[/]",
-                    border_style=theme["border_primary"],
-                    padding=(0, 1),
-                    expand=True
-                ))
+                console.print(Panel(payment_table, title=f"[{theme['text_title']}]Pilih Metode Pembayaran[/]", border_style=theme["border_primary"], padding=(0, 1), expand=True))
 
                 input_method = console.input(f"[{theme['text_sub']}]Pilih metode:[/{theme['text_sub']}] ").strip()
                 if input_method == "1":
-                    show_multipayment_v2(api_key, tokens, payment_items, "BUY_PACKAGE", True)
+                    try:
+                        show_multipayment_v2(api_key, tokens, payment_items, "BUY_PACKAGE", True)
+                    except Exception as e:
+                        print_panel("Error", f"Gagal memproses pembayaran: {str(e)}")
                     console.input(f"[{theme['text_sub']}]Tekan enter untuk kembali...[/{theme['text_sub']}] ")
-                    return
+                    break
                 elif input_method == "2":
-                    show_qris_payment_v2(api_key, tokens, payment_items, "BUY_PACKAGE", True)
+                    try:
+                        show_qris_payment_v2(api_key, tokens, payment_items, "BUY_PACKAGE", True)
+                    except Exception as e:
+                        print_panel("Error", f"Gagal memproses QRIS: {str(e)}")
                     console.input(f"[{theme['text_sub']}]Tekan enter untuk kembali...[/{theme['text_sub']}] ")
-                    return
+                    break
                 elif input_method == "3":
-                    settlement_balance(api_key, tokens, payment_items, "BUY_PACKAGE", True)
+                    try:
+                        settlement_balance(api_key, tokens, payment_items, "BUY_PACKAGE", True)
+                    except Exception as e:
+                        print_panel("Error", f"Gagal memproses saldo: {str(e)}")
                     console.input(f"[{theme['text_sub']}]Tekan enter untuk kembali...[/{theme['text_sub']}] ")
-                    return
+                    break
                 elif input_method == "00":
                     break
                 elif input_method == "99":
