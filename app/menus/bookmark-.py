@@ -5,7 +5,7 @@ from rich.align import Align
 from rich.text import Text
 from rich.box import MINIMAL_DOUBLE_HEAD
 from app.client.engsel2 import get_family
-from app.menus.package3 import show_package_details
+from app.menus.package- import show_package_details
 from app.service.auth import AuthInstance
 from app.menus.util import clear_screen
 from app.service.bookmark import BookmarkInstance
