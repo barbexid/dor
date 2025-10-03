@@ -189,6 +189,7 @@ def show_family_menu():
             pause()
 
         elif aksi == "00":
+            live_loading(text="Kembali ke menu utama...", theme=theme)
             return
 
         elif aksi.isdigit():
