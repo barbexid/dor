@@ -1,12 +1,43 @@
+import os
+from app.config.theme_config import get_theme
+import re
 from rich.console import Console
 from rich.panel import Panel
 from rich.table import Table
 from rich import box
-import os
-from app.config.theme_config import get_theme
-import re
+from rich.live import Live
+from rich.spinner import Spinner
+import time
 
 console = Console()
+
+
+def live_loading(task=None, text="Memuat...", spinner_type="dots", refresh_rate=10, theme=None):
+    """
+    Menampilkan spinner animasi dengan warna sesuai tema.
+
+    Parameters:
+    - task: fungsi yang ingin dijalankan (opsional)
+    - text: teks spinner
+    - spinner_type: jenis spinner Rich (default: "dots")
+    - refresh_rate: kecepatan refresh spinner (default: 10 fps)
+    - theme: dict tema aktif, gunakan get_theme() jika tidak diberikan
+    """
+    console = Console()
+    if theme is None:
+        theme = get_theme()
+
+    spinner_color = theme.get("border_info", "cyan")  # fallback ke cyan jika tidak ada
+
+    spinner = Spinner(spinner_type, text=text, style=spinner_color)
+
+    if callable(task):
+        with Live(spinner, refresh_per_second=refresh_rate):
+            return task()
+    else:
+        with Live(spinner, refresh_per_second=refresh_rate):
+            time.sleep(1.5)
+
 
 def clear_screen():
     os.system("cls" if os.name == "nt" else "clear")
