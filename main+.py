@@ -16,7 +16,7 @@ from app.menus.package_p import (
     get_packages_by_family,
     show_package_details,
 )
-from app.menus.hot+ import show_hot_menu, show_hot_menu2
+from app.menus.hot_p import show_hot_menu, show_hot_menu2
 from app.menus.familys_p import show_family_menu
 from app.menus.barbex_p import show_barbex_main_menu
 from app.service.sentry import enter_sentry_mode
