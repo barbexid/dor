@@ -286,7 +286,7 @@ def main():
             show_family_menu()
 
         elif choice == "7":
-            family_code = input("Masukkan Family Code (atau '99' untuk batal): ").strip()
+            family_code = input("Masukkan Family Code: ").strip()
             if family_code == "99":
                 continue
             result = get_packages_by_family(family_code)
