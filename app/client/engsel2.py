@@ -115,7 +115,7 @@ def submit_otp(api_key: str, contact: str, code: str) -> dict | None:
         return None
 
 
-def get_new_token(refresh_token: str) -> str | None:
+def get_new_token(refresh_token: str) -> dict | None:
     url = SUBMIT_OTP_URL
 
     now = datetime.now(timezone(timedelta(hours=7)))  # GMT+7
@@ -154,10 +154,17 @@ def get_new_token(refresh_token: str) -> str | None:
         if "error" in body or "id_token" not in body:
             return None
 
-        return body["id_token"]
+        # ✅ Kembalikan seluruh token sebagai dictionary
+        return {
+            "id_token": body["id_token"],
+            "access_token": body.get("access_token", ""),
+            "refresh_token": body.get("refresh_token", refresh_token)
+        }
 
-    except (requests.RequestException, ValueError):
+    except (requests.RequestException, ValueError) as e:
+        print("❌ Gagal mengambil token:", str(e))
         return None
+
 
 
 def send_api_request(
