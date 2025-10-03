@@ -196,11 +196,7 @@ def show_family_menu():
             selected = next((p for p in packages if p["number"] == nomor), None)
             if selected:
                 try:
-                    result = live_loading(
-                        task=lambda: get_packages_by_family(selected["code"]),
-                        text=f"Memuat paket untuk {selected['name']}...",
-                        theme=theme
-                    )
+                    result = get_packages_by_family(selected["code"])
                     if result == "MAIN":
                         return
                     elif result == "BACK":
