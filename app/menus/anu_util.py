@@ -60,7 +60,7 @@ def get_rupiah(value) -> str:
 
     # Format angka dengan titik ribuan dan tambahkan ,00
     #formatted = f"Rp {number:,}".replace(",", ".") + ",00"
-    formatted = f"{number:,}".replace(",", ".") + ",00"
+    formatted = f"{number:,}".replace(",", ".") + ",-"
 
     return f"{formatted} {suffix}" if suffix else formatted
 
