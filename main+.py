@@ -209,7 +209,6 @@ def main():
         elif choice == "6":
             family_code = input("Masukkan Family Code: ").strip()
             if family_code == "99":
-                live_loading(text="Membatalkan...", theme=theme)
                 continue
             result = get_packages_by_family(family_code)
             if result == "MAIN":
