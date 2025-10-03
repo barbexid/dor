@@ -203,21 +203,6 @@ def show_hot_menu():
             print_panel("⚠️ Error", "Input tidak valid. Silakan masukkan nomor yang tersedia.")
             pause()
 
-HOT2_CACHE_FILE = "hot2_cache.json"
-
-def load_hot2_cache():
-    if os.path.exists(HOT2_CACHE_FILE):
-        try:
-            with open(HOT2_CACHE_FILE, "r") as f:
-                return json.load(f)
-        except:
-            return {}
-    return {}
-
-def save_hot2_cache(cache):
-    with open(HOT2_CACHE_FILE, "w") as f:
-        json.dump(cache, f)
-
 def validate_package_detail(detail):
     return (
         detail and
@@ -230,47 +215,10 @@ def validate_package_detail(detail):
         "name" in detail["package_option"]
     )
 
-def refresh_package_details(packages, api_key, tokens, cache):
-    payment_items = []
-
-    for package in packages:
-        cache_key = f"{package['family_code']}-{package['variant_code']}-{package['order']}-{package['is_enterprise']}"
-        detail = cache.get(cache_key)
-
-        if not validate_package_detail(detail):
-            detail = get_package_details(
-                api_key,
-                tokens,
-                package["family_code"],
-                package["variant_code"],
-                package["order"],
-                package["is_enterprise"],
-            )
-            if detail:
-                cache[cache_key] = detail
-
-        if not validate_package_detail(detail):
-            continue
-
-        payment_items.append(
-            PaymentItem(
-                item_code=detail["package_option"]["package_option_code"],
-                product_type="",
-                item_price=detail["package_option"]["price"],
-                item_name=detail["package_option"]["name"],
-                tax=0,
-                token_confirmation=detail["token_confirmation"],
-            )
-        )
-
-    return payment_items
-
 def show_hot_menu2():
     theme = get_theme()
     api_key = AuthInstance.api_key
     tokens = AuthInstance.get_active_tokens()
-
-    hot2_cache = load_hot2_cache()
 
     while True:
         clear_screen()
@@ -329,28 +277,35 @@ def show_hot_menu2():
                 pause()
                 continue
 
-            payment_items = live_loading(
-                task=lambda: refresh_package_details(packages, api_key, tokens, hot2_cache),
-                text="Memuat detail semua paket...",
-                theme=theme
-            )
+            def fetch_payment_items():
+                items = []
+                for package in packages:
+                    detail = get_package_details(
+                        api_key,
+                        tokens,
+                        package["family_code"],
+                        package["variant_code"],
+                        package["order"],
+                        package["is_enterprise"],
+                    )
+                    if validate_package_detail(detail):
+                        items.append(PaymentItem(
+                            item_code=detail["package_option"]["package_option_code"],
+                            product_type="",
+                            item_price=detail["package_option"]["price"],
+                            item_name=detail["package_option"]["name"],
+                            tax=0,
+                            token_confirmation=detail["token_confirmation"],
+                        ))
+                return items
+
+            payment_items = live_loading(task=fetch_payment_items, text="Mengambil detail paket...", theme=theme)
 
             if not payment_items:
-                print_panel("⚠️ Cache tidak valid", "Data pembayaran tidak tersedia. Mengambil ulang data paket...")
-                hot2_cache = {}
-                save_hot2_cache(hot2_cache)
-                payment_items = live_loading(
-                    task=lambda: refresh_package_details(packages, api_key, tokens, hot2_cache),
-                    text="Mengambil ulang detail paket...",
-                    theme=theme
-                )
-
-            if not payment_items:
-                print_panel("⚠️ Error", "Gagal memuat data pembayaran setelah refresh. Silakan coba lagi nanti.")
+                print_panel("⚠️ Error", "Gagal memuat data pembayaran. Silakan coba lagi nanti.")
                 pause()
                 continue
 
-            save_hot2_cache(hot2_cache)
             clear_screen()
 
             info_text = Text()
