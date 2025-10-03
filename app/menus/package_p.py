@@ -461,7 +461,9 @@ def fetch_my_packages():
         while True:
             choice = console.input(f"[{theme['text_sub']}]Masukkan nomor paket {package_range} atau 00, untuk kembali:[/{theme['text_sub']}] ").strip()
             if choice == "00":
+                loading_animation("Kembali ke menu utama...")
                 return None
+
 
             selected_pkg = next((pkg for pkg in my_packages if str(pkg["number"]) == choice), None)
             if not selected_pkg:
