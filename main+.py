@@ -155,6 +155,7 @@ def main():
             else:
                 print_panel("⚠️ Gagal", "Tidak ada akun yang dipilih.")
                 pause()
+                live_loading(text=" ", theme=theme)
             continue
 
         api_key = AuthInstance.api_key
@@ -192,6 +193,7 @@ def main():
             else:
                 print_panel("⚠️ Gagal", "Tidak ada akun yang dipilih.")
                 pause()
+                live_loading(text=" ", theme=theme)
             continue
 
         elif choice == "2":
@@ -212,11 +214,9 @@ def main():
                 continue
             result = get_packages_by_family(family_code)
             if result == "MAIN":
-                live_loading(text="Kembali ke menu utama...", theme=theme)
                 return
             elif result == "BACK":
                 continue
-                live_loading(text="Kembali ke menu utama...", theme=theme)
 
         elif choice == "7":
             show_family_menu()
@@ -246,6 +246,7 @@ def main():
         else:
             print_panel("⚠️ Error", "Pilihan tidak valid.")
             pause()
+            live_loading(text=" ", theme=theme)
 
 if __name__ == "__main__":
     try:
