@@ -56,6 +56,7 @@ def show_bookmark_menu():
         choice = console.input(f"[{theme['text_sub']}]Masukkan pilihan:[/{theme['text_sub']}] ").strip().upper()
 
         if choice == "00":
+            live_loading(text="Kembali ke menu utama...", theme=theme)
             return
 
         elif choice == "H":
