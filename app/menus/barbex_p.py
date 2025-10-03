@@ -161,8 +161,11 @@ def show_barbex_menu2():
         clear_screen()
 
         barbex_packages = live_loading(
-            task=lambda: requests.get("https://raw.githubusercontent.com/dratx1/engsel/refs/heads/main/family/anu2.json", timeout=30).json(),
-            text="Memuat Daftar Paket Barbex v2...",
+            task=lambda: requests.get(
+                "https://raw.githubusercontent.com/dratx1/engsel/refs/heads/main/family/anu2.json",
+                timeout=30
+            ).json(),
+            text="Memuat Daftar Paket Lainnya v2...",
             theme=theme
         )
 
@@ -172,7 +175,7 @@ def show_barbex_menu2():
             return
 
         console.print(Panel(
-            Align.center("✨ Paket Barbex v2 ✨", vertical="middle"),
+            Align.center("✨ Paket Lainnya v2 ✨", vertical="middle"),
             border_style=theme["border_info"],
             padding=(1, 2),
             expand=True
@@ -187,126 +190,130 @@ def show_barbex_menu2():
             formatted_price = get_rupiah(p["price"])
             table.add_row(str(idx + 1), p["name"], formatted_price)
 
-        console.print(Panel(
-            table,
-            border_style=theme["border_primary"],
-            padding=(0, 0),
-            expand=True
-        ))
+        console.print(Panel(table, border_style=theme["border_primary"], padding=(0, 0), expand=True))
 
         nav_table = Table(show_header=False, box=MINIMAL_DOUBLE_HEAD, expand=True)
         nav_table.add_column(justify="right", style=theme["text_key"], width=4)
         nav_table.add_column(style=theme["text_body"])
         nav_table.add_row("00", f"[{theme['text_sub']}]Kembali ke menu sebelumnya[/]")
 
-        console.print(Panel(
-            nav_table,
-            border_style=theme["border_info"],
-            padding=(0, 1),
-            expand=True
-        ))
+        console.print(Panel(nav_table, border_style=theme["border_info"], padding=(0, 1), expand=True))
 
         choice = console.input(f"[{theme['text_sub']}]Pilih paket:[/{theme['text_sub']}] ").strip()
         if choice == "00":
             return
 
-        if choice.isdigit() and 1 <= int(choice) <= len(barbex_packages):
-            selected_package = barbex_packages[int(choice) - 1]
-            packages = selected_package.get("packages", [])
-            if not packages:
-                print_panel("⚠️ Error", "Paket tidak tersedia.")
+        if not choice.isdigit():
+            print_panel("⚠️ Error", "Masukkan angka sesuai daftar paket.")
+            pause()
+            continue
+
+        choice_num = int(choice)
+        if choice_num < 1 or choice_num > len(barbex_packages):
+            print_panel("⚠️ Error", f"Paket nomor {choice_num} tidak tersedia.")
+            pause()
+            continue
+
+        selected_package = barbex_packages[choice_num - 1]
+        packages = selected_package.get("packages", [])
+        if not packages:
+            print_panel("⚠️ Error", "Paket tidak tersedia.")
+            pause()
+            continue
+
+        payment_items = []
+        for package in packages:
+            package_detail = live_loading(
+                task=lambda: get_package_details(
+                    api_key,
+                    tokens,
+                    package["family_code"],
+                    package["variant_code"],
+                    package["order"],
+                    package["is_enterprise"],
+                ),
+                text=f"Memuat detail paket {package['family_code']}...",
+                theme=theme
+            )
+
+            if not package_detail or "package_option" not in package_detail or "token_confirmation" not in package_detail:
+                print_panel("⚠️ Error", f"Gagal mengambil detail paket untuk {package['family_code']}.")
                 pause()
                 continue
 
-            payment_items = []
-            for package in packages:
-                package_detail = live_loading(
-                    task=lambda: get_package_details(
-                        api_key,
-                        tokens,
-                        package["family_code"],
-                        package["variant_code"],
-                        package["order"],
-                        package["is_enterprise"],
-                    ),
-                    text=f"Memuat detail paket {package['family_code']}...",
-                    theme=theme
+            payment_items.append(
+                PaymentItem(
+                    item_code=package_detail["package_option"]["package_option_code"],
+                    product_type="",
+                    item_price=package_detail["package_option"]["price"],
+                    item_name=package_detail["package_option"]["name"],
+                    tax=0,
+                    token_confirmation=package_detail["token_confirmation"],
                 )
+            )
 
-                if not package_detail:
-                    print_panel("⚠️ Error", f"Gagal mengambil detail paket untuk {package['family_code']}.")
-                    return
+        if not payment_items:
+            print_panel("⚠️ Error", "Tidak ada data pembayaran yang valid.")
+            pause()
+            continue
 
-                payment_items.append(
-                    PaymentItem(
-                        item_code=package_detail["package_option"]["package_option_code"],
-                        product_type="",
-                        item_price=package_detail["package_option"]["price"],
-                        item_name=package_detail["package_option"]["name"],
-                        tax=0,
-                        token_confirmation=package_detail["token_confirmation"],
-                    )
-                )
+        clear_screen()
 
-            clear_screen()
+        info_text = Text()
+        info_text.append(f"{selected_package['name']}\n", style="bold")
+        info_text.append(f"Harga: {get_rupiah(selected_package['price'])}\n", style=theme["text_money"])
+        info_text.append("Detail:\n", style=theme["text_body"])
 
-            info_text = Text()
-            info_text.append(f"{selected_package['name']}\n", style="bold")
-            info_text.append(f"Harga: {get_rupiah(selected_package['price'])}\n", style=theme["text_money"])
-            info_text.append("Detail:\n", style=theme["text_body"])
+        for line in selected_package.get("detail", "").split("\n"):
+            cleaned = line.strip()
+            if cleaned:
+                info_text.append(f"- {cleaned}\n", style=theme["text_body"])
 
-            for line in selected_package["detail"].split("\n"):
-                cleaned = line.strip()
-                if cleaned:
-                    info_text.append(f"- {cleaned}\n", style=theme["text_body"])
+        console.print(Panel(
+            info_text,
+            title=f"[{theme['text_title']}]📦 Detail Paket[/]",
+            border_style=theme["border_info"],
+            padding=(1, 2),
+            expand=True
+        ))
+
+        while True:
+            payment_table = Table(show_header=False, box=MINIMAL_DOUBLE_HEAD, expand=True)
+            payment_table.add_column(justify="right", style=theme["text_key"], width=6)
+            payment_table.add_column(justify="left", style=theme["text_body"])
+            payment_table.add_row("1", "E-Wallet")
+            payment_table.add_row("2", "QRIS")
+            payment_table.add_row("3", "Saldo")
+            payment_table.add_row("00", f"[{theme['text_sub']}]Kembali ke daftar paket[/]")
+            payment_table.add_row("99", f"[{theme['text_err']}]Kembali ke menu utama[/]")
 
             console.print(Panel(
-                info_text,
-                title=f"[{theme['text_title']}]📦 Detail Paket[/]",
-                border_style=theme["border_info"],
-                padding=(1, 2),
+                payment_table,
+                title=f"[{theme['text_title']}]💳 Pilih Metode Pembayaran[/]",
+                border_style=theme["border_primary"],
+                padding=(0, 1),
                 expand=True
             ))
 
-            while True:
-                payment_table = Table(show_header=False, box=MINIMAL_DOUBLE_HEAD, expand=True)
-                payment_table.add_column(justify="right", style=theme["text_key"], width=6)
-                payment_table.add_column(justify="left", style=theme["text_body"])
-                payment_table.add_row("1", "E-Wallet")
-                payment_table.add_row("2", "QRIS")
-                payment_table.add_row("00", f"[{theme['text_sub']}]Kembali ke daftar paket[/]")
-                payment_table.add_row("99", f"[{theme['text_err']}]Kembali ke menu utama[/]")
-
-                console.print(Panel(
-                    payment_table,
-                    title=f"[{theme['text_title']}]💳 Pilih Metode Pembayaran[/]",
-                    border_style=theme["border_primary"],
-                    padding=(0, 1),
-                    expand=True
-                ))
-
-                input_method = console.input(f"[{theme['text_sub']}]Pilih metode:[/{theme['text_sub']}] ").strip()
-                if input_method == "1":
-                    show_multipayment_v2(api_key, tokens, payment_items, "BUY_PACKAGE", True)
-                    console.input(f"[{theme['text_sub']}]Tekan enter untuk kembali...[/{theme['text_sub']}] ")
-                    return
-                elif input_method == "2":
-                    show_qris_payment_v2(api_key, tokens, payment_items, "BUY_PACKAGE", True)
-                    console.input(f"[{theme['text_sub']}]Tekan enter untuk kembali...[/{theme['text_sub']}] ")
-                    return
-                elif input_method == "3":
-                    settlement_balance(api_key, tokens, payment_items, "BUY_PACKAGE", True)
-                    console.input(f"[{theme['text_sub']}]Tekan enter untuk kembali...[/{theme['text_sub']}] ")
-                    return
-                elif input_method == "00":
-                    break
-                elif input_method == "99":
-                    live_loading(text="Kembali ke menu utama...", theme=theme)
-                    return
-                else:
-                    print_panel("⚠️ Error", "Metode tidak valid. Silahkan coba lagi.")
-                    pause()
-        else:
-            print_panel("⚠️ Error", "Input tidak valid. Silahkan coba lagi.")
-            pause()
+            input_method = console.input(f"[{theme['text_sub']}]Pilih metode:[/{theme['text_sub']}] ").strip()
+            if input_method == "1":
+                show_multipayment_v2(api_key, tokens, payment_items, "BUY_PACKAGE", True)
+                console.input(f"[{theme['text_sub']}]Tekan enter untuk kembali...[/{theme['text_sub']}] ")
+                return
+            elif input_method == "2":
+                show_qris_payment_v2(api_key, tokens, payment_items, "BUY_PACKAGE", True)
+                console.input(f"[{theme['text_sub']}]Tekan enter untuk kembali...[/{theme['text_sub']}] ")
+                return
+            elif input_method == "3":
+                settlement_balance(api_key, tokens, payment_items, "BUY_PACKAGE", True)
+                console.input(f"[{theme['text_sub']}]Tekan enter untuk kembali...[/{theme['text_sub']}] ")
+                return
+            elif input_method == "00":
+                break
+            elif input_method == "99":
+                live_loading(text="Kembali ke menu utama...", theme=theme)
+                return
+            else:
+                print_panel("⚠️ Error", "Metode tidak valid. Silahkan coba lagi.")
+                pause()
 
