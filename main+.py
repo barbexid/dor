@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 from app.client.engsel2 import get_balance, get_quota, get_package
-from app.service.auth import AuthInstance
+from app.service.auth2 import AuthInstance
 from app.service.sentry import enter_sentry_mode
 from app.menus.bookmark_p import show_bookmark_menu
 from app.menus.donate_p import show_donate_menu
