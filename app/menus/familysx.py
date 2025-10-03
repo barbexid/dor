@@ -92,19 +92,19 @@ def show_family_menu():
             code = input("Masukkan family code: ").strip()
             name = input("Masukkan nama family: ").strip()
             if add_family_code(code, name):
-                print_panel("Info", "Berhasil menambahkan family code.")
+                print("Berhasil menambahkan family code.")
             else:
-                print_panel("Error", "Family code sudah ada atau input tidak valid.")
+                print("Family code sudah ada atau input tidak valid.")
             pause()
 
         elif aksi == "h":
             if not semua_kode:
-                print_panel("Info", "Tidak ada kode untuk dihapus.")
+                print("Tidak ada kode untuk dihapus.")
                 pause()
                 continue
             idx = input("Masukkan nomor kode yang ingin dihapus: ").strip()
             if not idx.isdigit() or not (1 <= int(idx) <= len(semua_kode)):
-                print_panel("Error", "Nomor tidak ditemukan.")
+                print("Nomor tidak ditemukan.")
             else:
                 index = int(idx) - 1
                 nama = semua_kode[index]["name"]
@@ -113,27 +113,27 @@ def show_family_menu():
                 if konfirmasi == "y":
                     removed = remove_family_code(index)
                     if removed:
-                        print_panel("Info", f"Berhasil menghapus {removed}.")
+                        print(f"Berhasil menghapus {removed}.")
                     else:
-                        print_panel("Error", "Gagal menghapus kode.")
+                        print("Gagal menghapus kode.")
                 else:
-                    print_panel("Info", "Penghapusan dibatalkan.")
+                    print("Penghapusan dibatalkan.")
             pause()
 
         elif aksi == "e":
             if not semua_kode:
-                print_panel("Info", "Tidak ada kode untuk diedit.")
+                print("Tidak ada kode untuk diedit.")
                 pause()
                 continue
             idx = input("Masukkan nomor kode yang ingin diubah namanya: ").strip()
             if not idx.isdigit() or not (1 <= int(idx) <= len(semua_kode)):
-                print_panel("Error", "Nomor tidak ditemukan.")
+                print("Nomor tidak ditemukan.")
             else:
                 new_name = input("Masukkan nama baru: ").strip()
                 if edit_family_name(int(idx) - 1, new_name):
-                    print_panel("Info", "Nama berhasil diperbarui.")
+                    print("Nama berhasil diperbarui.")
                 else:
-                    print_panel("Error", "Gagal memperbarui nama.")
+                    print("Gagal memperbarui nama.")
             pause()
 
         elif aksi == "00":
@@ -150,11 +150,11 @@ def show_family_menu():
                     elif result == "BACK":
                         continue
                 except Exception as e:
-                    print_panel("Error", f"Gagal menampilkan paket: {e}")
+                    print(f"Gagal menampilkan paket: {e}")
             else:
-                print_panel("Error", "Nomor tidak valid.")
+                print("Nomor tidak valid.")
             pause()
 
         else:
-            print_panel("Error", "Pilihan tidak valid.")
+            print("Pilihan tidak valid.")
             pause()
