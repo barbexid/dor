@@ -116,6 +116,7 @@ def show_theme_menu():
         choice = console.input(f"[{theme['text_sub']}]Pilih nomor tema:[/{theme['text_sub']}] ").strip()
 
         if choice == "00":
+            live_loading(text="Kembali ke menu utama...", theme=theme)
             return
 
         if choice.isdigit() and 1 <= int(choice) <= len(theme_names):
@@ -208,11 +209,14 @@ def main():
         elif choice == "6":
             family_code = input("Masukkan Family Code: ").strip()
             if family_code == "99":
+                live_loading(text="Membatalkan...", theme=theme)
                 continue
             result = get_packages_by_family(family_code)
             if result == "MAIN":
+                live_loading(text="Kembali ke menu utama...", theme=theme)
                 return
             elif result == "BACK":
+                live_loading(text="Kembali...", theme=theme)
                 continue
 
         elif choice == "7":
@@ -248,6 +252,7 @@ if __name__ == "__main__":
     try:
         main()
     except KeyboardInterrupt:
+        live_loading(text="Menutup aplikasi...", theme=get_theme())
         print_panel("👋 Keluar", "Aplikasi dihentikan oleh pengguna.")
 
                         
