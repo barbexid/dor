@@ -1,7 +1,7 @@
 import os
 import json
 import time
-from app.client.engsel import get_new_token
+from app.client.engsel2 import get_new_token
 from app.util import ensure_api_key
 
 class Auth:
