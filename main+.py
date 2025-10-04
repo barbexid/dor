@@ -40,18 +40,19 @@ def show_banner():
     )
     console.print(title_panel)
 
-def show_main_menu(number, balance, display_quota, balance_expired_at):
+def show_main_menu(profile):
     clear_screen()
     show_banner()
     theme = get_theme()
-    expired_at_dt = datetime.fromtimestamp(balance_expired_at).strftime("%Y-%m-%d %H:%M:%S")
+    expired_at_dt = datetime.fromtimestamp(profile["balance_expired_at"]).strftime("%Y-%m-%d %H:%M:%S")
 
     info_table = Table.grid(padding=(0, 1))
     info_table.add_column(justify="left", style=theme["text_body"])
     info_table.add_column(justify="left", style=theme["text_body"])
-    info_table.add_row(" Nomor", f": 📞 [bold {theme['text_body']}]{number}[/]")
-    info_table.add_row(" Pulsa", f": 💰 Rp[{theme['text_money']}]{get_rupiah(balance)}[/]")
-    info_table.add_row(" Kuota", f": 📊 [{theme['text_date']}]{display_quota or '-'}[/]")
+    info_table.add_row(" Nomor", f": 📞 [bold {theme['text_body']}]{profile['number']}[/]")
+    info_table.add_row(" Pulsa", f": 💰 Rp[{theme['text_money']}]{get_rupiah(profile['balance'])}[/]")
+    info_table.add_row(" Kuota", f": 📊 [{theme['text_date']}]{profile.get('display_quota', '-') or '-'}[/]")
+    info_table.add_row(" Tipe", f": 🧾 [{theme['text_body']}]{profile['subscription_type']} ({profile['subscriber_id']})[/]")
     info_table.add_row(" Masa Aktif", f": ⏳ [{theme['text_date']}]{expired_at_dt}[/]")
 
     console.print(Panel(info_table, border_style=theme["border_info"], padding=(0, 4), expand=True))
@@ -72,6 +73,124 @@ def show_main_menu(number, balance, display_quota, balance_expired_at):
     menu_table.add_row("99", f"[{theme['text_err']}]⛔ Tutup aplikasi[/]")
 
     console.print(Panel(menu_table, title=f"[{theme['text_title']}]✨ Menu Utama ✨[/]", title_align="center", border_style=theme["border_primary"], padding=(0, 1), expand=True))
+
+
+def main():
+    while True:
+        active_user = AuthInstance.get_active_user()
+
+        if active_user is None:
+            selected_user_number = show_account_menu()
+            if selected_user_number:
+                AuthInstance.set_active_user(selected_user_number)
+                clear_screen()
+            else:
+                print_panel("⚠️ Gagal", "Tidak ada akun yang dipilih.")
+                pause()
+            continue
+
+        api_key = AuthInstance.api_key
+        tokens = active_user["tokens"]
+        id_token = tokens["id_token"]
+
+        balance = get_balance(api_key, id_token)
+        quota = get_quota(api_key, id_token) or {}
+
+        balance_remaining = balance.get("remaining", 0)
+        balance_expired_at = balance.get("expired_at", 0)
+
+        profile_data = get_profile(api_key, tokens["access_token"], tokens["id_token"])
+        sub_id = profile_data["profile"]["subscriber_id"]
+        sub_type = profile_data["profile"]["subscription_type"]
+        print(f"Subscriber ID: {sub_id}, Type: {sub_type}")
+
+        remaining = quota.get("remaining", 0)
+        total = quota.get("total", 0)
+        has_unlimited = quota.get("has_unlimited", False)
+
+        if total > 0 or has_unlimited:
+            remaining_gb = remaining / 1e9
+            total_gb = total / 1e9
+            display_quota = (
+                f"{remaining_gb:.2f}/{total_gb:.2f} GB (Unlimited)"
+                if has_unlimited else f"{remaining_gb:.2f}/{total_gb:.2f} GB"
+            )
+        else:
+            display_quota = None
+
+        profile = {
+            "number": active_user["number"],
+            "subscriber_id": sub_id,
+            "subscription_type": sub_type,
+            "balance": balance_remaining,
+            "balance_expired_at": balance_expired_at,
+            "display_quota": display_quota
+        }
+
+        show_main_menu(profile)
+        choice = input("Pilih menu: ").strip()
+
+        if choice == "1":
+            selected_user_number = show_account_menu()
+            if selected_user_number:
+                AuthInstance.set_active_user(selected_user_number)
+                clear_screen()
+            else:
+                print_panel("⚠️ Gagal", "Tidak ada akun yang dipilih.")
+                pause()
+            continue
+
+        elif choice == "2":
+            fetch_my_packages()
+
+        elif choice == "3":
+            show_hot_menu()
+
+        elif choice == "4":
+            show_hot_menu2()
+
+        elif choice == "5":
+            show_barbex_main_menu()
+
+        elif choice == "6":
+            family_code = input("Masukkan Family Code: ").strip()
+            if family_code == "99":
+                continue
+            result = get_packages_by_family(family_code)
+            if result == "MAIN":
+                return
+            elif result == "BACK":
+                continue
+
+        elif choice == "7":
+            show_family_menu()
+
+        elif choice == "66":
+            show_bookmark_menu()
+
+        elif choice == "77":
+            show_donate_menu()
+
+        elif choice == "88":
+            show_theme_menu()
+
+        elif choice == "99":
+            live_loading(text="Menutup aplikasi...", theme=get_theme())
+            print_panel("👋 Sampai Jumpa", "Aplikasi ditutup")
+            sys.exit(0)
+
+        elif choice == "t":
+            res = get_package(api_key, tokens, "")
+            print(json.dumps(res, indent=2))
+            input("Tekan Enter untuk kembali...")
+
+        elif choice == "s":
+            enter_sentry_mode()
+
+        else:
+            print_panel("⚠️ Error", "Pilihan tidak valid.")
+            pause()
+
 
 def show_theme_menu():
     while True:
@@ -143,107 +262,6 @@ def print_theme_changed(theme_name):
     panel = Panel(Align.left(message_text), title="", title_align="left", style=theme["border_success"], width=terminal_width)
     console.print(panel)
 
-def main():
-    while True:
-        active_user = AuthInstance.get_active_user()
-
-        if active_user is None:
-            selected_user_number = show_account_menu()
-            if selected_user_number:
-                AuthInstance.set_active_user(selected_user_number)
-                clear_screen()
-            else:
-                print_panel("⚠️ Gagal", "Tidak ada akun yang dipilih.")
-                pause()
-            continue
-
-        api_key = AuthInstance.api_key
-        tokens = active_user["tokens"]
-        id_token = tokens["id_token"]
-
-        balance = get_balance(api_key, id_token)
-        quota = get_quota(api_key, id_token) or {}
-
-        balance_remaining = balance.get("remaining", 0)
-        balance_expired_at = balance.get("expired_at", 0)
-
-        remaining = quota.get("remaining", 0)
-        total = quota.get("total", 0)
-        has_unlimited = quota.get("has_unlimited", False)
-
-        if total > 0 or has_unlimited:
-            remaining_gb = remaining / 1e9
-            total_gb = total / 1e9
-            display_quota = (
-                f"{remaining_gb:.2f}/{total_gb:.2f} GB (Unlimited)"
-                if has_unlimited else f"{remaining_gb:.2f}/{total_gb:.2f} GB"
-            )
-        else:
-            display_quota = None
-
-        show_main_menu(active_user["number"], balance_remaining, display_quota, balance_expired_at)
-        choice = input("Pilih menu: ").strip()
-
-        if choice == "1":
-            selected_user_number = show_account_menu()
-            if selected_user_number:
-                AuthInstance.set_active_user(selected_user_number)
-                clear_screen()
-            else:
-                print_panel("⚠️ Gagal", "Tidak ada akun yang dipilih.")
-                pause()
-            continue
-
-        elif choice == "2":
-            fetch_my_packages()
-
-        elif choice == "3":
-            show_hot_menu()
-
-        elif choice == "4":
-            show_hot_menu2()
-
-        elif choice == "5":
-            show_barbex_main_menu()
-
-        elif choice == "6":
-            family_code = input("Masukkan Family Code: ").strip()
-            if family_code == "99":
-                continue
-            result = get_packages_by_family(family_code)
-            if result == "MAIN":
-                return
-            elif result == "BACK":
-                continue
-
-        elif choice == "7":
-            show_family_menu()
-
-        elif choice == "66":
-            show_bookmark_menu()
-
-        elif choice == "77":
-            show_donate_menu()
-
-        elif choice == "88":
-            show_theme_menu()
-
-        elif choice == "99":
-            live_loading(text="Menutup aplikasi...", theme=get_theme())
-            print_panel("👋 Sampai Jumpa", "Aplikasi ditutup")
-            sys.exit(0)
-
-        elif choice == "t":
-            res = get_package(api_key, tokens, "")
-            print(json.dumps(res, indent=2))
-            input("Tekan Enter untuk kembali...")
-
-        elif choice == "s":
-            enter_sentry_mode()
-
-        else:
-            print_panel("⚠️ Error", "Pilihan tidak valid.")
-            pause()
 
 if __name__ == "__main__":
     try:
