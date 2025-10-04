@@ -107,7 +107,7 @@ def show_account_menu():
     is_adding_user = False
 
     MAX_FREE_ACCOUNTS = 2
-    UNLOCK_CODE = "@barbex_id"
+    UNLOCK_CODE = "@barbex"
     unlock_data = load_unlock_status()
     is_unlocked = unlock_data.get("is_unlocked", False)
 
