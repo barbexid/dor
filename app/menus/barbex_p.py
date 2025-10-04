@@ -170,7 +170,7 @@ def show_barbex_menu2():
         )
 
         if not barbex_packages:
-            print_panel("⚠️ Error", "Tidak ada data pembayaran yang valid.")
+            print_panel("⚠️ Gagal Ambil Data", "Tidak dapat mengambil daftar paket dari server.")
             pause()
             return
 
@@ -204,53 +204,59 @@ def show_barbex_menu2():
             return
 
         if not choice.isdigit():
-            print_panel("⚠️ Error", "Tidak ada data pembayaran yang valid.")
+            print_panel("⚠️ Input Tidak Valid", "Masukkan angka sesuai daftar paket.")
             pause()
             continue
 
         choice_num = int(choice)
         if choice_num < 1 or choice_num > len(barbex_packages):
-            print_panel("⚠️ Error", "Tidak ada data pembayaran yang valid.")
+            print_panel("⚠️ Paket Tidak Ditemukan", f"Paket nomor {choice_num} tidak tersedia.")
             pause()
             continue
 
         selected_package = barbex_packages[choice_num - 1]
         packages = selected_package.get("packages", [])
         if not packages:
-            print_panel("⚠️ Error", "Tidak ada data pembayaran yang valid.")
+            print_panel("⚠️ Paket Kosong", "Paket yang dipilih tidak memiliki detail pembelian.")
             pause()
             continue
 
-        payment_items = []
-        for package in packages:
-            try:
-                detail = get_package_details(
-                    api_key,
-                    tokens,
-                    package.get("family_code"),
-                    package.get("variant_code"),
-                    package.get("order"),
-                    package.get("is_enterprise"),
-                )
-                if (
-                    detail and
-                    "package_option" in detail and
-                    "token_confirmation" in detail and
-                    "package_option_code" in detail["package_option"]
-                ):
-                    payment_items.append(PaymentItem(
-                        item_code=detail["package_option"]["package_option_code"],
+        def fetch_payment_items():
+            items = []
+            for package in packages:
+                try:
+                    detail = get_package_details(
+                        api_key,
+                        tokens,
+                        package.get("family_code"),
+                        package.get("variant_code"),
+                        package.get("order"),
+                        package.get("is_enterprise"),
+                    )
+                    if not detail:
+                        continue
+                    if "package_option" not in detail or "token_confirmation" not in detail:
+                        continue
+                    option = detail["package_option"]
+                    if "package_option_code" not in option or "price" not in option or "name" not in option:
+                        continue
+
+                    items.append(PaymentItem(
+                        item_code=option["package_option_code"],
                         product_type="",
-                        item_price=detail["package_option"]["price"],
-                        item_name=detail["package_option"]["name"],
+                        item_price=option["price"],
+                        item_name=option["name"],
                         tax=0,
                         token_confirmation=detail["token_confirmation"],
                     ))
-            except Exception:
-                continue  # skip silently
+                except Exception:
+                    continue
+            return items
+
+        payment_items = live_loading(task=fetch_payment_items, text="Memuat detail paket...", theme=theme)
 
         if not payment_items:
-            print_panel("⚠️ Error", "Tidak ada data pembayaran yang valid.")
+            print_panel("⚠️ Gagal Proses Paket", "Tidak ada detail pembayaran yang berhasil dimuat.")
             pause()
             continue
 
@@ -294,22 +300,35 @@ def show_barbex_menu2():
 
             input_method = console.input(f"[{theme['text_sub']}]Pilih metode:[/{theme['text_sub']}] ").strip()
             if input_method == "1":
-                show_multipayment_v2(api_key, tokens, payment_items, "BUY_PACKAGE", True)
+                live_loading(
+                    task=lambda: show_multipayment_v2(api_key, tokens, payment_items, "BUY_PACKAGE", True),
+                    text="Menyiapkan pembayaran E-Wallet...",
+                    theme=theme
+                )
                 console.input(f"[{theme['text_sub']}]Tekan enter untuk kembali...[/{theme['text_sub']}] ")
                 return
             elif input_method == "2":
-                show_qris_payment_v2(api_key, tokens, payment_items, "BUY_PACKAGE", True)
+                live_loading(
+                    task=lambda: show_qris_payment_v2(api_key, tokens, payment_items, "BUY_PACKAGE", True),
+                    text="Menyiapkan pembayaran QRIS...",
+                    theme=theme
+                )
                 console.input(f"[{theme['text_sub']}]Tekan enter untuk kembali...[/{theme['text_sub']}] ")
                 return
             elif input_method == "3":
-                settlement_balance(api_key, tokens, payment_items, "BUY_PACKAGE", True)
+                live_loading(
+                    task=lambda: settlement_balance(api_key, tokens, payment_items, "BUY_PACKAGE", True),
+                    text="Menyiapkan pembayaran dengan saldo...",
+                    theme=theme
+                )
                 console.input(f"[{theme['text_sub']}]Tekan enter untuk kembali...[/{theme['text_sub']}] ")
                 return
             elif input_method == "00":
+                live_loading(text="Kembali ke daftar paket Barbex v2...", theme=theme)
                 break
             elif input_method == "99":
                 live_loading(text="Kembali ke menu utama...", theme=theme)
                 return
             else:
-                print_panel("⚠️ Error", "Tidak ada data pembayaran yang valid.")
+                print_panel("⚠️ Input Tidak Valid", "Silakan pilih metode pembayaran yang tersedia.")
                 pause()
