@@ -4,7 +4,7 @@ from app.service.auth import AuthInstance
 from app.service.unlock import load_unlock_status, save_unlock_status
 
 MAX_FREE_ACCOUNTS = 2
-UNLOCK_CODE = "@barbex_id"
+UNLOCK_CODE = "@barbex"
 
 def login_prompt(api_key: str):
     clear_screen()
