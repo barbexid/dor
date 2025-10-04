@@ -171,13 +171,13 @@ def show_hot_menu():
         nav_table = Table(show_header=False, box=MINIMAL_DOUBLE_HEAD, expand=True)
         nav_table.add_column(justify="right", style=theme["text_key"], width=4)
         nav_table.add_column(style=theme["text_body"])
-        nav_table.add_row("00", f"[{theme['text_sub']}]Kembali ke menu sebelumnya[/]")
+        nav_table.add_row("00", f"[{theme['text_sub']}]Kembali ke menu awal[/]")
 
         console.print(Panel(nav_table, border_style=theme["border_info"], padding=(0, 1), expand=True))
 
         choice = console.input(f"[{theme['text_sub']}]Pilih paket:[/{theme['text_sub']}] ").strip()
         if choice == "00":
-            live_loading(text="Kembali ke menu sebelumnya...", theme=theme)
+            live_loading(text="Kembali ke menu awal...", theme=theme)
             return
 
         if choice.isdigit() and 1 <= int(choice) <= len(enriched_packages):
@@ -260,13 +260,13 @@ def show_hot_menu2():
         nav_table = Table(show_header=False, box=MINIMAL_DOUBLE_HEAD, expand=True)
         nav_table.add_column(justify="right", style=theme["text_key"], width=4)
         nav_table.add_column(style=theme["text_body"])
-        nav_table.add_row("00", f"[{theme['text_sub']}]Kembali ke menu sebelumnya[/]")
+        nav_table.add_row("00", f"[{theme['text_sub']}]Kembali ke menu awal[/]")
 
         console.print(Panel(nav_table, border_style=theme["border_info"], padding=(0, 1), expand=True))
 
         choice = console.input(f"[{theme['text_sub']}]Pilih paket:[/{theme['text_sub']}] ").strip()
         if choice == "00":
-            live_loading(text="Kembali ke menu sebelumnya...", theme=theme)
+            live_loading(text="Kembali ke menu awal...", theme=theme)
             return
 
         if choice.isdigit() and 1 <= int(choice) <= len(hot_packages):
