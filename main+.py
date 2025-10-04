@@ -40,6 +40,8 @@ def show_banner():
     )
     console.print(title_panel)
 
+
+
 def show_main_menu(profile):
     clear_screen()
     show_banner()
@@ -94,15 +96,24 @@ def main():
         id_token = tokens["id_token"]
 
         balance = get_balance(api_key, id_token)
+        if balance is None:
+            print_panel("⚠️ Gagal", "Tidak bisa mengambil data pulsa.")
+            pause()
+            continue
+
         quota = get_quota(api_key, id_token) or {}
 
         balance_remaining = balance.get("remaining", 0)
         balance_expired_at = balance.get("expired_at", 0)
 
         profile_data = get_profile(api_key, tokens["access_token"], tokens["id_token"])
-        sub_id = profile_data["profile"]["subscriber_id"]
-        sub_type = profile_data["profile"]["subscription_type"]
-        print(f"Subscriber ID: {sub_id}, Type: {sub_type}")
+        if not profile_data or "profile" not in profile_data:
+            print_panel("⚠️ Gagal", "Tidak bisa mengambil data profil.")
+            pause()
+            continue
+
+        sub_id = profile_data["profile"].get("subscriber_id", "-")
+        sub_type = profile_data["profile"].get("subscription_type", "-")
 
         remaining = quota.get("remaining", 0)
         total = quota.get("total", 0)
