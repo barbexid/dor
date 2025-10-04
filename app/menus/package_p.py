@@ -415,10 +415,10 @@ def fetch_my_packages():
             name = quota["name"]
             family_code = "N/A"
 
-            console.print(f"[dim]Mengambil detail paket no. {num}...[/]")
+            #console.print(f"[dim]Mengambil detail paket no. {num}...[/]")
             package_details = live_loading(
                 task=lambda: get_package(api_key, tokens, quota_code),
-                text=f"Memuat detail paket {num}...",
+                text=f"Memuat detail paket no.{num}...",
                 theme=theme
             )
             if package_details:
