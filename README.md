@@ -1,46 +1,71 @@
-# MYnyak Engsel
+# 🛠️ MYnyak Engsel
 
 ![banner](bnr.png)
 
-CLI client for a certain Indonesian mobile internet service provider.
+**MYnyak Engsel** adalah aplikasi CLI untuk mengakses layanan internet seluler tertentu di Indonesia secara efisien dan fleksibel melalui Termux.
 
-# How to get API Key
-Chat telegram bot [@fykxt_bot](https://t.me/fykxt_bot) with message `/viewkey`. Copy the API key.
+---
 
-# How to run with TERMUX
-1. Update & Upgrade Termux
-```
+## 🔑 Cara Mendapatkan API Key
+
+1. Buka Telegram dan cari bot [@fykxt_bot](https://t.me/fykxt_bot).
+2. Kirim pesan `/viewkey`.
+3. Salin API key yang diberikan oleh bot.
+
+---
+
+## 📦 Instalasi di Termux
+
+Ikuti langkah-langkah berikut untuk menginstal dan menjalankan aplikasi:
+
+## 1. Perbarui Termux
+```bash
 pkg update && pkg upgrade -y
 ```
-2. Install Git
+## 2. Instal Git
 ```
 pkg install git -y
 ```
-3. Clone this repo
+## 3. Kloning repositori
 ```
-git clone https://github.com/purplemashu/me-cli
+git clone https://github.com/barbexid/dor
 ```
-4. Open the folder
+## 4. Masuk ke folder
 ```
-cd me-cli
+cd dor
 ```
-5. Setup
+## 5. Jalankan setup
 ```
 bash setup.sh
 ```
-6. Run the script
+## 6. Konfigurasi Environment Variables
 ```
-python main.py
+nano .env
 ```
-7. Input your API key when prompted
+## 7. Jalankan skrip sesuai mode
+Untuk android ARMv7 (32-bit)
+```
+python main7.py
+```
+Untuk android ARMv8 (64-bit)
+```
+python main8.py
+```
 
-# Info
+# 💡 Masukkan API key saat diminta setelah menjalankan skrip.
 
-## PS for Certain Indonesian mobile internet service provider
+---
 
-Instead of just delisting the package from the app, ensure the user cannot purchase it.
-What's the point of strong client side security when the server don't enforce it?
+## ℹ️ Catatan Teknis
 
-## Contact
+> Untuk penyedia layanan internet seluler tertentu
 
-contact@mashu.lol
+---
+
+## 📬 Kontak
+
+Jika ada pertanyaan atau masukan, silakan hubungi:
+
+**Email:** [contact@mashu.lol](mailto:contact@mashu.lol)
+
+---
