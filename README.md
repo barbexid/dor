@@ -33,7 +33,7 @@ uname -m
 ```
 Untuk android ARMv7 (32-bit)
 ```
-git clone https://github.com/barbexid/xldor/tree/main/arm7/dor
+git clone https://github.com/barbexid/xldor/tree/c2e08e86f82e1e4d494aae381ff5cd5f41a81641/arm7/dor
 ```
 Untuk android aarch64/ARMv8 (64-bit)
 ```
