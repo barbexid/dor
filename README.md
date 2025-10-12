@@ -26,20 +26,10 @@ pkg update && pkg upgrade -y
 ```
 pkg install git -y
 ```
-## 3. Kloning repositori, Sesuaikan dengan arsitektur android kalian
-cek arsitektur 
+## 3. Kloning repositori
 ```
-uname -m
+git clone https://github.com/barbexid/dor
 ```
-Untuk android ARMv7 (32-bit)
-```
-git clone https://github.com/barbexid/xldor/tree/c2e08e86f82e1e4d494aae381ff5cd5f41a81641/arm7/dor
-```
-Untuk android aarch64/ARMv8 (64-bit)
-```
-git clone https://github.com/barbexid/xldor/tree/69a41914f20a031e4c35f74ee86bce547ea7797e/arm8/dor
-```
-
 ## 4. Masuk ke folder
 ```
 cd dor
