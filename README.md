@@ -26,10 +26,20 @@ pkg update && pkg upgrade -y
 ```
 pkg install git -y
 ```
-## 3. Kloning repositori
+## 3. Kloning repositori, Sesuaikan dengan arsitektur android kalian
+cek arsitektur 
 ```
-git clone https://github.com/barbexid/dor
+uname -m
 ```
+Untuk android ARMv7 (32-bit)
+```
+git clone https://github.com/barbexid/xldor/arm7/dor
+```
+Untuk android aarch64/ARMv8 (64-bit)
+```
+git clone https://github.com/barbexid/xldor/arm8/dor
+```
+
 ## 4. Masuk ke folder
 ```
 cd dor
@@ -42,16 +52,10 @@ bash setup.sh
 ```
 nano .env
 ```
-## 7. Jalankan skrip sesuai mode
-Untuk android ARMv7 (32-bit)
+## 7. Jalankan skrip
 ```
-python main7.py
+python main.py
 ```
-Untuk android ARMv8 (64-bit)
-```
-python main8.py
-```
-
 # 💡 Masukkan API key saat diminta setelah menjalankan skrip.
 
 ---
