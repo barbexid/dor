@@ -33,11 +33,11 @@ uname -m
 ```
 Untuk android ARMv7 (32-bit)
 ```
-git clone https://github.com/barbexid/xldor/arm7/dor
+git clone https://github.com/barbexid/xldor/tree/main/arm7/dor
 ```
 Untuk android aarch64/ARMv8 (64-bit)
 ```
-git clone https://github.com/barbexid/xldor/arm8/dor
+git clone https://github.com/barbexid/xldor/tree/main/arm8/dor
 ```
 
 ## 4. Masuk ke folder
