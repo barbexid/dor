@@ -33,16 +33,21 @@ uname -m
 ```
 Untuk android ARMv7 (32-bit)
 ```
-git clone https://github.com/barbexid/xldor/32bit/dor
+git clone https://github.com/barbexid/dor7
 ```
 Untuk android aarch64/ARMv8 (64-bit)
 ```
-git clone https://github.com/barbexid/xldor/64bit/dor
+git clone https://github.com/barbexid/dor8
 ```
 
 ## 4. Masuk ke folder
+ARMv7 (32-bit)
 ```
-cd dor
+cd dor7
+```
+ARMv8 (64-bit)
+```
+cd dor8
 ```
 ## 5. Jalankan setup
 ```
