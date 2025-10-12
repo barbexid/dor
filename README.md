@@ -37,7 +37,7 @@ git clone https://github.com/barbexid/xldor/tree/c2e08e86f82e1e4d494aae381ff5cd5
 ```
 Untuk android aarch64/ARMv8 (64-bit)
 ```
-git clone https://github.com/barbexid/xldor/tree/main/arm8/dor
+git clone https://github.com/barbexid/xldor/tree/69a41914f20a031e4c35f74ee86bce547ea7797e/arm8/dor
 ```
 
 ## 4. Masuk ke folder
