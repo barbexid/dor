@@ -4,16 +4,6 @@
 
 **MYnyak Engsel** adalah aplikasi CLI untuk mengakses layanan internet seluler tertentu di Indonesia secara efisien dan fleksibel melalui Termux.
 
----
-
-## 🔑 Cara Mendapatkan API Key
-
-1. Buka Telegram dan cari bot [@fykxt_bot](https://t.me/fykxt_bot).
-2. Kirim pesan `/viewkey`.
-3. Salin API key yang diberikan oleh bot.
-
----
-
 ## 📦 Instalasi di Termux
 
 Ikuti langkah-langkah berikut untuk menginstal dan menjalankan aplikasi:
@@ -26,28 +16,14 @@ pkg update && pkg upgrade -y
 ```
 pkg install git -y
 ```
-## 3. Kloning repositori, Sesuaikan dengan arsitektur android kalian
-cek arsitektur 
+## 3. Kloning repositori
 ```
-uname -m
-```
-Untuk android ARMv7 (32-bit)
-```
-git clone https://github.com/barbexid/dor7
-```
-Untuk android aarch64/ARMv8 (64-bit)
-```
-git clone https://github.com/barbexid/dor8
+git clone https://github.com/barbexid/dor
 ```
 
 ## 4. Masuk ke folder
-ARMv7 (32-bit)
 ```
-cd dor7
-```
-ARMv8 (64-bit)
-```
-cd dor8
+cd dor
 ```
 ## 5. Jalankan setup
 ```
@@ -59,7 +35,7 @@ nano .env
 ```
 ## 7. Jalankan skrip
 ```
-python main.py
+python dor.py
 ```
 # 💡 Masukkan API key saat diminta setelah menjalankan skrip.
 
