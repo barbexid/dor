@@ -38,9 +38,6 @@ nano .env
 ```
 python dor.py
 ```
-# 💡 Masukkan API key saat diminta setelah menjalankan skrip.
-
----
 
 ## ℹ️ Catatan Teknis
 
