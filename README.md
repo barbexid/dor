@@ -30,7 +30,7 @@ cd dor
 bash setup.sh
 ```
 ## 6. Konfigurasi Environment Variables
-Wajib diisi dulu agak tidak di BOM error 🤭 ✌️
+Wajib diisi dulu, agak tidak di BOM error 🤭 ✌️
 ```
 nano .env
 ```
