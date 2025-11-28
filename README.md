@@ -1,49 +1,59 @@
-# MYnyak Engsel
+## 📦 Instalasi di Termux
 
-![banner](bnr.png)
+Ikuti langkah-langkah berikut untuk menginstal dan menjalankan aplikasi:
 
-CLI client for a certain Indonesian mobile internet service provider.
-
-# How to get API Key
-Chat telegram bot [@fykxt_bot](https://t.me/fykxt_bot) with message `/viewkey`. Copy the API key.
-
-# How to run with TERMUX
-1. Update & Upgrade Termux
-```
+## 1. Perbarui Termux
+```bash
 pkg update && pkg upgrade -y
 ```
-2. Install Git
+## 2. Instal Git
 ```
 pkg install git -y
 ```
-3. Clone this repo
+## 3. Kloning repositori, Sesuaikan dengan arsitektur android kalian
+cek arsitektur 
 ```
-git clone https://github.com/purplemashu/me-cli
+uname -m
 ```
-4. Open the folder
+Untuk android ARMv7 (32-bit)
 ```
-cd me-cli
+git clone https://github.com/barbexid/dor7
 ```
-5. Setup
+Untuk android aarch64/ARMv8 (64-bit)
+```
+git clone https://github.com/barbexid/dor8
+```
+
+## 4. Masuk ke folder
+ARMv7 (32-bit)
+```
+cd dor7
+```
+ARMv8 (64-bit)
+```
+cd dor8
+```
+## 5. Jalankan setup
 ```
 bash setup.sh
 ```
-6. Run the script
+## 6. Konfigurasi Environment Variables
+Hubungi saya di  [TELEGRAM](https://t.me/barbex_id)
+ untuk mendapatkan environment variables
+```
+nano .env
+```
+Lalu isi dan simpan
+## 7. Jalankan skrip
 ```
 python main.py
 ```
-7. Input your API key when prompted
+# 💡 Pastikan semua perintah di atas dijalankan dengan benar.
 
-# Info
+---
 
-## PS for Certain Indonesian mobile internet service provider
+## ℹ️ Catatan Teknis
 
-Instead of just delisting the package from the app, ensure the user cannot purchase it.
-What's the point of strong client side security when the server don't enforce it?
+> Untuk penyedia layanan internet seluler tertentu
 
-## Terms of Service
-By using this tool, the user agrees to comply with all applicable laws and regulations and to release the developer from any and all claims arising from its use.
-
-## Contact
-
-contact@mashu.lol
+---
