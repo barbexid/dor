@@ -14,7 +14,7 @@ API_KEY = os.getenv("API_KEY")
 AES_KEY_ASCII = os.getenv("AES_KEY_ASCII")
 AX_FP_KEY = os.getenv("AX_FP_KEY")
 
-BASE_CRYPTO_URL = "https://crypto.mashu.lol/api/890"
+BASE_CRYPTO_URL = "https://me-crypto.mashu.lol/api/890"
 # BASE_CRYPTO_URL = "http://127.0.0.1:5000/api/890"  # For local testing
 
 XDATA_DECRYPT_URL = f"{BASE_CRYPTO_URL}/decrypt"
@@ -22,6 +22,7 @@ XDATA_ENCRYPT_SIGN_URL = f"{BASE_CRYPTO_URL}/encryptsign"
 PAYMENT_SIGN_URL = f"{BASE_CRYPTO_URL}/sign-payment"
 BOUNTY_SIGN_URL = f"{BASE_CRYPTO_URL}/sign-bounty"
 BOUNTY_ALLOTMENT_SIGN_URL = f"{BASE_CRYPTO_URL}/sign-bounty-allotment"
+BALANCE_ALLOTMENT_SIGN_URL = f"{BASE_CRYPTO_URL}/sign-balance-allotment"
 LOYALTY_SIGN_URL = f"{BASE_CRYPTO_URL}/sign-loyalty"
 AX_SIGN_URL = f"{BASE_CRYPTO_URL}/sign-ax"
 CIRCLE_MSISDN_ENCRYPT_URL = f"{BASE_CRYPTO_URL}/encrypt-circle-msisdn"
@@ -343,3 +344,31 @@ def get_x_signature_bounty_allotment(
         raise Exception("Insufficient API credit.")
     else:
         raise Exception(f"Signature generation failed: {response.text}")
+
+def get_x_signature_balance_allotment(
+    api_key: str,
+    path: str,
+    access_token: str,
+    msisdn: str,
+    amount: int,
+) -> str:
+    headers = {
+        "Content-Type": "application/json",
+        "x-api-key": api_key,
+    }
+    
+    request_body = {
+        "access_token": access_token,
+        "msisdn": msisdn,
+        "amount": amount,
+        "path": path
+    }
+    
+    response = requests.request("POST", BALANCE_ALLOTMENT_SIGN_URL, json=request_body, headers=headers, timeout=30)
+    if response.status_code == 200:
+        return response.json().get("x_signature")
+    elif response.status_code == 402:
+        raise Exception("Insufficient API credit.")
+    else:
+        raise Exception(f"Signature generation failed: {response.text}")
+
