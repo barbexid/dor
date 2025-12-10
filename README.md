@@ -44,12 +44,12 @@ Hubungi saya di  [TELEGRAM](https://t.me/barbex_id)
 nano .env
 ```
 Lalu isi dan simpan
-## 7. Jalankan skrip
-```
-python main.py
-```
 
-##  Shortcut (jalan pintas)
+## ~~7. Jalankan skrip~~
+
+~~python main.py~~
+
+## 8. Shortcut (jalan pintas)
 ```
 chmod +x dor.sh
 ```
@@ -61,7 +61,7 @@ ARMv8 (64-bit)
 ```
 mv ~/dor8/dor.sh $PREFIX/bin/dor
 ```
-Untuk menjalankan cukup panggil dor dimana  saja
+## Untuk menjalankan cukup panggil dor dimana  saja
 ```
 dor
 ```
