@@ -62,7 +62,9 @@ ARMv8 (64-bit)
 mv ~/dor8/dor.sh $PREFIX/bin/dor
 ```
 Untuk menjalankan cukup panggil dor dimana  saja
-
+```
+dor
+```
 ---
 # 💡 Pastikan semua perintah di atas dijalankan dengan benar.
 
