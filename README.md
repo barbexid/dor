@@ -48,9 +48,22 @@ Lalu isi dan simpan
 ```
 python main.py
 ```
-# 💡 Pastikan semua perintah di atas dijalankan dengan benar.
 
----
+##  Shortcut
+```
+chmod +x dor.sh
+```
+ARMv7 (32-bit)
+```
+mv ~/dor7/dor.sh $PREFIX/bin/dor
+```
+ARMv8 (64-bit)
+```
+mv ~/dor8/dor.sh $PREFIX/bin/dor
+```
+Menjalankan cukup panggil dor
+```
+# 💡 Pastikan semua perintah di atas dijalankan dengan benar.
 
 ## ℹ️ Catatan Teknis
 
