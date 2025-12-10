@@ -49,7 +49,7 @@ Lalu isi dan simpan
 python main.py
 ```
 
-##  Shortcut
+##  Shortcut (jalan pintas)
 ```
 chmod +x dor.sh
 ```
@@ -61,7 +61,7 @@ ARMv8 (64-bit)
 ```
 mv ~/dor8/dor.sh $PREFIX/bin/dor
 ```
-Menjalankan cukup panggil dor
+Untuk menjalankan cukup panggil dor dimana  saja
 
 ---
 # 💡 Pastikan semua perintah di atas dijalankan dengan benar.
