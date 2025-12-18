@@ -37,19 +37,11 @@ cd dor8
 ```
 bash setup.sh
 ```
-## 6. Konfigurasi Environment Variables
-Hubungi saya di  [TELEGRAM](https://t.me/barbex_id)
- untuk mendapatkan environment variables
-```
-nano .env
-```
-Lalu isi dan simpan
-
-## ~~7. Jalankan skrip~~
+## ~~6. Jalankan skrip~~
 
 ~~python main.py~~
 
-## 8. Shortcut (jalan pintas)
+## 7. Shortcut (jalan pintas)
 ```
 chmod +x dor.sh
 ```
